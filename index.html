@@ -378,7 +378,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.9 · 23/10 17:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.10 · 23/10 17:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -476,7 +476,7 @@ function normalizar(R){
   d.txPor={};d.tx.forEach(function(t){d.txPor[t.num]=t;});
   d.rx=linhas(R,'rx').map(function(o){return {id:str(o['Receptor']),modelo:str(o['Modelo']),rxch:str(o['Canal do receptor']),input:str(o['Input do Scorpio']),conector:str(o['Conector']),canal:str(o['Canal no gravador']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações'])};}).filter(function(r){return r.id;});
   d.rxPor={};d.rx.forEach(function(r){d.rxPor[r.id]=r;});
-  d.cap=linhas(R,'cap').map(function(o){return {id:str(o['Cápsula']),tipo:str(o['Tipo']).toLowerCase()||'lapela',modelo:str(o['Modelo']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações']),cor:str(o['Cor']).toLowerCase(),inv:o['Polaridade invertida']===true||/^(true|verdadeiro|sim|x)$/i.test(str(o['Polaridade invertida']))};}).filter(function(c){return c.id;});
+  d.cap=linhas(R,'cap').map(function(o){return {id:str(o['Cápsula']),tipo:str(o['Tipo']).toLowerCase()||'lapela',modelo:str(o['Modelo']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações']),cor:str(o['Cor']).toLowerCase(),serial:str(o['Serial']),term:str(o['Terminação']),inv:o['Polaridade invertida']===true||/^(true|verdadeiro|sim|x)$/i.test(str(o['Polaridade invertida']))};}).filter(function(c){return c.id;});
   d.capPor={};d.cap.forEach(function(c){d.capPor[c.id]=c;});
   d.elenco=linhas(R,'elenco').map(function(o,ix){return {ix:ix,id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),papel:str(o['Papel']).toUpperCase()||'PARTICIPANTE',colinha:str(o['Colinha (pista)']),foto:str(o['Foto']),elim:int(o['Eliminado após EP']),obs:str(o['Observações']),pista:str(o['Nome de pista'])};}).filter(function(p){return p.id;});
   d.elenco.sort(function(a,b){return (ORDEM_PAPEL[a.papel]==null?9:ORDEM_PAPEL[a.papel])-(ORDEM_PAPEL[b.papel]==null?9:ORDEM_PAPEL[b.papel])||nat(a.colinha||'99',b.colinha||'99')||a.ix-b.ix;});
@@ -855,7 +855,7 @@ function editorHtml(){
   var caps=D.cap.filter(function(c){return c.tipo===tipo;});
   h+='<h3>Cápsula</h3><div class="opts">'+caps.map(function(c){
     var quem=(s.uso.cap[c.id]||[]).filter(function(id){return id!==p.id;}),dev=c.dev&&ep>c.dev,sel=e.cap===c.id;
-    return '<button class="opt" type="button" data-act="cap" data-v="'+esc(c.id)+'" aria-pressed="'+sel+'"'+((dev||quem.length)&&!sel?' disabled':'')+'><b>'+bolinha(c.id)+esc(c.id)+(c.inv?' '+invIcon(c.id,1):'')+'</b><span>'+esc(dev?'devolvida':quem.length?'com '+D.pPor[quem[0]].nome:[c.cor,(c.modelo&&c.modelo!=='a definir'?c.modelo:c.dono)].filter(Boolean).join(' · '))+'</span></button>';
+    return '<button class="opt" type="button" data-act="cap" data-v="'+esc(c.id)+'" aria-pressed="'+sel+'"'+((dev||quem.length)&&!sel?' disabled':'')+'><b>'+bolinha(c.id)+esc(c.id)+(c.inv?' '+invIcon(c.id,1):'')+'</b><span>'+esc(dev?'devolvida':quem.length?'com '+D.pPor[quem[0]].nome:[c.cor,(c.modelo&&c.modelo!=='a definir'&&c.modelo!==c.id?c.modelo:''),c.term,(!c.modelo||c.modelo==='a definir')?c.dono:''].filter(Boolean).join(' · '))+'</span></button>';
   }).join('')+(e.cap?'<button class="opt limpar" type="button" data-act="cap" data-v="">Tirar cápsula</button>':'')+'</div>';
   // ligação
   if(t){
