@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2 · 2026-10-23
+- Mixer, aba Pistas: ON e ARM como no CL-12 e envios X1 · L · R · X2 (verde pré, amarelo pós) embaixo de cada fader; contagem de pistas armadas e ligadas; impressão marca ARM e envios.
+- Painel da pista: ON, ARM, ISO pré/pós, roteamento para L, R e buses 1–10 (pós, pré ou send com ganho), trim, HPF, fase e delay (fase e delay só 1–16). Campos vazios = não mexer no gravador.
+- Copiar canal como no Scorpio: escolhe o que copiar (fonte e nome, roteamento, ISO, ON, ARM, trim, HPF, fase, delay) e toca nas pistas de destino.
+- Novas abas no mixer: Routing (matriz 32 × 12), Buses (nome e retorno), Saídas (L, R, X1–X10 com fonte única, nível, ganho e delay) e Scorpio.
+- Scorpio: importa o settings (.json), compara com a cena, traz a configuração do gravador para a cena e exporta a cena como settings novo, mudando só os campos do plano. Arquivo testado byte a byte: sem mudanças, sai idêntico ao original.
+- Plano inicial de buses e saídas tirado da aba LAYOUT (CTK 1/2, MIX, TELMA, SALADA, ASSIST 1/2; CTRL A/B, ISO B1–B5, CAM, ASSIST, CTK).
+
 ## v1.1 · 2026-10-23
 - Carômetro: busca por nome, TX, modelo, canal ou cápsula; filtro por time; card mostra o modelo do transmissor e o canal do gravador.
 - Times passam a ser **Vermelho** e **Azul** (valores antigos A/B continuam sendo lidos). O Azul vai para a Clara (17–21).

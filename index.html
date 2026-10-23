@@ -240,6 +240,34 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .undo{display:inline-flex;gap:.3rem}
 .fita span.tv{background:#f2c4bd}.fita span.tz{background:#c3d5f3}
 .fita span{font-family:'Permanent Marker',var(--fc);font-weight:400}
+/* mesa */
+.leds{display:flex;gap:3px;width:var(--sw);margin-top:4px;justify-content:center}
+.led{border:1px solid #3a3e45;background:#15171a;color:#6d737c;border-radius:3px;font:700 .56rem/1 var(--f);padding:.28rem 0;flex:1;min-width:0;cursor:pointer;letter-spacing:.02em}
+.led.on.aceso{background:#1f7a3a;color:#d9ffe4;box-shadow:0 0 6px #2ecc71;border-color:#2ecc71}
+.led.arm.aceso{background:#9b1c14;color:#ffe0dc;box-shadow:0 0 6px #ff4b3e;border-color:#ff4b3e}
+.led.rt.r-pre{background:#1f7a3a;color:#d9ffe4;border-color:#2ecc71;box-shadow:0 0 5px #2ecc71}
+.led.rt.r-post{background:#9a6a00;color:#fff3cf;border-color:#f0b429;box-shadow:0 0 5px #f0b429}
+.led.rt.r-send{background:#1d5d8a;color:#dff1ff;border-color:#5ab4f0}
+table.rota .led{flex:none;width:2.6rem;padding:.3rem 0;font-size:.62rem}
+table.rota .led:not(.aceso){background:#eef0f3;color:#8a9099;border-color:#cfd3d9}
+.chip.r-pre,.rc.r-pre{background:#d5f0dc;color:#1d6b34}.chip.r-post,.rc.r-post{background:#fde9b8;color:#7a5200}.chip.r-send,.rc.r-send{background:#d6ebfb;color:#174f7d}
+.rc{border:1px solid var(--line);background:#fff;border-radius:5px;min-width:3.1rem;padding:.25rem .3rem;font-weight:600;font-size:.78rem;color:var(--ink3)}
+table.rota th.c,table.rota td.c{text-align:center}
+table.tab th i{display:block;font-style:normal;font-weight:400;font-size:.62rem;color:#b9bfc7}
+table.tab tr.vaz td{color:var(--ink3)}
+table.rota td,table.rota th{padding:.22rem .3rem}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:.35rem;margin:.6rem 0}
+.rcel{border:1px solid var(--line);border-radius:6px;padding:.3rem;display:flex;flex-direction:column;gap:.2rem;font-size:.78rem}
+.rcel span{font-weight:700}.rcel span i{font-style:normal;font-weight:400;color:var(--ink2);margin-left:.3rem;font-size:.7rem}
+.rcel select,.rcel input{min-height:1.9rem;padding:.15rem .3rem;font-size:.82rem;width:100%}
+.rcel.r-pre{background:#e8f7ec}.rcel.r-post{background:#fff5d9}.rcel.r-send{background:#e6f2fc}
+.ajs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem}
+.ledbtn.on.aceso{background:#1f7a3a;color:#fff;border-color:#1f7a3a}.ledbtn.arm.aceso{background:#b3261e;color:#fff;border-color:#b3261e}
+.cks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.3rem .8rem;font-size:.9rem}
+.mpan.copia{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.strip.colavel{outline:2px dashed var(--accent);outline-offset:1px}
+.armtxt{color:var(--bad)}
+.mresumo{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0 0;font-size:.86rem}
 @media print{
   .fita span.tv,.fita span.tz,.inv,.chip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
@@ -307,7 +335,7 @@ var API=jget(K.api,'')||API_FIXO;
 var MODO=API?'api':'demo';
 var RAW=MODO==='api'?jget(K.cache,null):(jget(K.demo,null)||clone(DEMO));
 var FILA=jget(K.fila,[]);
-var UI=Object.assign({view:'car',ep:1,ordem:'tx',fmt:'fichas',cena:'base',mixv:'all',ft:''},jget(K.ui,{}));
+var UI=Object.assign({view:'car',ep:1,ordem:'tx',fmt:'fichas',cena:'base',mixv:'all',ft:'',mixp:'pistas'},jget(K.ui,{}));
 var QUEM=jget(K.quem,'');
 var D=null, EDIT=null, PREVIEW=null, NET='', enviando=false, BUSCA='', MBUSCA='', MINV=false;
 
@@ -344,7 +372,7 @@ function normalizar(R){
   d.eps=linhas(R,'eps').map(function(o){return {ep:int(o['EP']),a:int(o['Vermelho']!=null?o['Vermelho']:o['Equipe A']),b:int(o['Azul']!=null?o['Azul']:o['Equipe B']),data:str(o['Data de gravação'])};}).filter(function(e){return e.ep;}).sort(function(a,b){return a.ep-b.ep;});
   if(!d.eps.length)for(var i=1;i<=8;i++)d.eps.push({ep:i,a:0,b:0,data:''});
   d.imp=linhas(R,'imp').map(function(o){return {gerado:str(o['Report gerado em']),em:str(o['Importado em']),por:str(o['Por']),n:str(o['Transmissores atualizados']),mud:str(o['Mudanças']),nao:str(o['Nomes sem correspondência'])};});
-  d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[];try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}while(pp.length<32)pp.push('');return {id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};}).filter(function(c){return c.id;}):null;
+  d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}if(pp&&!Array.isArray(pp)){mm=pp.m||null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;return c;}).filter(function(c){return c.id;}):null;
   d.lidoEm=str(R&&R.lidoEm);d.planilha=str(R&&R.planilha);
   return d;
 }
@@ -801,7 +829,7 @@ function migrarColinha(c){
 }
 function cenaAtual(){var L=cenasLista();return L.filter(function(c){return c.id===UI.cena;})[0]||L[0];}
 function gravarCena(c,apagar){
-  if(cenasCompartilhadas()){fazer({acao:'cena',id:c.id,nome:c.nome,ordem:c.ordem,pistas:JSON.stringify(c.pistas),apagar:!!apagar});return;}
+  if(cenasCompartilhadas()){fazer({acao:'cena',id:c.id,nome:c.nome,ordem:c.ordem,pistas:JSON.stringify(c.mesa?{p:c.pistas,m:c.mesa}:c.pistas),apagar:!!apagar});return;}
   var L=(jget(K.cenas,[])||[]).filter(function(x){return x.id!==c.id;});
   if(!apagar)L.push(c);
   jset(K.cenas,L);
@@ -873,10 +901,10 @@ function avisosMix(R,ep){
   return W;
 }
 function zonaDe(n){for(var i=0;i<ZONAS.length;i++)if(n>=ZONAS[i][0]&&n<=ZONAS[i][1])return i;return 0;}
-function stripHtml(s,v){
+function stripHtml(s,v,M){
   var p=s.p,nome=p?nomePista(p):'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
   var cap=s.n<=12?CAPS[s.n-1]:'';
-  var cls='strip z'+zonaDe(s.n)+(MSEL===s.n?' sel':'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
+  var cls='strip z'+zonaDe(s.n)+(MSEL===s.n?' sel':'')+(COPIA&&COPIA.de!==s.n?' colavel':'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
   var sub=p?[s.t?'TX '+s.t.num:'sem TX',s.t&&s.t.canal?s.t.canal:''].filter(Boolean).join(' · '):(s.motivo||'');
   var out=s.n>=17&&s.n<=22?'<span class="xout">X'+(s.n-16)+' → 633·'+(s.n-16)+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
@@ -888,18 +916,18 @@ function stripHtml(s,v){
     '<span class="ssub">'+esc(sub)+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
     '<span class="strk"><span class="scap'+(cap?'':' sd')+'" style="'+(cap?'background:'+cap:'')+'"></span></span>'+out+
     '<span class="sfoot">Ch '+s.n+'</span></button>'+
-    '<span class="fitac '+(p?tc:'vz')+'"'+(nome.length>6?' style="font-size:'+Math.max(.62,1.02*6/nome.length).toFixed(2)+'rem"':'')+'>'+(p?esc(nome):'')+'</span>';
+    (M?ledsHtml(s,M.ch[s.n]):'')+'<span class="fitac '+(p?tc:'vz')+'"'+(nome.length>6?' style="font-size:'+Math.max(.62,1.02*6/nome.length).toFixed(2)+'rem"':'')+'>'+(p?esc(nome):'')+'</span>';
 }
-function linhaMix(R,a,b,v){
+function linhaMix(R,a,b,v,M){
   var S=R.S.slice(a-1,b),cols=b-a+1,h='<div class="mrow" style="grid-template-columns:repeat('+cols+',var(--sw))">';
   [[1,12,'CL-12'],[13,32,'só iPad']].forEach(function(z){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     h+='<span class="band zb z'+i+'" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
-  S.forEach(function(s,i){h+='<span style="grid-row:3;grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v)+'</span>';});
+  S.forEach(function(s,i){h+='<span style="grid-row:3;grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
   return h+'</div>';
 }
-function painelSlot(R){
+function painelSlot(R,M){
   if(!MSEL)return '<p class="hint">Toque numa pista para ver quem está nela, trocar o conteúdo, encurtar o nome ou mover. No computador, dá para arrastar uma pista sobre a outra para trocar.</p>';
   var s=R.S[MSEL-1],o='<option value="">Vazio</option>';
   ['A','B'].forEach(function(t){var L=R[t];
@@ -924,8 +952,9 @@ function painelSlot(R){
   h+='<label class="campo" style="margin-top:.7rem">Conteúdo da pista<select data-act="mtok">'+o+'</select></label>';
   if(s.p)h+='<div class="linha" style="margin-top:.6rem"><label class="campo" style="flex:1">Nome de pista (vale em todas as cenas)<input type="text" id="mpista" maxlength="14" value="'+esc(nomePista(s.p))+'"></label><button class="btn" type="button" data-act="mpista" style="align-self:flex-end">Salvar nome</button></div>'+
     '<p class="hint" style="margin-top:.3rem">Na visão de 16 faders aparece como <b>'+esc(corta16(nomePista(s.p)))+'</b>.</p>';
-  h+='<div class="linha" style="margin-top:.6rem"><button class="btn'+(MTROCA?' pri':'')+'" type="button" data-act="mtroca">'+(MTROCA?'Toque na pista de destino…':'⇄ Trocar de lugar')+'</button><button class="btn" type="button" data-act="mlimpa">Esvaziar pista</button></div></div>';
-  return h;
+  h+='<div class="linha" style="margin-top:.6rem"><button class="btn'+(MTROCA?' pri':'')+'" type="button" data-act="mtroca">'+(MTROCA?'Toque na pista de destino…':'⇄ Trocar de lugar')+'</button><button class="btn" type="button" data-act="mlimpa">Esvaziar pista</button></div>';
+  if(M)h+=painelCanal(s,M);
+  return h+'</div>';
 }
 function aplicarBuscaMix(){
   var q=termos(MBUSCA),ativo=q.length||MINV,n=0;
@@ -940,12 +969,12 @@ function cenaPorId(id){return cenasLista().filter(function(c){return c.id===id;}
 function salvarCenaMix(c){var antes=cenaPorId(c.id);if(antes){UNDO.push(clone(antes));if(UNDO.length>60)UNDO.shift();REDO=[];}salvarCena(c);}
 function desfazerMix(){var prev=UNDO.pop();if(!prev){toast('Nada para desfazer');return;}var at=cenaPorId(prev.id);if(at)REDO.push(clone(at));UI.cena=prev.id;salvarUi();salvarCena(prev);render();}
 function refazerMix(){var nx=REDO.pop();if(!nx){toast('Nada para refazer');return;}var at=cenaPorId(nx.id);if(at)UNDO.push(clone(at));UI.cena=nx.id;salvarUi();salvarCena(nx);render();}
-function impressaoMix(R,c){
-  var linhas=R.S.filter(function(s){return s.p||s.tok;}).map(function(s){var p=s.p;
-    return '<tr><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(p?nomePista(p):'—')+'</td><td>'+esc(p?p.nome:(s.motivo||rotuloTok(s.tok)))+'</td><td>'+esc(s.t?'TX '+s.t.num:'')+'</td><td><b>'+esc(s.t?s.t.canal:'')+'</b></td><td>'+(s.e&&s.e.cap?esc(s.e.cap)+(capInv(s.e.cap)?' '+invIcon(s.e.cap,1):''):'')+'</td><td>'+esc(s.e?timeNome(s.e.time):'')+'</td><td>'+esc(s.copia?'cópia do Ch '+s.copia:'')+(s.n>=17&&s.n<=22?' X'+(s.n-16)+' → 633·'+(s.n-16):'')+'</td></tr>';}).join('');
+function impressaoMix(R,c,M){
+  var linhas=R.S.filter(function(s){return s.p||s.tok||(M&&M.ch[s.n].arm);}).map(function(s){var p=s.p;
+    return '<tr><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(p?nomePista(p):'—')+'</td><td>'+esc(p?p.nome:(s.motivo||rotuloTok(s.tok)))+'</td><td>'+esc(s.t?'TX '+s.t.num:'')+'</td><td><b>'+esc(s.t?s.t.canal:'')+'</b></td><td>'+(s.e&&s.e.cap?esc(s.e.cap)+(capInv(s.e.cap)?' '+invIcon(s.e.cap,1):''):'')+'</td><td>'+esc(s.e?timeNome(s.e.time):'')+'</td><td>'+(M&&M.ch[s.n].on?'●':'')+'</td><td>'+(M&&M.ch[s.n].arm?'<b class="armtxt">● ARM</b>':'')+'</td><td>'+(M?CL_ROTAS.map(function(r){var x=M.ch[s.n].r[r[0]];return x?r[1]+' '+ROTA_TXT[x]:'';}).filter(Boolean).join(' · '):'')+'</td><td>'+esc(s.copia?'cópia do Ch '+s.copia:'')+(s.n>=17&&s.n<=22?' X'+(s.n-16)+' → 633·'+(s.n-16):'')+'</td></tr>';}).join('');
   var fita='<div class="fita">'+R.S.slice(0,12).map(function(s){return '<span class="'+(s.p&&s.e?timeCls(s.e.time):'')+'" style="border-top:6px solid '+CAPS[s.n-1]+'">'+esc(s.p?nomePista(s.p):'')+'<i>'+s.n+'</i></span>';}).join('')+'</div>';
   return '<section class="doc soimpr"><div class="dochead"><div><h1>Cena · '+esc(c.nome)+'</h1><p>EP '+UI.ep+' · ordem nos times: '+(c.ordem==='tx'?'transmissor':'alfabética')+' · colinha em ordem de transmissor</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
-    '<h3>Fita do CL-12</h3>'+fita+'<h3>Pistas do Scorpio</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Ch</th><th>Nome de pista</th><th>Quem</th><th>TX</th><th>Canal</th><th>Cápsula</th><th>Time</th><th>Obs.</th></tr></thead><tbody>'+linhas+'</tbody></table></div></section>';
+    '<h3>Fita do CL-12</h3>'+fita+'<h3>Pistas do Scorpio</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Ch</th><th>Nome de pista</th><th>Quem</th><th>TX</th><th>Canal</th><th>Cápsula</th><th>Time</th><th>ON</th><th>ARM</th><th>X1 · L · R · X2</th><th>Obs.</th></tr></thead><tbody>'+linhas+'</tbody></table></div></section>';
 }
 function viewMix(){
   var L=cenasLista(),c=cenaAtual(),R=resolver(c,UI.ep),v=MIXV.filter(function(x){return x[0]===UI.mixv;})[0]||MIXV[7];
@@ -960,19 +989,30 @@ function viewMix(){
     '<button class="btn sm'+(MINV?' pri':'')+'" type="button" data-act="minv" title="Destacar quem precisa inverter a polaridade no transmissor">Ø polaridade</button>'+
     '<span class="undo"><button class="btn sm" type="button" data-act="mundo" title="Desfazer (Ctrl+Z)"'+(UNDO.length?'':' disabled')+'>↶ Desfazer</button><button class="btn sm" type="button" data-act="mredo" title="Refazer (Ctrl+Shift+Z)"'+(REDO.length?'':' disabled')+'>↷ Refazer</button></span>'+
     '<span class="hint" id="nmbusca" style="margin:0"></span></div>';
+  var M=mesaEf(c,R),pg=UI.mixp||'pistas';
+  h+='<div class="bar noprint"><span class="seg" role="group" aria-label="Página do mixer">'+MPAGS.map(function(x){return '<button type="button" data-act="mpag" data-v="'+x[0]+'" aria-pressed="'+(x[0]===pg)+'">'+x[1]+'</button>';}).join('')+'</span>'+
+    '<span class="hint" style="margin:0">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas</span></div>';
+  if(pg!=='pistas'){
+    h+='<section class="doc'+(pg==='rota'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
+      ({rota:viewRota,bus:viewBus,out:viewOut}[pg]?{rota:viewRota,bus:viewBus,out:viewOut}[pg](R,M):viewScorpio(c,R,M))+'</section>';
+    return h;
+  }
   h+='<div class="console">';
-  if(v[0]==='all')h+=linhaMix(R,1,16,v)+linhaMix(R,17,32,v);else h+=linhaMix(R,v[2],v[3],v);
+  if(v[0]==='all')h+=linhaMix(R,1,16,v,M)+linhaMix(R,17,32,v,M);else h+=linhaMix(R,v[2],v[3],v,M);
   h+='</div>';
+  h+='<p class="hint noprint" style="margin:.4rem 0 0">Embaixo de cada fader: ON e ARM como no CL-12, e os envios X1 · L · R · X2 (verde = pré, amarelo = pós). Toque para trocar.</p>';
   var W=avisosMix(R,UI.ep);
   h+='<div class="alertas noprint" style="margin-top:.8rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>';
-  h+='<div class="noprint">'+painelSlot(R)+'</div>';
+  h+='<div class="noprint">'+painelCopia()+painelSlot(R,M)+'</div>';
   h+='<p class="hint noprint">Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p>';
-  return h+impressaoMix(R,c);
+  return h+impressaoMix(R,c,M);
 }
 function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
 function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
 function cliqueMix(a,el){
   var c;
+  if(a==='mslot'&&COPIA){var nn=+el.dataset.n;if(nn!==COPIA.de){colarCanal(nn);render();}return true;}
+  if(cliqueMesa(a,el))return true;
   if(a==='mslot'){var n=+el.dataset.n;if(MTROCA&&MSEL&&MSEL!==n){trocarPistas(MSEL,n);MSEL=n;MTROCA=false;render();return true;}MSEL=MSEL===n?0:n;MTROCA=false;render();return true;}
   if(a==='mfechar'){MSEL=0;MTROCA=false;render();return true;}
   if(a==='mtroca'){MTROCA=!MTROCA;render();return true;}
@@ -991,6 +1031,7 @@ function cliqueMix(a,el){
   return false;
 }
 function mudancaMix(a,el){
+  if(mudancaMesa(a,el))return true;
   if(a==='mtok'){mudarPista(MSEL,el.value);return true;}
   if(a==='mordem'){var c=clone(cenaAtual());c.ordem=el.value;salvarCenaMix(c);return true;}
   return false;
@@ -1000,6 +1041,404 @@ document.addEventListener('dragstart',function(ev){var el=ev.target.closest&&ev.
 document.addEventListener('dragover',function(ev){if(mDrag&&ev.target.closest&&ev.target.closest('[data-act=mslot]'))ev.preventDefault();});
 document.addEventListener('drop',function(ev){var el=ev.target.closest&&ev.target.closest('[data-act=mslot]');if(!el||!mDrag)return;ev.preventDefault();var n=+el.dataset.n;trocarPistas(mDrag,n);MSEL=n;mDrag=0;render();});
 document.addEventListener('dragend',function(){mDrag=0;});
+
+/* ───────── settings do Scorpio: JSON que preserva ordem e números ───────── */
+/* Objetos viram Map (ordem exata das chaves), números guardam o texto original (1.0 continua 1.0).
+   A saída é compacta e com caracteres não-ASCII em \uXXXX, igual ao arquivo que o Scorpio grava. */
+function SNum(raw){this.raw=raw;}
+SNum.prototype.valueOf=function(){return +this.raw;};
+function sjParse(txt){
+  var i=0,n=txt.length;
+  function ws(){while(i<n){var c=txt.charCodeAt(i);if(c===32||c===9||c===10||c===13)i++;else break;}}
+  function err(m){throw new Error('Arquivo inválido ('+m+') na posição '+i);}
+  function val(){
+    ws();var c=txt[i];
+    if(c==='{'){i++;var m=new Map();ws();if(txt[i]==='}'){i++;return m;}
+      for(;;){ws();if(txt[i]!=='"')err('chave');var k=strv();ws();if(txt[i]!==':')err(':');i++;m.set(k,val());ws();
+        if(txt[i]===','){i++;continue;}if(txt[i]==='}'){i++;return m;}err('objeto');}}
+    if(c==='['){i++;var a=[];ws();if(txt[i]===']'){i++;return a;}
+      for(;;){a.push(val());ws();if(txt[i]===','){i++;continue;}if(txt[i]===']'){i++;return a;}err('lista');}}
+    if(c==='"')return strv();
+    if(txt.startsWith('true',i)){i+=4;return true;}
+    if(txt.startsWith('false',i)){i+=5;return false;}
+    if(txt.startsWith('null',i)){i+=4;return null;}
+    var mm=/^-?\d+(\.\d+)?([eE][+-]?\d+)?/.exec(txt.slice(i,i+40));if(!mm)err('valor');i+=mm[0].length;return new SNum(mm[0]);
+  }
+  function strv(){
+    i++;var s='',st=i;
+    for(;;){var c=txt[i];if(c===undefined)err('texto');
+      if(c==='"'){s+=txt.slice(st,i);i++;return s;}
+      if(c==='\\'){s+=txt.slice(st,i);var e=txt[i+1];
+        if(e==='u'){s+=String.fromCharCode(parseInt(txt.substr(i+2,4),16));i+=6;}
+        else{s+={'"':'"','\\':'\\','/':'/',b:'\b',f:'\f',n:'\n',r:'\r',t:'\t'}[e];i+=2;}
+        st=i;continue;}
+      i++;}
+  }
+  var v=val();ws();return v;
+}
+function sjStr(s){
+  return '"'+String(s).replace(/[\u0000-\u001f"\\\u007f-\uffff]/g,function(c){
+    var m={'"':'\\"','\\':'\\\\','\b':'\\b','\f':'\\f','\n':'\\n','\r':'\\r','\t':'\\t'}[c];
+    return m||'\\u'+('000'+c.charCodeAt(0).toString(16)).slice(-4);})+'"';
+}
+function sjDump(v){
+  if(v instanceof Map){var o=[];v.forEach(function(x,k){o.push(sjStr(k)+':'+sjDump(x));});return '{'+o.join(',')+'}';}
+  if(Array.isArray(v))return '['+v.map(sjDump).join(',')+']';
+  if(v instanceof SNum)return v.raw;
+  if(typeof v==='number')return String(v);
+  if(typeof v==='string')return sjStr(v);
+  if(v===true||v===false)return String(v);
+  return 'null';
+}
+function sjGet(m,path){var v=m;for(var k=0;k<path.length;k++){if(!(v instanceof Map)||!v.has(path[k]))return undefined;v=v.get(path[k]);}return v instanceof SNum?+v.raw:v;}
+/* grava mantendo o tipo do original: inteiro continua inteiro, 0.0 continua com casa decimal */
+function sjSet(m,path,val){
+  var v=m;for(var k=0;k<path.length-1;k++){if(!(v instanceof Map)||!v.has(path[k]))return false;v=v.get(path[k]);}
+  var last=path[path.length-1];if(!(v instanceof Map)||!v.has(last))return false;
+  var old=v.get(last);
+  if(old instanceof SNum&&typeof val==='number'){var r=old.raw.indexOf('.')>=0?(Number.isInteger(val)?val.toFixed(1):String(val)):String(Math.round(val));v.set(last,new SNum(r));}
+  else v.set(last,val);
+  return true;
+}
+
+/* ───────── mesa: canais, routing, buses e saídas de cada cena ───────── */
+var BUSES=['L','R','1','2','3','4','5','6','7','8','9','10'];
+var SAIDAS=['L','R','X1','X2','X3','X4','X5','X6','X7','X8','X9','X10'];
+var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
+var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
+var ROTA_CICLO=['','post','pre','send'];
+var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
+var COPIA=null;
+var COPIA_ITENS=[['conteudo','Fonte e nome (quem está na pista)'],['rota','Roteamento e sends'],['iso','ISO pré/pós'],['on','ON'],['arm','ARM'],['trim','Trim'],['hpf','HPF'],['ph','Fase'],['dly','Delay']];
+
+function busNome(b,M){var x=M&&M.bus[b];return (x&&x.nome)||(b==='L'||b==='R'?'Mix '+b:'Bus '+b);}
+function busCurto(b){return b==='L'||b==='R'?b:b;}
+function busPadrao(){
+  var n={L:'Mix L',R:'Mix R','1':'CTK 1','2':'CTK 2','3':'MIX','4':'TELMA','5':'SALADA','6':'ASSIST 1','7':'ASSIST 2','8':'','9':'','10':''},o={};
+  BUSES.forEach(function(b){o[b]={nome:n[b],src:''};});return o;
+}
+function saidasPadrao(){
+  var o={L:{nome:'CTRL A',src:'bus:L'},R:{nome:'CTRL B',src:'bus:R'},X6:{nome:'CAM',src:'bus:3'},X7:{nome:'ASSIST 1',src:'bus:6'},X8:{nome:'ASSIST 2',src:'bus:7'},X9:{nome:'CTK 1',src:'bus:1'},X10:{nome:'CTK 2',src:'bus:2'}};
+  for(var i=1;i<=5;i++)o['X'+i]={nome:'ISO B'+i,src:'iso:'+(16+i)+':pre'};
+  SAIDAS.forEach(function(k){o[k]=Object.assign({nome:'',src:'',nivel:'',gain:null,dly:null},o[k]||{});});
+  return o;
+}
+/* rascunho inicial de cada canal: pistas 1–16 ocupadas vão para L, R e MIX; Telma e Salada também pré no bus delas */
+function chPadrao(s){
+  var occ=!!s.p,r={};BUSES.forEach(function(b){r[b]='';});
+  if(occ&&s.n<=16&&!s.copia){r.L='post';r.R='post';r['3']='post';
+    if(s.p.id==='TELMA')r['4']='pre';if(s.p.id==='SALADA')r['5']='pre';}
+  return {on:occ,arm:occ,r:r,sg:{},iso:'pre',trim:null,hpf:null,ph:null,dly:null};
+}
+function mesaEf(c,R){
+  var m=c.mesa||{},chs=m.ch||{},M={ch:[],bus:busPadrao(),out:saidasPadrao()};
+  R.S.forEach(function(s){
+    var d=chPadrao(s),x=chs[s.n]||{};
+    var e=Object.assign({},d,x);e.r=Object.assign({},d.r,x.r||{});e.sg=Object.assign({},d.sg,x.sg||{});
+    if(s.n>16){e.ph=null;e.dly=null;}
+    M.ch[s.n]=e;
+  });
+  Object.keys(m.bus||{}).forEach(function(b){if(M.bus[b])Object.assign(M.bus[b],m.bus[b]);});
+  Object.keys(m.out||{}).forEach(function(k){if(M.out[k])Object.assign(M.out[k],m.out[k]);});
+  return M;
+}
+function mudarMesa(fn){var c=clone(cenaAtual());c.mesa=c.mesa||{};c.mesa.ch=c.mesa.ch||{};c.mesa.bus=c.mesa.bus||{};c.mesa.out=c.mesa.out||{};fn(c.mesa,c);salvarCenaMix(c);}
+function setCh(n,patch){mudarMesa(function(m){var x=m.ch[n]=m.ch[n]||{};
+  Object.keys(patch).forEach(function(k){if(k==='r'||k==='sg'){x[k]=Object.assign({},x[k]||{},patch[k]);}else x[k]=patch[k];});});}
+function rotaCls(v){return v?'r-'+v:'';}
+
+/* ───────── fontes das saídas ───────── */
+/* códigos do arquivo do Scorpio: confirmados no teste de 23/10 ou deduzidos (*) */
+function opcoesSaida(M,R){
+  var g=[['Desligada',[['','Silêncio']]]],iso=[],isop=[];
+  for(var n=1;n<=32;n++){var s=R.S[n-1],q=s&&s.p?' · '+nomePista(s.p):'';iso.push(['iso:'+n+':pre','ISO '+n+' pré'+q]);isop.push(['iso:'+n+':post','ISO '+n+' pós'+q]);}
+  g.push(['ISO pré-fader',iso],['ISO pós-fader',isop]);
+  g.push(['Bus',BUSES.map(function(b){return ['bus:'+b,'Bus '+b+(M.bus[b].nome?' · '+M.bus[b].nome:'')+(b==='3'?'':' *')];}).concat([['hp:L','HP-L'],['hp:R','HP-R *']])]);
+  g.push(['Retornos',[['ret:A1','Return A1 *'],['ret:A2','Return A2 *'],['ret:B1','Return B1'],['ret:B2','Return B2 *'],['ret:C1','Return C1 *'],['ret:C2','Return C2 *'],['com:1','Com Rtn 1'],['com:2','Com Rtn 2 *']]]);
+  return g;
+}
+function saidaTxt(src,M,R){
+  if(!src)return 'Silêncio';var a=src.split(':');
+  if(a[0]==='iso'){var s=R.S[+a[1]-1];return 'ISO '+a[1]+' '+(a[2]==='post'?'pós':'pré')+(s&&s.p?' ('+nomePista(s.p)+')':'');}
+  if(a[0]==='bus')return 'Bus '+a[1]+(M.bus[a[1]]&&M.bus[a[1]].nome?' · '+M.bus[a[1]].nome:'');
+  if(a[0]==='hp')return 'HP-'+a[1];if(a[0]==='ret')return 'Return '+a[1];if(a[0]==='com')return 'Com Rtn '+a[1];
+  if(a[0]==='raw')return a[1]+' '+a[2]+' (desconhecido)';return src;
+}
+var RET_ORD=['A1','A2','B1','B2','C1','C2'];
+function srcParaArquivo(src){
+  if(!src)return ['Silence',1];var a=src.split(':');
+  if(a[0]==='iso')return [a[2]==='post'?'PostFaderIso':'PreFaderIso',+a[1]];
+  if(a[0]==='bus')return ['MixBusPostLim',a[1]==='L'?5:a[1]==='R'?6:+a[1]+6];
+  if(a[0]==='hp')return ['MixBusPostLim',a[1]==='L'?1:2];
+  if(a[0]==='ret')return ['StereoReturn',RET_ORD.indexOf(a[1])+1];
+  if(a[0]==='com')return ['Comms',a[1]==='2'?4:3];
+  if(a[0]==='raw')return [a[1],+a[2]];
+  return null;
+}
+function srcDoArquivo(source,chan){
+  if(source==='Silence')return '';
+  if(source==='PreFaderIso')return 'iso:'+chan+':pre';
+  if(source==='PostFaderIso')return 'iso:'+chan+':post';
+  if(source==='MixBusPostLim'){if(chan===1)return 'hp:L';if(chan===2)return 'hp:R';if(chan===5)return 'bus:L';if(chan===6)return 'bus:R';if(chan>=7&&chan<=16)return 'bus:'+(chan-6);}
+  if(source==='StereoReturn'&&chan>=1&&chan<=6)return 'ret:'+RET_ORD[chan-1];
+  if(source==='Comms'&&(chan===3||chan===4))return 'com:'+(chan-2);
+  return 'raw:'+source+':'+chan;
+}
+var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV']];
+var BUS_FONTES=[['','—'],['_1','Com Rtn 1 *'],['_2','Com Rtn 2 *'],['Al','Return A esq. *'],['Ar','Return A dir. *'],['Bl','Return B esq.'],['Br','Return B dir. *'],['Cl','Return C esq. *'],['Cr','Return C dir. *']];
+
+/* ───────── fonte do canal a partir do transmissor ───────── */
+function fonteCanal(t){
+  if(!t)return '';var c=String(t.canal||'').toUpperCase(),m;
+  if((m=/^LINE\s*(\d+)/.exec(c)))return 'Adc'+m[1];
+  if((m=/^AES\s*(\d+)/.exec(c)))return 'AES3-'+m[1];
+  if(/MIC/.test(c)&&t.input)return 'Adc'+t.input;
+  return '';
+}
+function fonteTxt(f){var m;if(!f||f==='Nosource')return 'sem fonte';if((m=/^Adc(\d+)/.exec(f)))return 'Input '+m[1];if((m=/^AES3-(\d+)/.exec(f)))return 'AES '+m[1];if((m=/^Dante_(\d+)/.exec(f)))return 'Dante '+m[1];return f;}
+
+/* ───────── LEDs do CL-12 em cada pista ───────── */
+function ledsHtml(s,ch){
+  var h='<span class="leds">'+
+    '<button type="button" class="led on'+(ch.on?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="on" title="ON (canal ligado)">ON</button>'+
+    '<button type="button" class="led arm'+(ch.arm?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="arm" title="ARM (grava a pista)">ARM</button></span>'+
+    '<span class="leds rts">'+CL_ROTAS.map(function(r){var v=ch.r[r[0]]||'';
+      return '<button type="button" class="led rt '+rotaCls(v)+'" data-act="mled" data-n="'+s.n+'" data-k="r:'+r[0]+'" title="'+r[1]+': '+ROTA_TXT[v]+' (toque para trocar)">'+r[1]+'</button>';}).join('')+'</span>';
+  return h;
+}
+function cliqueLed(n,k){
+  var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),ch=M.ch[n];
+  if(k==='on'||k==='arm'){var p={};p[k]=!ch[k];setCh(n,p);return;}
+  var b=k.slice(2),i=ROTA_CICLO.indexOf(ch.r[b]||''),nx=ROTA_CICLO[(i+1)%3],r={};r[b]=nx;setCh(n,{r:r});
+}
+
+/* ───────── painel do canal (dentro do painel da pista) ───────── */
+function painelCanal(s,M){
+  var ch=M.ch[s.n],n=s.n,h='<h3>Canal no Scorpio</h3>';
+  h+='<div class="linha"><button type="button" class="btn sm ledbtn on'+(ch.on?' aceso':'')+'" data-act="mled" data-n="'+n+'" data-k="on">ON</button>'+
+    '<button type="button" class="btn sm ledbtn arm'+(ch.arm?' aceso':'')+'" data-act="mled" data-n="'+n+'" data-k="arm">ARM</button>'+
+    '<span class="seg" role="group" aria-label="ISO"><button type="button" data-act="mchv" data-k="iso" data-v="pre" aria-pressed="'+(ch.iso!=='post')+'">ISO pré</button><button type="button" data-act="mchv" data-k="iso" data-v="post" aria-pressed="'+(ch.iso==='post')+'">ISO pós</button></span>'+
+    (s.t?'<span class="chip pend">fonte: '+esc(fonteTxt(fonteCanal(s.t)))+'</span>':'')+'</div>';
+  h+='<div class="rgrid">'+BUSES.map(function(b){var v=ch.r[b]||'';
+    return '<label class="rcel '+rotaCls(v)+'"><span>'+esc(b==='L'||b==='R'?b:b)+'<i>'+esc(M.bus[b].nome||'')+'</i></span><select data-act="mrsel" data-b="'+b+'">'+ROTA_CICLO.map(function(o){return '<option value="'+o+'"'+(o===v?' selected':'')+'>'+ROTA_TXT[o]+'</option>';}).join('')+'</select>'+
+      (v==='send'?'<input type="number" step="0.5" data-act="msg" data-b="'+b+'" value="'+(ch.sg[b]!=null?ch.sg[b]:0)+'" title="ganho do send em dB">':'')+'</label>';}).join('')+'</div>';
+  function num(k,rot,un,dis){var v=ch[k];return '<label class="campo">'+rot+(dis?' <i class="hint">(só 1–16)</i>':'')+'<input type="number" step="any" data-act="mchn" data-k="'+k+'" value="'+(v==null?'':v)+'" placeholder="não mexer"'+(dis?' disabled':'')+'></label>';}
+  h+='<div class="ajs">'+num('trim','Trim (dB)')+num('hpf','HPF (Hz, 0 desliga)')+num('dly','Delay (ms)','',n>16)+
+    '<label class="campo">Fase'+(n>16?' <i class="hint">(só 1–16)</i>':'')+'<select data-act="mchs" data-k="ph"'+(n>16?' disabled':'')+'><option value=""'+(ch.ph==null?' selected':'')+'>não mexer</option><option value="0"'+(ch.ph===false?' selected':'')+'>normal</option><option value="1"'+(ch.ph===true?' selected':'')+'>invertida Ø</option></select></label></div>';
+  h+='<p class="hint" style="margin:.3rem 0 0">Campos vazios ficam como estão no gravador quando você exportar.</p>';
+  h+='<div class="linha" style="margin-top:.6rem"><button class="btn'+(COPIA?' pri':'')+'" type="button" data-act="mcopia">'+(COPIA?'Copiando do Ch '+COPIA.de+'…':'⧉ Copiar canal')+'</button></div>';
+  return h;
+}
+function painelCopia(){
+  if(!COPIA)return '';
+  return '<div class="painel mpan copia"><div class="linha"><h3 style="margin:0">Copiar do Ch '+COPIA.de+'</h3><span class="sp" style="flex:1"></span><button class="btn sm pri" type="button" data-act="mcopiafim">Concluir</button></div>'+
+    '<p class="hint">Marque o que copiar e toque nas pistas de destino. Como no Scorpio, EQ, fase e delay não vão de/para 17–32.</p><div class="cks">'+
+    COPIA_ITENS.map(function(it){return '<label><input type="checkbox" data-act="mcopiak" data-k="'+it[0]+'"'+(COPIA.k[it[0]]?' checked':'')+'> '+it[1]+'</label>';}).join('')+'</div>'+
+    (COPIA.feitos.length?'<p class="hint">Colado em: '+COPIA.feitos.map(function(n){return 'Ch '+n;}).join(', ')+'</p>':'')+'</div>';
+}
+function colarCanal(n){
+  var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),de=COPIA.de,src=M.ch[de],k=COPIA.k;
+  if(n===de)return;
+  var patch={};
+  if(k.rota){patch.r=clone(src.r);patch.sg=clone(src.sg);}
+  ['iso','on','arm','trim','hpf'].forEach(function(x){if(k[x])patch[x]=src[x];});
+  if(n<=16&&de<=16){if(k.ph)patch.ph=src.ph;if(k.dly)patch.dly=src.dly;}
+  var cc=clone(c);cc.mesa=cc.mesa||{};cc.mesa.ch=cc.mesa.ch||{};
+  var x=cc.mesa.ch[n]=cc.mesa.ch[n]||{};Object.keys(patch).forEach(function(q){x[q]=patch[q];});
+  if(k.conteudo)cc.pistas[n-1]=c.pistas[de-1];
+  salvarCenaMix(cc);
+  if(COPIA.feitos.indexOf(n)<0)COPIA.feitos.push(n);
+}
+
+/* ───────── páginas: routing, buses, saídas ───────── */
+function viewRota(R,M){
+  var h='<p class="hint noprint">Toque numa célula para trocar: — → pós → pré → send. O ganho do send fica no painel da pista (aba Pistas). <span class="chip r-post">pós</span> <span class="chip r-pre">pré</span> <span class="chip r-send">send</span></p>';
+  h+='<div class="tabwrap"><table class="tab rota"><thead><tr><th>Ch</th><th>Pista</th><th>ON</th><th>ARM</th><th>ISO</th>'+BUSES.map(function(b){return '<th class="c">'+esc(b)+'<i>'+esc(M.bus[b].nome||'')+'</i></th>';}).join('')+'</tr></thead><tbody>';
+  R.S.forEach(function(s){var ch=M.ch[s.n];
+    h+='<tr class="'+(s.p?'':'vaz')+'"><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(s.p?nomePista(s.p):'—')+(s.copia?' <span class="hint">= '+s.copia+'</span>':'')+'</td>'+
+      '<td><button type="button" class="led on'+(ch.on?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="on">ON</button></td>'+
+      '<td><button type="button" class="led arm'+(ch.arm?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="arm">ARM</button></td>'+
+      '<td><button type="button" class="btn sm" data-act="miso" data-n="'+s.n+'">'+(ch.iso==='post'?'pós':'pré')+'</button></td>'+
+      BUSES.map(function(b){var v=ch.r[b]||'';return '<td class="c"><button type="button" class="rc '+rotaCls(v)+'" data-act="mrota" data-n="'+s.n+'" data-b="'+b+'">'+(v==='send'?(ch.sg[b]!=null?ch.sg[b]:0)+' dB':ROTA_TXT[v])+'</button></td>';}).join('')+'</tr>';});
+  h+='</tbody><tfoot><tr><td></td><td class="n">Armadas / no bus</td><td>'+M.ch.filter(function(c){return c&&c.on;}).length+'</td><td>'+M.ch.filter(function(c){return c&&c.arm;}).length+'</td><td></td>'+
+    BUSES.map(function(b){return '<td class="c">'+M.ch.filter(function(c){return c&&c.r[b];}).length+'</td>';}).join('')+'</tr></tfoot></table></div>';
+  return h;
+}
+function viewBus(R,M){
+  var h='<p class="hint">Nome de cada bus e o retorno que entra nele. Opções com * foram deduzidas do arquivo de teste e ainda precisam ser conferidas no Scorpio.</p>';
+  h+='<div class="tabwrap"><table class="tab"><thead><tr><th>Bus</th><th>Nome</th><th>Retorno que entra</th><th>Canais que mandam</th></tr></thead><tbody>';
+  BUSES.forEach(function(b){var x=M.bus[b],lista=[];
+    R.S.forEach(function(s){var v=M.ch[s.n].r[b];if(v)lista.push('<span class="chip '+rotaCls(v)+'">'+s.n+(s.p?' '+esc(nomePista(s.p)):'')+' · '+ROTA_TXT[v]+'</span>');});
+    h+='<tr><td><span class="tag sm">'+esc(b)+'</span></td><td><input type="text" maxlength="12" data-act="mbusnome" data-b="'+b+'" value="'+esc(x.nome)+'" placeholder="'+esc(busNome(b))+'"></td>'+
+      '<td>'+(b==='L'||b==='R'?'<span class="hint">não aceita retorno</span>':'<select data-act="mbussrc" data-b="'+b+'">'+BUS_FONTES.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===(x.src||'')?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>')+'</td>'+
+      '<td class="w">'+(lista.join(' ')||'<span class="hint">nenhum</span>')+'</td></tr>';});
+  h+='</tbody></table></div>';
+  h+='<p class="hint">Rtn B ← 633 X3/X4 (mix da Clara) · Com Rtn 1 ← rádio.</p>';
+  h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
+  return h;
+}
+function viewOut(R,M){
+  var g=opcoesSaida(M,R);
+  var h='<p class="hint">Cada saída tem uma fonte só. Opções com * foram deduzidas do arquivo de teste e ainda precisam ser conferidas no Scorpio. Ganho e delay vazios ficam como estão no gravador.</p>';
+  h+='<div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th><th>Ganho dB</th><th>Delay ms</th></tr></thead><tbody>';
+  SAIDAS.forEach(function(k){var o=M.out[k];
+    h+='<tr><td><span class="tag sm">'+k+'</span>'+(k==='L'?' <span class="hint">XLR 1</span>':k==='R'?' <span class="hint">XLR 2</span>':'')+'</td>'+
+      '<td><input type="text" maxlength="12" data-act="moutv" data-o="'+k+'" data-k="nome" value="'+esc(o.nome)+'"></td>'+
+      '<td><select data-act="moutv" data-o="'+k+'" data-k="src">'+(o.src&&/^raw:/.test(o.src)?'<option value="'+esc(o.src)+'" selected>'+esc(saidaTxt(o.src,M,R))+'</option>':'')+
+        g.map(function(gr){return '<optgroup label="'+esc(gr[0])+'">'+gr[1].map(function(op){return '<option value="'+esc(op[0])+'"'+(op[0]===o.src?' selected':'')+'>'+esc(op[1])+'</option>';}).join('')+'</optgroup>';}).join('')+'</select></td>'+
+      '<td><select data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+nv[1]+'</option>';}).join('')+'</select></td>'+
+      '<td><input type="number" step="0.5" style="width:5.5rem" data-act="moutn" data-o="'+k+'" data-k="gain" value="'+(o.gain==null?'':o.gain)+'" placeholder="—"></td>'+
+      '<td><input type="number" step="1" style="width:5.5rem" data-act="moutn" data-o="'+k+'" data-k="dly" value="'+(o.dly==null?'':o.dly)+'" placeholder="—"></td></tr>';});
+  h+='</tbody></table></div>';
+  h+='<p class="hint">Saídas Dante e AES não entram no plano: o arquivo exportado mantém o que já está no gravador.</p>';
+  h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
+  return h;
+}
+
+/* ───────── Scorpio: importar, comparar, exportar ───────── */
+var KSC='plc_scorpio';
+var SC=null; /* {nome, em, txt, m} */
+function scCarregar(){if(SC)return SC;var x=jget(KSC,null);if(x&&x.txt){try{SC={nome:x.nome,em:x.em,txt:x.txt,m:sjParse(x.txt)};}catch(e){SC=null;}}return SC;}
+function scGuardar(nome,txt){var m=sjParse(txt);if(!(m instanceof Map)||!m.has('InputChannel1')||!m.has('AnalogOutputs'))throw new Error('Esse arquivo não parece um settings do Scorpio.');
+  SC={nome:nome,em:agora(),txt:txt,m:m};if(!jset(KSC,{nome:nome,em:SC.em,txt:txt}))toast('O arquivo ficou só nesta sessão (o navegador não deixou guardar).',true);}
+function rotaArq(o){var st=o&&o.routeState,g=o?+o.gain:-1275;if(st==='Prefader')return 'pre';if(st==='Postfader')return 'post';if(st==='PostSend'&&g>-1270)return 'send';return '';}
+function lerArquivo(m){
+  var A={ch:[],nomes:[],fonte:[],bus:{},out:{}};
+  for(var n=1;n<=32;n++){var k='InputChannel'+n,ch={r:{},sg:{}};
+    BUSES.forEach(function(b){var st=sjGet(m,[k,'bus'+b,'routeState']),g=sjGet(m,[k,'bus'+b,'dB10thsSendGain']);var v=rotaArq({routeState:st,gain:g});ch.r[b]=v;if(v==='send')ch.sg[b]=g/10;});
+    ch.on=!sjGet(m,[k,'isMuted']);ch.arm=!!sjGet(m,[k,'isRecordArmed']);ch.iso=sjGet(m,[k,'isoPostFader'])?'post':'pre';
+    ch.trim=(sjGet(m,[k,'trimGaindB10ths'])||0)/10;ch.hpf=sjGet(m,[k,'lowcutEnabled'])?sjGet(m,[k,'lowcutHz']):0;
+    ch.ph=n<=16?!!sjGet(m,[k,'isPolarityInverted']):null;ch.dly=n<=16?(sjGet(m,[k,'msInputDelay'])||0):null;
+    A.ch[n]=ch;A.nomes[n]=sjGet(m,['MetaData','TrackName'+n])||'';A.fonte[n]=sjGet(m,[k,'inputSrcName'])||'';}
+  BUSES.forEach(function(b){A.bus[b]={nome:sjGet(m,['OutputBusControl','obus'+b,'userName'])||'',src:b==='L'||b==='R'?'':(sjGet(m,['SlateMicAndReturns','bus'+b])||'')};});
+  SAIDAS.forEach(function(o){var p=['AnalogOutputs',o];A.out[o]={nome:sjGet(m,p.concat('userName'))||'',src:srcDoArquivo(sjGet(m,p.concat('source')),sjGet(m,p.concat('chan'))),
+    nivel:sjGet(m,p.concat('lineMic'))||'',gain:(sjGet(m,p.concat('dB10thsGain'))||0)/10,dly:sjGet(m,p.concat('msDelay'))||0};});
+  return A;
+}
+function nomeArquivoPista(s){return s.p?nomePista(s.p).slice(0,16):'Ch '+s.n;}
+function comparar(R,M,A){
+  var L=[];function add(onde,campo,cena,grav){if(String(cena)!==String(grav))L.push([onde,campo,cena,grav]);}
+  function rt(v){return ROTA_TXT[v||''];}
+  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');
+    add(on,'Nome',nomeArquivoPista(s),A.nomes[n]);
+    add(on,'Fonte',s.p?fonteTxt(fonteCanal(s.t)||'—'):'sem fonte',fonteTxt(A.fonte[n]));
+    add(on,'ON',c.on?'sim':'não',a.on?'sim':'não');add(on,'ARM',c.arm?'sim':'não',a.arm?'sim':'não');add(on,'ISO',c.iso==='post'?'pós':'pré',a.iso==='post'?'pós':'pré');
+    BUSES.forEach(function(b){add(on,'→ '+b,rt(c.r[b])+(c.r[b]==='send'?' '+(c.sg[b]||0)+' dB':''),rt(a.r[b])+(a.r[b]==='send'?' '+a.sg[b]+' dB':''));});
+    if(c.trim!=null)add(on,'Trim',c.trim+' dB',a.trim+' dB');
+    if(c.hpf!=null)add(on,'HPF',c.hpf?c.hpf+' Hz':'desl.',a.hpf?a.hpf+' Hz':'desl.');
+    if(c.ph!=null)add(on,'Fase',c.ph?'Ø':'normal',a.ph?'Ø':'normal');
+    if(c.dly!=null)add(on,'Delay',c.dly+' ms',a.dly+' ms');
+  });
+  BUSES.forEach(function(b){add('Bus '+b,'Nome',M.bus[b].nome||'(mantém)',M.bus[b].nome?A.bus[b].nome:'(mantém)');if(b!=='L'&&b!=='R')add('Bus '+b,'Retorno',M.bus[b].src||'—',A.bus[b].src||'—');});
+  SAIDAS.forEach(function(o){var c=M.out[o],a=A.out[o];add('Saída '+o,'Nome',c.nome,a.nome);add('Saída '+o,'Fonte',saidaTxt(c.src,M,R),saidaTxt(a.src,M,R));
+    if(c.nivel)add('Saída '+o,'Nível',c.nivel,a.nivel);if(c.gain!=null)add('Saída '+o,'Ganho',c.gain+' dB',a.gain+' dB');if(c.dly!=null)add('Saída '+o,'Delay',c.dly+' ms',a.dly+' ms');});
+  return L;
+}
+function trazerDoArquivo(R,A){
+  mudarMesa(function(m){
+    R.S.forEach(function(s){var a=A.ch[s.n];m.ch[s.n]={on:a.on,arm:a.arm,r:clone(a.r),sg:clone(a.sg),iso:a.iso,trim:a.trim,hpf:a.hpf,ph:a.ph,dly:a.dly};});
+    BUSES.forEach(function(b){m.bus[b]={nome:A.bus[b].nome,src:A.bus[b].src};});
+    SAIDAS.forEach(function(o){m.out[o]=clone(A.out[o]);});
+  });
+}
+function deduzidosUsados(M,R){
+  var d=[];
+  if(R)R.S.forEach(function(x){var f=x.p?fonteCanal(x.t):'';if(/^AES3-[1-4]$/.test(f))d.push('Ch '+x.n+' ← '+f+' (fonte)');});
+  SAIDAS.forEach(function(o){var s=M.out[o].src||'';if(/^bus:(?!3$)/.test(s)||s==='hp:R'||/^ret:(?!B1$)/.test(s)||s==='com:2')d.push(o+' ← '+s.replace(':',' '));});
+  BUSES.forEach(function(b){var s=M.bus[b].src;if(s&&s!=='Bl')d.push('Bus '+b+' ← '+s);});
+  return d;
+}
+function exportar(c,R,M,nome){
+  var m=sjParse(SC.txt),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
+  R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
+    sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s));
+    sjSet(m,[k,'inputSrcName'],s.p?(fonteCanal(s.t)||sjGet(m,[k,'inputSrcName'])):'Nosource');
+    sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);sjSet(m,[k,'isoPostFader'],ch.iso==='post');
+    BUSES.forEach(function(b){var v=ch.r[b]||'';
+      /* send em −∞ já é "desligado": não mexe para não sujar o arquivo */
+      if(!v&&rotaArq({routeState:sjGet(m,[k,'bus'+b,'routeState']),gain:sjGet(m,[k,'bus'+b,'dB10thsSendGain'])})==='')return;
+      sjSet(m,[k,'bus'+b,'routeState'],rot[v]);
+      if(v==='send')sjSet(m,[k,'bus'+b,'dB10thsSendGain'],Math.round((ch.sg[b]||0)*10));});
+    if(ch.trim!=null)sjSet(m,[k,'trimGaindB10ths'],Math.round(ch.trim*10));
+    if(ch.hpf!=null){sjSet(m,[k,'lowcutEnabled'],ch.hpf>0);if(ch.hpf>0)sjSet(m,[k,'lowcutHz'],Math.round(ch.hpf));}
+    if(n<=16&&ch.ph!=null)sjSet(m,[k,'isPolarityInverted'],!!ch.ph);
+    if(n<=16&&ch.dly!=null)sjSet(m,[k,'msInputDelay'],+ch.dly);
+  });
+  BUSES.forEach(function(b){var x=M.bus[b];if(x.nome)sjSet(m,['OutputBusControl','obus'+b,'userName'],x.nome);if(b!=='L'&&b!=='R')sjSet(m,['SlateMicAndReturns','bus'+b],x.src||'');});
+  SAIDAS.forEach(function(o){var x=M.out[o],p=['AnalogOutputs',o],f=srcParaArquivo(x.src);
+    sjSet(m,p.concat('userName'),x.nome||'');if(f){sjSet(m,p.concat('source'),f[0]);sjSet(m,p.concat('chan'),f[1]);}
+    if(x.nivel)sjSet(m,p.concat('lineMic'),x.nivel);if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));});
+  /* saídas em par (link) com fontes diferentes no plano: desfaz o link */
+  for(var i=1;i<=9;i+=2){var a1='X'+i,a2='X'+(i+1),la=sjGet(m,['AnalogOutputs',a1,'linkedToOutput']),lb=sjGet(m,['AnalogOutputs',a2,'linkedToOutput']);
+    if((la&&la!=='nAnalogOutputs'||lb&&lb!=='nAnalogOutputs')&&M.out[a1].src!==M.out[a2].src){sjSet(m,['AnalogOutputs',a1,'linkedToOutput'],'nAnalogOutputs');sjSet(m,['AnalogOutputs',a2,'linkedToOutput'],'nAnalogOutputs');}}
+  sjSet(m,['system','name'],nome);
+  return sjDump(m)+'\n';
+}
+function nomeArq(s){return semAcento(s).replace(/[^A-Za-z0-9 _-]/g,'').trim().replace(/\s+/g,'_').slice(0,24)||'cena';}
+function viewScorpio(c,R,M){
+  var sc=scCarregar(),h='';
+  h+='<div class="painel"><h3>Arquivo do gravador</h3><p class="hint">No Scorpio, salve os settings num pendrive (Settings › Save) e escolha o arquivo .json aqui. Ele fica guardado só neste aparelho: tem nome, telefone e e-mail do técnico, então não vai para a planilha.</p>'+
+    '<label class="btn pri">Escolher settings (.json)…<input type="file" accept=".json,application/json" data-act="mscfile" class="sr"></label>'+
+    (sc?' <span class="chip ok">'+esc(sc.nome)+' · '+esc(String(sjGet(sc.m,['system','name'])||''))+' · firmware '+esc(String(sjGet(sc.m,['0version'])||'?'))+' · lido em '+esc(sc.em)+'</span> <button class="btn sm" type="button" data-act="mscdel">Esquecer arquivo</button>':'')+'</div>';
+  if(!sc){h+='<p class="hint">Sem arquivo, as abas Pistas, Routing, Buses e Saídas continuam servindo de plano; a comparação e a exportação aparecem aqui depois que você escolher um settings.</p>';return h+resumoCanais(R,M);}
+  var A=lerArquivo(sc.m),dif=comparar(R,M,A);
+  h+='<div class="painel"><h3>Comparar a cena "'+esc(c.nome)+'" (EP '+UI.ep+') com o gravador</h3>'+
+    (dif.length?'<p class="hint">'+dif.length+' diferença(s). "Cena" é o plano do app; "Gravador" é o arquivo.</p><div class="tabwrap" style="max-height:26rem;overflow:auto"><table class="tab"><thead><tr><th>Onde</th><th>O quê</th><th>Cena</th><th>Gravador</th></tr></thead><tbody>'+
+      dif.map(function(d){return '<tr><td class="n">'+esc(d[0])+'</td><td>'+esc(d[1])+'</td><td><b>'+esc(d[2])+'</b></td><td>'+esc(d[3])+'</td></tr>';}).join('')+'</tbody></table></div>'
+    :'<div class="alerta ok">A cena e o gravador estão iguais.</div>')+
+    '<div class="linha" style="margin-top:.7rem"><button class="btn" type="button" data-act="mtrazer">Trazer do gravador para a cena</button><span class="hint" style="margin:0">Copia ON, ARM, ISO, routing, trim, HPF, fase, delay, buses e saídas do arquivo para esta cena. Os nomes continuam vindo das pessoas. Dá para desfazer.</span></div></div>';
+  var ded=deduzidosUsados(M,R);
+  h+='<div class="painel"><h3>Exportar a cena para o Scorpio</h3><p class="hint">Gera um settings novo a partir do arquivo acima, mudando só nomes de pista, fontes, ON, ARM, ISO, routing, buses, saídas e os ajustes que você preencheu. Pistas vazias ficam "Ch N" sem fonte. Teste em casa, com backup dos settings atuais, antes de usar no set.</p>'+
+    (ded.length?'<div class="alerta warn">Usa códigos ainda não conferidos no aparelho: '+esc(ded.join(', '))+'. Confira essas saídas depois de carregar.</div>':'')+
+    '<div class="linha"><label class="campo">Nome do arquivo<input type="text" id="mscnome" value="'+esc(nomeArq(c.nome)+'_EP'+UI.ep)+'" maxlength="24"></label><button class="btn pri" type="button" data-act="mexport" style="align-self:flex-end">Baixar settings</button></div></div>';
+  return h+resumoCanais(R,M);
+}
+function resumoCanais(R,M){
+  var h='<h3>Resumo por canal</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Ch</th><th>Pista</th><th>Fonte</th><th>ON</th><th>ARM</th><th>ISO</th><th>Routing</th><th>Trim</th><th>HPF</th><th>Fase</th><th>Delay</th></tr></thead><tbody>';
+  R.S.forEach(function(s){var ch=M.ch[s.n];
+    var rts=BUSES.filter(function(b){return ch.r[b];}).map(function(b){return b+' '+ROTA_TXT[ch.r[b]]+(ch.r[b]==='send'?' '+(ch.sg[b]||0)+'dB':'');}).join(', ');
+    h+='<tr class="'+(s.p?'':'vaz')+'"><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(s.p?nomePista(s.p):'—')+'</td><td>'+esc(s.p?fonteTxt(fonteCanal(s.t)):'')+'</td><td>'+(ch.on?'●':'')+'</td><td>'+(ch.arm?'<b class="armtxt">●</b>':'')+'</td><td>'+(ch.iso==='post'?'pós':'pré')+'</td><td class="w">'+esc(rts||'—')+'</td>'+
+      '<td>'+(ch.trim==null?'':ch.trim+' dB')+'</td><td>'+(ch.hpf==null?'':ch.hpf?ch.hpf+' Hz':'desl.')+'</td><td>'+(ch.ph==null?'':ch.ph?'Ø':'normal')+'</td><td>'+(ch.dly==null?'':ch.dly+' ms')+'</td></tr>';});
+  return h+'</tbody></table></div>';
+}
+function baixar(nome,txt){
+  var b=new Blob([txt],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(u);a.remove();},1500);
+}
+
+/* ───────── eventos da mesa ───────── */
+function cliqueMesa(a,el){
+  if(a==='mpag'){UI.mixp=el.dataset.v;salvarUi();render();return true;}
+  if(a==='mled'){cliqueLed(+el.dataset.n,el.dataset.k);return true;}
+  if(a==='mrota'){var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),n=+el.dataset.n,b=el.dataset.b,i=ROTA_CICLO.indexOf(M.ch[n].r[b]||''),r={};r[b]=ROTA_CICLO[(i+1)%4];setCh(n,{r:r});return true;}
+  if(a==='miso'){var c2=cenaAtual(),M2=mesaEf(c2,resolver(c2,UI.ep)),n2=+el.dataset.n;setCh(n2,{iso:M2.ch[n2].iso==='post'?'pre':'post'});return true;}
+  if(a==='mchv'){var p={};p[el.dataset.k]=el.dataset.v;setCh(MSEL,p);return true;}
+  if(a==='mcopia'){COPIA=COPIA?null:{de:MSEL,k:{rota:true,iso:true,on:true,arm:true},feitos:[]};render();return true;}
+  if(a==='mcopiafim'){COPIA=null;render();return true;}
+  if(a==='mbusall'){if(!confirm('Copiar os buses e as saídas desta cena para todas as outras?'))return true;
+    var cur=cenaAtual(),mb=(cur.mesa&&cur.mesa.bus)||{},mo=(cur.mesa&&cur.mesa.out)||{};
+    cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);salvarCena(y);});toast('Buses e saídas copiados para as outras cenas');return true;}
+  if(a==='mscdel'){SC=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
+  if(a==='mtrazer'){if(!SC)return true;if(!confirm('Substituir ON, ARM, ISO, routing, ajustes, buses e saídas desta cena pelo que está no arquivo?'))return true;
+    var c3=cenaAtual(),R3=resolver(c3,UI.ep);trazerDoArquivo(R3,lerArquivo(SC.m));toast('Cena atualizada com o gravador');return true;}
+  if(a==='mexport'){if(!SC)return true;var c4=cenaAtual(),R4=resolver(c4,UI.ep),M4=mesaEf(c4,R4),nm=nomeArq($('#mscnome').value||c4.nome);
+    try{baixar(nm+'.json',exportar(c4,R4,M4,nm));toast('Settings gerado: '+nm+'.json');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
+  return false;
+}
+function mudancaMesa(a,el){
+  var b=el.dataset.b,k=el.dataset.k,r,p;
+  if(a==='mrsel'){r={};r[b]=el.value;setCh(MSEL,{r:r});return true;}
+  if(a==='msg'){r={};r[b]=parseFloat(el.value)||0;setCh(MSEL,{sg:r});return true;}
+  if(a==='mchn'){p={};p[k]=el.value===''?null:parseFloat(el.value);if(p[k]!==null&&isNaN(p[k]))return true;setCh(MSEL,p);return true;}
+  if(a==='mchs'){p={};p[k]=el.value===''?null:el.value==='1';setCh(MSEL,p);return true;}
+  if(a==='mcopiak'){COPIA.k[k]=el.checked;return true;}
+  if(a==='mbusnome'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{nome:el.value.trim().toUpperCase()});});return true;}
+  if(a==='mbussrc'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{src:el.value});});return true;}
+  if(a==='moutv'){var o=el.dataset.o;mudarMesa(function(m){var x={};x[k]=k==='nome'?el.value.trim().toUpperCase():el.value;m.out[o]=Object.assign({},m.out[o]||{},x);});return true;}
+  if(a==='moutn'){var o2=el.dataset.o;mudarMesa(function(m){var x={};x[k]=el.value===''?null:parseFloat(el.value);m.out[o2]=Object.assign({},m.out[o2]||{},x);});return true;}
+  if(a==='mscfile'&&el.files[0]){var f=el.files[0];f.text().then(function(t){try{scGuardar(f.name,t);toast('Settings lido');render();}catch(e){toast(e.message,true);}});return true;}
+  return false;
+}
 
 /* ───────── render ───────── */
 function render(){
