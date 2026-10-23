@@ -258,6 +258,27 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .undo{display:inline-flex;gap:.3rem}
 .fita span.tv{background:#f2c4bd}.fita span.tz{background:#c3d5f3}
 .fita span{font-family:'Permanent Marker',var(--fc);font-weight:400}
+
+/* cores por função (configuráveis no mixer) */
+:root{--c-host:#c9a227;--c-mentor:#8e5cc4;--c-A:#d0362b;--c-B:#2e6fd6;--c-boom:#2aa198;--c-goose:#8a9a2e}
+.strip.k-host{background:color-mix(in srgb,var(--c-host) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-host) 45%,#1c1e22)}
+.strip.k-mentor{background:color-mix(in srgb,var(--c-mentor) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-mentor) 45%,#1c1e22)}
+.strip.k-tv{background:color-mix(in srgb,var(--c-A) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-A) 45%,#1c1e22)}
+.strip.k-tz{background:color-mix(in srgb,var(--c-B) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-B) 45%,#1c1e22)}
+.strip.k-boom{background:color-mix(in srgb,var(--c-boom) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-boom) 45%,#1c1e22)}
+.strip.k-goose{background:color-mix(in srgb,var(--c-goose) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-goose) 45%,#1c1e22)}
+.card.tv{border-color:color-mix(in srgb,var(--c-A) 45%,#fff);background:color-mix(in srgb,var(--c-A) 12%,#fff)}
+.card.tz{border-color:color-mix(in srgb,var(--c-B) 45%,#fff);background:color-mix(in srgb,var(--c-B) 12%,#fff)}
+.card.tv .ft,.card.tz .ft{border-bottom:6px solid}.card.tv .ft{border-color:var(--c-A)}.card.tz .ft{border-color:var(--c-B)}
+.chip.tv{background:color-mix(in srgb,var(--c-A) 16%,#fff);color:color-mix(in srgb,var(--c-A) 80%,#000)}.chip.tz{background:color-mix(in srgb,var(--c-B) 16%,#fff);color:color-mix(in srgb,var(--c-B) 80%,#000)}
+.seg button.tv[aria-pressed=true]{background:var(--c-A)}.seg button.tz[aria-pressed=true]{background:var(--c-B)}
+.fita span.tv{background:color-mix(in srgb,var(--c-A) 25%,#fff)}.fita span.tz{background:color-mix(in srgb,var(--c-B) 25%,#fff)}
+.mleg label{display:inline-flex;align-items:center;gap:.3rem;cursor:pointer}
+.mleg input[type=color]{width:1.3rem;height:1.3rem;border:1px solid var(--line);border-radius:4px;padding:0;background:none;cursor:pointer}
+.mlog{margin-top:.8rem}.mlog summary{cursor:pointer;font-weight:600;font-size:.9rem}
+.mlog ol{list-style:none;margin:.4rem 0 0;padding:0;max-height:16rem;overflow:auto;font-size:.84rem;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.mlog li{padding:.3rem .6rem;border-bottom:1px solid var(--line);display:flex;gap:.6rem}.mlog li:last-child{border-bottom:0}
+.mlog time{color:var(--ink3);font-variant-numeric:tabular-nums;flex:none}.mlog i{font-style:normal;color:var(--ink3);flex:none}
 /* estilo SD-Remote */
 .sdr{--sdbg:#1c1c1e;--sdln:#2e2e31;background:var(--sdbg);color:#ececee;border-radius:12px;overflow:hidden;margin-top:.9rem;font-size:.95rem}
 .sd-hd{display:flex;gap:.7rem;align-items:center;padding:.55rem .8rem;background:#141416;border-bottom:1px solid var(--sdln);flex-wrap:wrap}
@@ -322,7 +343,9 @@ table.sd-mx{border-collapse:separate;border-spacing:4px}
 .sd-mx th.rl{position:sticky;left:0;z-index:1;background:#5d5d61;color:#fff;text-align:left;font-weight:500;border-radius:3px;padding:.3rem .5rem;white-space:nowrap;font-size:.86rem}
 .sd-mx th.rl.arm{background:#9b3d1f}.sd-mx th.rl span{opacity:.8}.sd-mx th.rl i{display:block;font-style:normal;font-size:.72rem;opacity:.85}
 .mx{width:2.6rem;height:2.4rem;border:0;border-radius:3px;background:#48484b;color:#1b2340;font-size:.66rem;font-weight:700}
-.sd-nav{position:sticky;bottom:.4rem;z-index:6;display:flex;gap:.1rem;background:#1c1c1e;border-radius:12px;padding:.3rem;margin:1rem auto 0;overflow-x:auto;width:max-content;max-width:100%;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.sd-nav{display:flex;gap:.1rem;background:#1c1c1e;border-radius:0 0 12px 12px;padding:.3rem;margin:0 auto 0;overflow-x:auto;width:100%;justify-content:safe center}
+.console{border-radius:12px 12px 0 0}
+.sd-nav.solo{border-radius:12px;margin-top:.6rem}
 .sd-nav button{background:none;border:0;color:#8e8e93;display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.68rem;padding:.3rem .5rem;min-width:3.3rem;border-radius:8px}
 .sd-nav svg{width:1.25rem;height:1.25rem;fill:currentColor}
 .sd-nav button.sel{color:#fff;background:#2c2c2f}
@@ -379,7 +402,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.13 · 23/10 17:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.14 · 23/10 18:15</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -434,7 +457,7 @@ function salvarUi(){jset(K.ui,UI);}
 /* ───────── dados ───────── */
 /* times: guardados como Vermelho/Azul (aceita A/B antigos); internamente A=Vermelho, B=Azul */
 function normTime(v){var t=str(v).toLowerCase();if(/^az/.test(t)||t==='b')return 'B';if(/^verm/.test(t)||t==='a'||t==='v')return 'A';return '';}
-var TIMES={A:{nome:'Vermelho',cls:'tv',grava:'Vermelho'},B:{nome:'Azul',cls:'tz',grava:'Azul'}};
+var TIMES={A:{nome:'Time A',cls:'tv',grava:'A'},B:{nome:'Time B',cls:'tz',grava:'B'}};
 function timeNome(t){return TIMES[t]?TIMES[t].nome:'';}
 function timeCls(t){return TIMES[t]?TIMES[t].cls:'';}
 function timeChip(t){return TIMES[t]?'<span class="chip '+TIMES[t].cls+'">'+TIMES[t].nome+'</span>':'';}
@@ -484,13 +507,13 @@ function normalizar(R){
     var dig=campo(o,['Compatível com digital','Digital?','Digital']),inv=campo(o,['Polaridade invertida','INV. ?','INV.?','Inv.','Polaridade']);
     return {id:str(o['Cápsula']),tipo:str(o['Tipo']).toLowerCase()||'lapela',modelo:str(o['Modelo']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações']),cor:str(o['Cor']).toLowerCase(),
       serial:/^(true|false)$/i.test(str(o['Serial']))?'':str(o['Serial']),term:str(campo(o,['Terminação','Conector'])),qtd:int(o['Qtd']),para:/^(true|false)$/i.test(str(o['Converte para']))?'':str(o['Converte para']),
-      soAna:dig!==undefined&&str(dig)!==''&&!simNao(dig),manut:simNao(campo(o,['Manutenção','Manut.','Manutenção?'])),inv:simNao(inv)};}).filter(function(c){return c.id;});
+      soAna:dig!==undefined&&str(dig)!==''&&!simNao(dig),manut:simNao(campo(o,['Manutenção','Manut.','Manutenção?'])),inv:inv!==undefined&&str(inv)!==''?simNao(inv):/sanken|shure|twinplex|cos-?11/i.test(str(o['Modelo']))};}).filter(function(c){return c.id;});
   d.capPor={};d.cap.forEach(function(c){d.capPor[c.id]=c;});
   d.elenco=linhas(R,'elenco').map(function(o,ix){return {ix:ix,id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),papel:str(o['Papel']).toUpperCase()||'PARTICIPANTE',colinha:str(o['Colinha (pista)']),foto:str(o['Foto']),elim:int(o['Eliminado após EP']),obs:str(o['Observações']),pista:str(o['Nome de pista'])};}).filter(function(p){return p.id;});
   d.elenco.sort(function(a,b){return (ORDEM_PAPEL[a.papel]==null?9:ORDEM_PAPEL[a.papel])-(ORDEM_PAPEL[b.papel]==null?9:ORDEM_PAPEL[b.papel])||nat(a.colinha||'99',b.colinha||'99')||a.ix-b.ix;});
   d.pPor={};d.elenco.forEach(function(p){d.pPor[p.id]=p;});
   d.esc=linhas(R,'esc').map(function(o){return {ep:int(o['EP']),id:str(o['ID']),tx:str(o['TX']),cap:str(o['Cápsula']),time:normTime(o['Time']),obs:str(o['Observações']),em:str(o['Atualizado em']),por:str(o['Por'])};}).filter(function(r){return r.ep&&r.id;});
-  d.eps=linhas(R,'eps').map(function(o){return {ep:int(o['EP']),a:int(o['Vermelho']!=null?o['Vermelho']:o['Equipe A']),b:int(o['Azul']!=null?o['Azul']:o['Equipe B']),data:str(o['Data de gravação'])};}).filter(function(e){return e.ep;}).sort(function(a,b){return a.ep-b.ep;});
+  d.eps=linhas(R,'eps').map(function(o){return {ep:int(o['EP']),a:int(campo(o,['Time A','Vermelho','Equipe A'])),b:int(campo(o,['Time B','Azul','Equipe B'])),data:str(o['Data de gravação'])};}).filter(function(e){return e.ep;}).sort(function(a,b){return a.ep-b.ep;});
   if(!d.eps.length)for(var i=1;i<=8;i++)d.eps.push({ep:i,a:0,b:0,data:''});
   d.imp=linhas(R,'imp').map(function(o){return {gerado:str(o['Report gerado em']),em:str(o['Importado em']),por:str(o['Por']),n:str(o['Transmissores atualizados']),mud:str(o['Mudanças']),nao:str(o['Nomes sem correspondência'])};});
   d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}if(pp&&!Array.isArray(pp)){mm=pp.m||null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;return c;}).filter(function(c){return c.id;}):null;
@@ -685,6 +708,7 @@ function adaptUso(ep,exceto){
   return u;
 }
 function txDigital(t){return /DBSMD|A10|DCHT|DBu/i.test(t.modelo||'')||/\bD2\b|HDM|^digital(?!\s*hybrid)/i.test(t.mod||'');}
+function primeiroNome(p){return String(p.nome||'').trim().split(/\s+/)[0]||p.nome;}
 function capInv(id){var c=D.capPor[id];return !!(c&&c.inv);}
 function invIcon(id,sm){return capInv(id)?'<span class="inv'+(sm?' sm':'')+'" title="Polaridade invertida: inverter no transmissor">Ø</span>':'';}
 /* colinha 23–32: participantes ativos do episódio, em ordem de transmissor, sem buracos */
@@ -716,7 +740,7 @@ function cardHtml(x,col){
   var rx=t?rxTxt(t):'';
   return '<button class="card'+(x.ativo?'':' fora')+(bad&&x.ativo?' bad':'')+(tc?' '+tc:'')+'" type="button" data-act="abrir" data-id="'+esc(p.id)+'" data-busca="'+esc(buscaTxt(x,ch))+'">'+
     fotoGrande(p)+'<span class="papel">'+esc(papelTxt(p))+(ch?' · '+ch:'')+'</span>'+(tc?'<span class="timefaixa">'+esc(timeNome(e.time))+'</span>':'')+
-    '<span class="bd"><span class="nm">'+esc(p.nome)+'</span>'+
+    '<span class="bd"><span class="nm" title="'+esc(p.nome)+'">'+esc(primeiroNome(p))+'</span>'+
     (x.ativo?'<span class="eq">'+(e&&e.tx?'<span class="tag" title="TX '+esc(e.tx)+'">'+esc(txNome(t,e.tx))+'</span>':'<span class="tag vazio">TX –</span>')+
       (e&&e.cap?'<span class="tag cap '+(corDe(e.cap)||'semcor')+'">'+esc(e.cap)+'</span>'+invIcon(e.cap)+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?'<span class="chip pend" title="adaptador MicroDot → '+esc(k.ad)+'">+AD '+esc(k.ad)+'</span>':'';})():'')+'</span>'+
       rf+
@@ -742,13 +766,13 @@ function aplicarBusca(){
 function viewCar(){
   var s=situacao(UI.ep),h=epBar();
   var ep=D.eps.filter(function(e){return e.ep===UI.ep;})[0]||{};
-  h+='<div class="sumario"><span><b>EP '+UI.ep+'</b>'+(ep.a||ep.b?' · vermelho '+ep.a+' × '+ep.b+' azul':'')+(ep.data?' · '+esc(ep.data):'')+'</span>'+
+  h+='<div class="sumario"><span><b>EP '+UI.ep+'</b>'+(ep.a||ep.b?' · time A '+ep.a+' × '+ep.b+' time B':'')+(ep.data?' · '+esc(ep.data):'')+'</span>'+
     (s.graves?'<span class="chip bad">'+s.graves+' problema(s)</span>':'')+
     (s.avisos-s.graves?'<span class="chip warn">'+(s.avisos-s.graves)+' aviso(s)</span>':'')+
     (!s.avisos?'<span class="chip ok">tudo certo</span>':'')+'</div>';
   var col=colinhaMap(UI.ep);
   h+='<div class="busca noprint"><input type="search" id="busca" data-act="busca" value="'+esc(BUSCA)+'" placeholder="Buscar nome, TX, modelo, canal, cápsula…" aria-label="Buscar" autocomplete="off">'+
-    '<span class="seg" role="group" aria-label="Time">'+[['','Todos',''],['A','Vermelho','tv'],['B','Azul','tz'],['-','Sem time','']].map(function(o){return '<button type="button" class="'+o[2]+'" data-act="ft" data-v="'+o[0]+'" aria-pressed="'+((UI.ft||'')===o[0])+'">'+o[1]+'</button>';}).join('')+'</span>'+
+    '<span class="seg" role="group" aria-label="Time">'+[['','Todos',''],['A','Time A','tv'],['B','Time B','tz'],['-','Sem time','']].map(function(o){return '<button type="button" class="'+o[2]+'" data-act="ft" data-v="'+o[0]+'" aria-pressed="'+((UI.ft||'')===o[0])+'">'+o[1]+'</button>';}).join('')+'</span>'+
     '<span class="hint" id="nbusca" style="margin:0"></span></div>';
   var ft=UI.ft||'';
   function passaTime(x){if(!ft)return true;if(x.p.papel!=='PARTICIPANTE'&&x.p.papel!=='CONVIDADO')return false;var t=(x.e||{}).time||'';return ft==='-'?!t:t===ft;}
@@ -809,7 +833,7 @@ function monSaidasHtml(){
   var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R);
   h+='<div class="quebra"><h3>Transmissores de monitoração</h3>'+(mon.length?'<div class="tabwrap"><table class="tab"><thead><tr><th>TX</th><th>Nome</th><th>Modelo</th><th>Freq. MHz</th><th>Código</th><th>Banda</th><th>Fonte no Scorpio</th><th>Obs.</th></tr></thead><tbody>'+
     mon.map(function(t){var fonte=t.saida&&M.out[t.saida.toUpperCase()]?t.saida.toUpperCase()+' · '+(M.out[t.saida.toUpperCase()].nome||'')+' ← '+saidaTxt(M.out[t.saida.toUpperCase()].src,M,R):t.saida;
-      return '<tr><td><span class="tag sm">'+esc(t.num)+'</span></td><td class="n">'+esc(t.nome)+'</td><td>'+esc(t.modelo)+'</td><td><b>'+mhz(t.freq)+'</b></td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':esc(t.cod))+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(fonte||'a definir')+'</td><td class="w">'+esc(t.grade&&!t.grade.ok?t.grade.msg:'')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="livres">Nenhum cadastrado.</p>');
+      return '<tr><td><span class="tag sm">'+esc(t.num)+'</span></td><td class="n">'+esc(t.nome)+'</td><td>'+esc(t.modelo)+'</td><td><b>'+mhz(t.freq)+'</b></td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':esc(t.cod))+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(fonte||'a definir')+'</td><td class="w">'+esc(t.grade&&!t.grade.ok?t.grade.msg:'')+(t.ajustado?' <span class="chip ok">ajustado</span>':' <button class="btn sm noprint" type="button" data-act="ajustado" data-tx="'+esc(t.num)+'">Já ajustei</button>')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="livres">Nenhum cadastrado.</p>');
   h+='<h3>Saídas do Scorpio · cena "'+esc(c.nome)+'"</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th></tr></thead><tbody>'+
     SAIDAS.map(function(k){var o=M.out[k];return '<tr><td><span class="tag sm">'+k+'</span></td><td class="n">'+esc(o.nome)+'</td><td>'+esc(saidaTxt(o.src,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(o.nivel||'');})[0]||['',''])[1])+'</td></tr>';}).join('')+'</tbody></table></div>';
   h+='<p class="livres"><b>Buses:</b> '+esc(BUSES.filter(function(b){return M.bus[b].nome;}).map(function(b){return b+' '+M.bus[b].nome+(M.bus[b].src?' (+'+((RET_COD.filter(function(r){return r[0]===M.bus[b].src;})[0]||[0,M.bus[b].src])[1])+')':'');}).join(' · '))+'. Routing completo na aba Mixer › Routing.</p></div>';
@@ -867,7 +891,7 @@ function editorHtml(){
   if(!x)return '';
   var p=x.p,e=x.e||{},t=x.t,tipo=tipoCap(p),h='';
   h+='<div class="ov" data-act="fecharfora"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(p.nome)+'">';
-  h+='<div class="sh-hd">'+avatar(p)+'<div><h2>'+esc(p.nome)+'</h2><div class="hint" style="margin:0">'+esc(papelTxt(p))+(colinhaMap(ep).map[p.id]?' · colinha '+colinhaMap(ep).map[p.id]:'')+' · EP '+ep+(x.herdado?' · igual ao EP '+x.herdado:'')+'</div></div><span class="sp"></span><button class="x" type="button" data-act="fechar" aria-label="Fechar">×</button></div>';
+  h+='<div class="sh-hd">'+avatar(p)+'<div><h2>'+esc(primeiroNome(p))+'</h2><div class="hint" style="margin:0">'+esc(p.nome!==primeiroNome(p)?p.nome+' · ':'')+esc(papelTxt(p))+(colinhaMap(ep).map[p.id]?' · colinha '+colinhaMap(ep).map[p.id]:'')+' · EP '+ep+(x.herdado?' · igual ao EP '+x.herdado:'')+'</div></div><span class="sp"></span><button class="x" type="button" data-act="fechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sh-bd">';
   if(!x.ativo){
     h+='<div class="alerta pend">Eliminado após o EP '+p.elim+'. O transmissor e a cápsula dele ficaram livres.<span class="sp"></span><button class="btn sm" type="button" data-act="desfazerelim">Desfazer</button></div></div></div></div>';
@@ -1056,7 +1080,7 @@ function rotuloTok(tok){
 function avisosMix(R,ep){
   var W=[],S=R.S,EF=R.EF;
   var semTime=D.elenco.filter(function(p){return ativo(p,ep)&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')&&!(EF[p.id]||{}).time;});
-  if(semTime.length)W.push(['bad','Sem time (Vermelho/Azul) marcado no Carômetro: '+semTime.map(function(p){return p.nome;}).join(', ')+'. Eles não entram nas pistas de time.']);
+  if(semTime.length)W.push(['bad','Sem time (A/B) marcado no Carômetro: '+semTime.map(function(p){return p.nome;}).join(', ')+'. Eles não entram nas pistas de time.']);
   var foraCL=S.filter(function(s){return s.n>=13&&s.n<=16&&s.p&&!s.copia;});
   if(foraCL.length)W.push(['warn','Fora do CL-12, só no iPad: '+foraCL.map(function(s){return 'Ch '+s.n+' '+nomePista(s.p);}).join(', ')+'.']);
   var naClara={};S.forEach(function(s){if(s.n>=17&&s.n<=22&&s.p)naClara[s.p.id]=1;});
@@ -1115,12 +1139,55 @@ function aplicarBuscaMix(){
     el.classList.toggle('achado',!!ok);el.classList.toggle('fosco',!!ativo&&!ok);if(ok)n++;});
   var c=$('#nmbusca');if(c)c.textContent=ativo?n+' pista(s)':'';
 }
+/* cores das funções no mixer (por aparelho) */
+var CORES_PAD={host:'#c9a227',mentor:'#8e5cc4',A:'#d0362b',B:'#2e6fd6',boom:'#2aa198',goose:'#8a9a2e'};
+var CORES_ROT=[['host','Host'],['mentor','Mentores'],['A','Time A'],['B','Time B'],['boom','Boom'],['goose','Gooseneck']];
+function corFuncao(k){return (UI.cores&&UI.cores[k])||CORES_PAD[k];}
+function aplicarCores(){var r=document.documentElement.style;CORES_ROT.forEach(function(x){r.setProperty('--c-'+x[0],corFuncao(x[0]));});}
+/* histórico de mudanças do mixer (por aparelho, últimas 150) */
+var KLOG='plc_mixlog',MLOG=jget(KLOG,[]);
+function logMix(msgs){if(!msgs.length)return;var hh=agora().slice(11),c=cenaAtual();msgs.forEach(function(m){MLOG.unshift({h:hh,ep:UI.ep,cena:c?c.nome:'',m:m});});MLOG=MLOG.slice(0,150);jset(KLOG,MLOG);}
+function logHtml(){
+  return '<details class="mlog noprint"'+(UI.logAberto?' open':'')+'><summary data-act="mlogtog">Histórico de mudanças ('+MLOG.length+')</summary>'+
+    (MLOG.length?'<ol>'+MLOG.slice(0,80).map(function(x){return '<li><time>'+esc(x.h)+'</time><i>EP '+x.ep+' · '+esc(x.cena)+'</i><span>'+esc(x.m)+'</span></li>';}).join('')+'</ol><div class="linha" style="margin-top:.4rem"><button class="btn sm" type="button" data-act="mlogclr">Limpar histórico</button></div>':'<p class="hint">Nada mudou ainda.</p>')+'</details>';
+}
+function nomeTok(tok,R){
+  if(!tok)return 'vazio';var m=/^([PABC]):(.+)$/.exec(tok);if(!m)return tok;
+  var who='';if(m[1]==='P'){var p=D.pPor[m[2]];return p?nomePista(p):m[2];}
+  var L=m[1]==='A'?R.A:m[1]==='B'?R.B:R.C,x=L&&L[int(m[2])-1];
+  return rotuloTok(tok)+(x?' ('+nomePista(x)+')':'');
+}
+/* descreve o que mudou entre duas versões de uma cena */
+function diffCena(a,b){
+  var out=[],R=resolver(b,UI.ep),Ra=resolver(a,UI.ep);
+  if(a.nome!==b.nome)out.push('Cena renomeada: '+a.nome+' → '+b.nome);
+  if(a.ordem!==b.ordem)out.push('Ordem nos times: '+(b.ordem==='tx'?'transmissor':'alfabética'));
+  var mud=[];for(var i=0;i<32;i++)if((a.pistas[i]||'')!==(b.pistas[i]||''))mud.push(i);
+  if(mud.length===2&&a.pistas[mud[0]]===b.pistas[mud[1]]&&a.pistas[mud[1]]===b.pistas[mud[0]])
+    out.push('Ch '+(mud[0]+1)+' ⇄ Ch '+(mud[1]+1)+' ('+nomeTok(a.pistas[mud[0]],Ra)+' ⇄ '+nomeTok(a.pistas[mud[1]],Ra)+')');
+  else if(mud.length>6)out.push(mud.length+' pistas mudaram de conteúdo ('+faixaTxt(mud.map(function(x){return x+1;}))+')');
+  else mud.forEach(function(i){out.push('Ch '+(i+1)+': '+nomeTok(a.pistas[i],Ra)+' → '+nomeTok(b.pistas[i],R));});
+  var Ma=mesaEf(a,R),Mb=mesaEf(b,R),grp={};
+  function add(txt,n){(grp[txt]=grp[txt]||[]).push(n);}
+  function sw(v){return v?'ligado':'desligado';}
+  for(var n=1;n<=32;n++){var x=Ma.ch[n],y=Mb.ch[n];
+    if(x.on!==y.on)add('ON '+sw(y.on),n);if(x.arm!==y.arm)add('ARM '+sw(y.arm),n);
+    BUSES.forEach(function(k){if((x.r[k]||'')!==(y.r[k]||''))add('→ '+(k==='L'||k==='R'?k:'B'+k)+' '+ROTA_TXT[y.r[k]||'']+(y.r[k]==='send'?' '+(y.sg[k]||0)+' dB':''),n);
+      else if(y.r[k]==='send'&&(x.sg[k]||0)!==(y.sg[k]||0))add('→ B'+k+' send '+(y.sg[k]||0)+' dB',n);});
+    [['trim','Trim',' dB'],['hpf','HPF',' Hz'],['dly','Delay',' ms']].forEach(function(f){if(x[f[0]]!==y[f[0]])add(f[1]+' '+(y[f[0]]==null?'não mexer':y[f[0]]+f[2]),n);});
+    if(x.ph!==y.ph)add('Fase '+(y.ph==null?'não mexer':y.ph?'Ø':'normal'),n);}
+  Object.keys(grp).forEach(function(t){out.push(faixaTxt(grp[t])+': '+t);});
+  BUSES.forEach(function(k){if(Ma.bus[k].nome!==Mb.bus[k].nome)out.push('Bus '+k+' renomeado: '+(Mb.bus[k].nome||'—'));if((Ma.bus[k].src||'')!==(Mb.bus[k].src||''))out.push('Bus '+k+' retorno: '+(Mb.bus[k].src||'nenhum'));});
+  SAIDAS.forEach(function(k){var p=Ma.out[k],q=Mb.out[k];if(p.src!==q.src)out.push('Saída '+k+': '+saidaTxt(q.src,Mb,R));if(p.nome!==q.nome)out.push('Saída '+k+' renomeada: '+q.nome);
+    if(p.nivel!==q.nivel||p.gain!==q.gain||p.dly!==q.dly)out.push('Saída '+k+': nível/ganho/delay ajustados');});
+  return out;
+}
 /* desfazer / refazer no mixer */
 var UNDO=[],REDO=[];
 function cenaPorId(id){return cenasLista().filter(function(c){return c.id===id;})[0];}
-function salvarCenaMix(c){var antes=cenaPorId(c.id);if(antes){UNDO.push(clone(antes));if(UNDO.length>60)UNDO.shift();REDO=[];}salvarCena(c);}
-function desfazerMix(){var prev=UNDO.pop();if(!prev){toast('Nada para desfazer');return;}var at=cenaPorId(prev.id);if(at)REDO.push(clone(at));UI.cena=prev.id;salvarUi();salvarCena(prev);render();}
-function refazerMix(){var nx=REDO.pop();if(!nx){toast('Nada para refazer');return;}var at=cenaPorId(nx.id);if(at)UNDO.push(clone(at));UI.cena=nx.id;salvarUi();salvarCena(nx);render();}
+function salvarCenaMix(c){var antes=cenaPorId(c.id);if(antes){UNDO.push(clone(antes));if(UNDO.length>60)UNDO.shift();REDO=[];try{logMix(diffCena(antes,c));}catch(e){}}salvarCena(c);}
+function desfazerMix(){var prev=UNDO.pop();if(!prev){toast('Nada para desfazer');return;}var at=cenaPorId(prev.id);if(at){REDO.push(clone(at));try{logMix(diffCena(at,prev).map(function(m){return '↶ desfeito: '+m;}));}catch(e){}}UI.cena=prev.id;salvarUi();salvarCena(prev);render();}
+function refazerMix(){var nx=REDO.pop();if(!nx){toast('Nada para refazer');return;}var at=cenaPorId(nx.id);if(at){UNDO.push(clone(at));try{logMix(diffCena(at,nx).map(function(m){return '↷ refeito: '+m;}));}catch(e){}}UI.cena=nx.id;salvarUi();salvarCena(nx);render();}
 function impressaoMix(R,c,M){
   var linhas=R.S.filter(function(s){return s.p||s.tok||(M&&M.ch[s.n].arm);}).map(function(s){var p=s.p;
     return '<tr><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(p?nomePista(p):'—')+'</td><td>'+esc(p?p.nome:(s.motivo||rotuloTok(s.tok)))+'</td><td>'+esc(s.t?txNome(s.t):'')+'</td><td><b>'+esc(s.t?s.t.canal:'')+'</b></td><td>'+(s.e&&s.e.cap?esc(s.e.cap)+(capInv(s.e.cap)?' '+invIcon(s.e.cap,1):''):'')+'</td><td>'+esc(s.e?timeNome(s.e.time):'')+'</td><td>'+(M&&M.ch[s.n].on?'●':'')+'</td><td>'+(M&&M.ch[s.n].arm?'<b class="armtxt">● ARM</b>':'')+'</td><td>'+(M?CL_ROTAS.map(function(r){var x=M.ch[s.n].r[r[0]];return x?r[1]+' '+ROTA_TXT[x]:'';}).filter(Boolean).join(' · '):'')+'</td><td>'+esc(s.copia?'cópia do Ch '+s.copia:'')+(s.n>=17&&s.n<=22?' X'+(s.n-16)+' → 633·'+(s.n-16):'')+'</td></tr>';}).join('');
@@ -1147,18 +1214,18 @@ function viewMix(){
   if(pg!=='pistas'){
     h+='<section class="doc'+(pg==='rota'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
       ({rota:viewRota,bus:viewBus,out:viewOut}[pg]?{rota:viewRota,bus:viewBus,out:viewOut}[pg](R,M):viewScorpio(c,R,M))+'</section>';
-    return h+sdNav();
+    return h+sdNav(true)+logHtml();
   }
   h+='<div class="console">';
   if(v[0]==='all')h+=linhaMix(R,1,16,v,M)+linhaMix(R,17,32,v,M);else h+=linhaMix(R,v[2],v[3],v,M);
-  h+='</div>';
-  h+='<div class="mleg noprint">'+[['#3b3524','Host'],['#33293f','Mentores'],['#3c2527','Vermelho'],['#223049','Azul'],['#1f3a39','Boom'],['#363a22','Gooseneck']].map(function(x){return '<span><i style="background:'+x[0]+'"></i>'+x[1]+'</span>';}).join('')+'</div>';
+  h+='</div>'+sdNav();
+  h+='<div class="mleg noprint">'+CORES_ROT.map(function(x){return '<label title="Toque para escolher a cor"><input type="color" data-act="mcor" data-k="'+x[0]+'" value="'+esc(corFuncao(x[0]))+'">'+x[1]+'</label>';}).join('')+'<button class="btn sm" type="button" data-act="mcorreset">Cores padrão</button></div>';
   h+='<p class="hint noprint" style="margin:.4rem 0 0">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON (amarelo) e ARM (vermelho). Toque para trocar.</p>';
   var W=avisosMix(R,UI.ep);
   h+='<div class="alertas noprint" style="margin-top:.8rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>';
   h+='<div class="noprint">'+painelCopia()+(MSELS.length>1?painelGrupo(R,M):painelSlot(R,M))+'</div>';
   h+='<p class="hint noprint">Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p>';
-  return h+sdNav()+impressaoMix(R,c,M);
+  return h+logHtml()+impressaoMix(R,c,M);
 }
 function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
 function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
@@ -1172,6 +1239,9 @@ function cliqueMix(a,el){
     if(EVK.ctrl||MVARIOS){var cur=MSELS.length?MSELS.slice():(MSEL?[MSEL]:[]),ix=cur.indexOf(n);if(ix>=0)cur.splice(ix,1);else cur.push(n);cur.sort(function(x,y){return x-y;});
       MANC=n;if(cur.length>1){MSELS=cur;MSEL=0;}else{MSELS=[];MSEL=cur[0]||0;}render();return true;}
     MSELS=[];MANC=n;MSEL=MSEL===n?0:n;MTROCA=false;render();return true;}
+  if(a==='mcorreset'){UI.cores={};salvarUi();aplicarCores();render();return true;}
+  if(a==='mlogclr'){MLOG=[];jset(KLOG,MLOG);render();return true;}
+  if(a==='mlogtog'){UI.logAberto=!UI.logAberto;salvarUi();return false;}
   if(a==='mvarios'){MVARIOS=!MVARIOS;if(!MVARIOS&&MSELS.length<2)MSELS=[];render();return true;}
   if(a==='mgrpfim'){MSELS=[];MSEL=0;render();return true;}
   if(a==='mgrp'){grupoAplicar(el.dataset.k,el.dataset.v);return true;}
@@ -1180,18 +1250,19 @@ function cliqueMix(a,el){
   if(a==='mlimpa'){mudarPista(MSEL,'');return true;}
   if(a==='mcena'){UI.cena=el.dataset.v;MSEL=0;salvarUi();render();return true;}
   if(a==='mview'){UI.mixv=el.dataset.v;salvarUi();render();return true;}
-  if(a==='mreset'){if(confirm('Voltar esta cena para a estrutura base (fixos 1–3, Vermelho 4–8, Azul 9–13, boom 14, gooseneck 15, Azul para a Clara 17–21, colinha 23–32)?')){c=clone(cenaAtual());c.pistas=cenaBase();salvarCenaMix(c);}return true;}
+  if(a==='mreset'){if(confirm('Voltar esta cena para a estrutura base (fixos 1–3, Time A 4–8, Time B 9–13, boom 14, gooseneck 15, Time B para a Clara 17–21, colinha 23–32)?')){c=clone(cenaAtual());c.pistas=cenaBase();salvarCenaMix(c);}return true;}
   if(a==='minv'){MINV=!MINV;render();return true;}
   if(a==='mundo'){desfazerMix();return true;}
   if(a==='mredo'){refazerMix();return true;}
   if(a==='mnova'){var nome=prompt('Nome da nova cena (ex.: QG equipes separadas):');if(!nome)return true;c=clone(cenaAtual());c.id='c'+Date.now().toString(36);c.nome=nome.trim();
-    salvarCena(c);UI.cena=c.id;salvarUi();render();return true;}
+    salvarCena(c);logMix(['Cena nova: '+c.nome]);UI.cena=c.id;salvarUi();render();return true;}
   if(a==='mren'){c=clone(cenaAtual());var nn=prompt('Novo nome da cena:',c.nome);if(nn){c.nome=nn.trim();salvarCena(c);}return true;}
-  if(a==='mdel'){c=cenaAtual();if(confirm('Excluir a cena "'+c.nome+'"?')){salvarCena(c,true);UI.cena='';salvarUi();render();}return true;}
+  if(a==='mdel'){c=cenaAtual();if(confirm('Excluir a cena "'+c.nome+'"?')){logMix(['Cena excluída: '+c.nome]);salvarCena(c,true);UI.cena='';salvarUi();render();}return true;}
   if(a==='mpista'){var s=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(s&&s.p){fazer({acao:'pessoa',id:s.p.id,pista:semAcento($('#mpista').value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   return false;
 }
 function mudancaMix(a,el){
+  if(a==='mcor'){UI.cores=Object.assign({},UI.cores||{});UI.cores[el.dataset.k]=el.value;salvarUi();aplicarCores();return true;}
   if(mudancaMesa(a,el))return true;
   if(a==='mtok'){mudarPista(MSEL,el.value);return true;}
   if(a==='mordem'){var c=clone(cenaAtual());c.ordem=el.value;salvarCenaMix(c);return true;}
@@ -1555,7 +1626,7 @@ function mudancaMesa(a,el){
   if(a==='mchn'){p={};p[k]=el.value===''?null:parseFloat(el.value);if(p[k]!==null&&isNaN(p[k]))return true;setCh(MSEL,p);return true;}
   if(a==='mchs'){p={};p[k]=el.value===''?null:el.value==='1';setCh(MSEL,p);return true;}
   if(a==='mcopiak'){COPIA.k[k]=el.checked;return true;}
-  if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
+  if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){logMix(['Nome de pista: '+nomePista(sp.p)+' → '+semAcento(el.value.trim()).toUpperCase()]);fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   if(a==='mhpfhz'){var hzv=el.value===''?null:parseFloat(el.value),cH=cenaAtual(),chH=mesaEf(cH,resolver(cH,UI.ep)).ch[MSEL],pt={hpfhz:hzv};if(chH.hpf>0&&hzv>0)pt.hpf=hzv;setCh(MSEL,pt);return true;}
   if(a==='mbusnome'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{nome:el.value.trim().toUpperCase()});});return true;}
   if(a==='mbussrc'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{src:el.value});});return true;}
@@ -1572,9 +1643,9 @@ var SDICO={f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" widt
   d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
 var RET_COD=[['Al','A1'],['Ar','A2'],['Bl','B1'],['Br','B2'],['Cl','C1'],['Cr','C2']];
 var BUS_FONTES=[['','—'],['_1','Com Rtn 1 *'],['_2','Com Rtn 2 *']].concat(RET_COD.map(function(r){return [r[0],'Return '+r[1]+(r[0]==='Bl'?'':' *')];}));
-function sdNav(){
+function sdNav(solo){
   var at=UI.mixp&&UI.mixp!=='pistas'?UI.mixp:UI.mixv;
-  return '<nav class="sd-nav noprint" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'"'+(x[0]===at?' class="sel" aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
+  return '<nav class="sd-nav noprint'+(solo?' solo':'')+'" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'"'+(x[0]===at?' class="sel" aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
 }
 function sdSw(on,attrs,dis){var st=on===null||on===undefined?'nulo':on?'on':'';return '<button type="button" role="switch" aria-checked="'+(on===true)+'" class="sw '+st+'" '+attrs+(dis?' disabled':'')+' title="'+(st==='nulo'?'não mexer no gravador':on?'ligado':'desligado')+'"></button>';}
 function sdRow(l,v,cls){return '<div class="sd-row'+(cls?' '+cls:'')+'"><span class="sd-l">'+l+'</span><span class="sd-v">'+v+'</span></div>';}
@@ -1773,7 +1844,7 @@ document.addEventListener('keydown',function(ev){
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&MODO==='api')buscar();});
 
 /* ───────── início ───────── */
-recalcular();render();
+aplicarCores();recalcular();render();
 if(MODO==='api'){buscar();setInterval(function(){if(!document.hidden&&!EDIT)buscar();else if(FILA.length)enviar();},30000);}
 window.__plc={lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir};
 })();

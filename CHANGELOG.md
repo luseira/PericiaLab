@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.14 · 2026-10-23
+- Times passam a se chamar Time A e Time B (na planilha: A e B; valores antigos ainda são lidos).
+- Mixer: cores de fundo por função configuráveis (host, mentores, time A, time B, boom, gooseneck), salvas no aparelho; os cards do Carômetro seguem as cores dos times.
+- Mixer: barra de bancos e páginas colada embaixo do console.
+- Mixer: histórico de mudanças (troca de pistas, ON/ARM, envios, ajustes, buses, saídas, desfazer/refazer, cenas), guardado no aparelho.
+- Carômetro mostra só o primeiro nome (nome completo no editor e ao passar o mouse).
+- Polaridade: Sanken e Shure invertidos, DPA normal (regra aplicada quando a coluna está vazia).
+- Transmissores de monitoração ganham "Já ajustei" na input list.
+- Planilha: blocos/bandas numa aba própria (Blocos); a aba de modelos virou "Modelos".
+
 ## v1.12 · 2026-10-23
 - Cápsula × transmissor: a escolha respeita o conector (TA5F nos Lectrosonics, Lemo 3 no A10 e no SSM). DPA MicroDot/MicroLock entram com adaptador, contando quantos estão livres no episódio (5 para TA5F, 2 para Lemo). Sanken COS-11 sem D não vai em transmissor digital (DBSMD, A10).
 - Avisos: cápsula incompatível, falta de adaptador, cápsula em manutenção. Card e input list mostram "+AD TA5F/Lemo 3" quando a cápsula usa adaptador.
