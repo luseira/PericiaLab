@@ -379,7 +379,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.12 · 23/10 17:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.13 · 23/10 17:50</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -460,6 +460,9 @@ function gradeTx(t,f){
   }
   return r;
 }
+/* lê um campo aceitando nomes alternativos de coluna (o usuário pode renomear cabeçalhos) */
+function campo(o,nomes){for(var i=0;i<nomes.length;i++)if(o[nomes[i]]!==undefined&&o[nomes[i]]!=='')return o[nomes[i]];for(i=0;i<nomes.length;i++)if(o[nomes[i]]!==undefined)return o[nomes[i]];return undefined;}
+function simNao(v){return v===true||/^(true|verdadeiro|sim|x|s)$/i.test(str(v));}
 function linhas(R,k){return (R&&R[k])||[];}
 function normalizar(R){
   var d={};
@@ -477,7 +480,11 @@ function normalizar(R){
   d.txPor={};d.tx.forEach(function(t){d.txPor[t.num]=t;});
   d.rx=linhas(R,'rx').map(function(o){return {id:str(o['Receptor']),modelo:str(o['Modelo']),rxch:str(o['Canal do receptor']),input:str(o['Input do Scorpio']),conector:str(o['Conector']),canal:str(o['Canal no gravador']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações'])};}).filter(function(r){return r.id;});
   d.rxPor={};d.rx.forEach(function(r){d.rxPor[r.id]=r;});
-  d.cap=linhas(R,'cap').map(function(o){return {id:str(o['Cápsula']),tipo:str(o['Tipo']).toLowerCase()||'lapela',modelo:str(o['Modelo']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações']),cor:str(o['Cor']).toLowerCase(),serial:str(o['Serial']),term:str(o['Terminação']),qtd:int(o['Qtd']),para:str(o['Converte para']),soAna:o['Compatível com digital']!==undefined&&str(o['Compatível com digital'])!==''&&!(o['Compatível com digital']===true||/^(true|verdadeiro|sim|x)$/i.test(str(o['Compatível com digital']))),manut:(o['Manutenção']===true||/^(true|verdadeiro|sim|x)$/i.test(str(o['Manutenção']))),inv:o['Polaridade invertida']===true||/^(true|verdadeiro|sim|x)$/i.test(str(o['Polaridade invertida']))};}).filter(function(c){return c.id;});
+  d.cap=linhas(R,'cap').map(function(o){
+    var dig=campo(o,['Compatível com digital','Digital?','Digital']),inv=campo(o,['Polaridade invertida','INV. ?','INV.?','Inv.','Polaridade']);
+    return {id:str(o['Cápsula']),tipo:str(o['Tipo']).toLowerCase()||'lapela',modelo:str(o['Modelo']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações']),cor:str(o['Cor']).toLowerCase(),
+      serial:/^(true|false)$/i.test(str(o['Serial']))?'':str(o['Serial']),term:str(campo(o,['Terminação','Conector'])),qtd:int(o['Qtd']),para:/^(true|false)$/i.test(str(o['Converte para']))?'':str(o['Converte para']),
+      soAna:dig!==undefined&&str(dig)!==''&&!simNao(dig),manut:simNao(campo(o,['Manutenção','Manut.','Manutenção?'])),inv:simNao(inv)};}).filter(function(c){return c.id;});
   d.capPor={};d.cap.forEach(function(c){d.capPor[c.id]=c;});
   d.elenco=linhas(R,'elenco').map(function(o,ix){return {ix:ix,id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),papel:str(o['Papel']).toUpperCase()||'PARTICIPANTE',colinha:str(o['Colinha (pista)']),foto:str(o['Foto']),elim:int(o['Eliminado após EP']),obs:str(o['Observações']),pista:str(o['Nome de pista'])};}).filter(function(p){return p.id;});
   d.elenco.sort(function(a,b){return (ORDEM_PAPEL[a.papel]==null?9:ORDEM_PAPEL[a.papel])-(ORDEM_PAPEL[b.papel]==null?9:ORDEM_PAPEL[b.papel])||nat(a.colinha||'99',b.colinha||'99')||a.ix-b.ix;});
