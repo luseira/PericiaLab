@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.12 · 2026-10-23
+- Cápsula × transmissor: a escolha respeita o conector (TA5F nos Lectrosonics, Lemo 3 no A10 e no SSM). DPA MicroDot/MicroLock entram com adaptador, contando quantos estão livres no episódio (5 para TA5F, 2 para Lemo). Sanken COS-11 sem D não vai em transmissor digital (DBSMD, A10).
+- Avisos: cápsula incompatível, falta de adaptador, cápsula em manutenção. Card e input list mostram "+AD TA5F/Lemo 3" quando a cápsula usa adaptador.
+
 ## v1.6 · 2026-10-23
 - Código calculado pelo app: Lectrosonics em hex com ¼ ½ ¾ (e o bloco nos wideband), Sony UTX pelo canal de TV + passos de 125 kHz.
 - Aviso de frequência fora da grade do aparelho (passo do modelo) ou fora da faixa: no card e na prévia da importação do report.
