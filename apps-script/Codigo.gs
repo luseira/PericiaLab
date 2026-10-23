@@ -129,7 +129,7 @@ function efetivo_(esc, ep) {
     const e = Number(r['EP']);
     if (!(e <= ep)) return;
     const id = String(r['ID']), cur = m[id];
-    if (!cur || e > cur.ep || (e === cur.ep && i > cur.i)) m[id] = { ep: e, i: i, tx: String(r['TX']), cap: String(r['Cápsula']) };
+    if (!cur || e > cur.ep || (e === cur.ep && i > cur.i)) m[id] = { ep: e, i: i, tx: String(r['TX']), cap: String(r['Cápsula']), time: String(r['Time'] || '') };
   });
   return m;
 }
@@ -161,10 +161,10 @@ function escalar_(q) {
   for (let i = esc.length - 1; i >= 0; i--) {
     if (Number(esc[i]['EP']) === ep && String(esc[i]['ID']) === id) { linha = esc[i]._linha; break; }
   }
-  const anterior = ef[id] || { tx: '', cap: '' };
+  const anterior = ef[id] || { tx: '', cap: '', time: '' };
   const atual = linha ? esc.filter(function (r) { return r._linha === linha; })[0] : null;
   const base = atual ? { tx: atual['TX'], cap: atual['Cápsula'], time: atual['Time'], obs: atual['Observações'] }
-                     : { tx: anterior.tx, cap: anterior.cap, time: '', obs: '' };
+                     : { tx: anterior.tx, cap: anterior.cap, time: anterior.time || '', obs: '' };
   const novo = {
     tx: q.tx !== undefined ? q.tx : base.tx,
     cap: q.cap !== undefined ? q.cap : base.cap,
@@ -173,9 +173,8 @@ function escalar_(q) {
   };
   if (!linha) linha = s.getLastRow() + 1;
   s.getRange(linha, 1, 1, 9).setValues([[
-    ep, id, '', valorTx_(novo.tx), novo.cap || '', novo.time || '', novo.obs || '', '', q.por || 'app'
+    ep, id, nomes[id]['Nome'] || id, valorTx_(novo.tx), novo.cap || '', novo.time || '', novo.obs || '', '', q.por || 'app'
   ]]);
-  s.getRange(linha, 3).setFormula('=IF(B' + linha + '="","",XLOOKUP(B' + linha + ',Elenco!$A:$A,Elenco!$B:$B,"?"))');
   s.getRange(linha, 8).setValue(agora_());
   return {};
 }
