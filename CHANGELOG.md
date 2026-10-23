@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.18 · 2026-10-23
+- Mixer: arrastar uma pista não troca mais o conteúdo de lugar (era o que fazia canais "desligarem" ao tentar mexer no fader). Clicar no canal só seleciona.
+
 ## v1.17 · 2026-10-23
 - Copiar canal igual à tela "Copy Channel" do Scorpio: canal de origem, grade 1–32 de destinos (vários), "Settings to Copy" e botão Copy. Uma ação, um desfazer.
 - Tela do canal: saiu o "Trocar" (no computador continua arrastando uma pista sobre a outra); "Esvaziar" virou "Limpar canal".

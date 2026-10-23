@@ -191,7 +191,7 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .band.ctl{background:#2a2d33;color:#9aa1ab}
 .band.ctl.cl{background:#5e5034;color:#e6d9bd}
 .band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2f3a33}
-.strip{width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:grab}
+.strip{user-select:none;-webkit-user-select:none;width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:pointer}
 .strip.k-host{background:#3b3524;border-color:#5a5034}.strip.k-mentor{background:#33293f;border-color:#4f3f61}
 .strip.k-tv{background:#3c2527;border-color:#5e383b}.strip.k-tz{background:#223049;border-color:#344a6e}
 .strip.k-boom{background:#1f3a39;border-color:#305957}.strip.k-goose{background:#363a22;border-color:#545a35}
@@ -413,7 +413,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.17 · 23/10 18:55</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.18 · 23/10 19:05</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1127,7 +1127,7 @@ function stripHtml(s,v,M){
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
   var busca=p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'',inv?'ø inverter polaridade fase':'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
-  return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+(inv?' data-inv="1"':'')+' draggable="true" title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
+  return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+(inv?' data-inv="1"':'')+' title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
     '<span class="slab">'+(p?esc(estreito?corta16(nome):nome):'—')+'</span>'+
     '<span class="sph">'+(p?avatar(p):'')+'</span>'+(inv?'<span class="sinv">'+invIcon(s.e.cap,1)+'</span>':'')+
     '<span class="ssub">'+esc(sub)+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
@@ -1295,11 +1295,7 @@ function mudancaMix(a,el){
   if(a==='mordem'){var c=clone(cenaAtual());c.ordem=el.value;salvarCenaMix(c);return true;}
   return false;
 }
-var mDrag=0;
-document.addEventListener('dragstart',function(ev){var el=ev.target.closest&&ev.target.closest('[data-act=mslot]');if(!el)return;mDrag=+el.dataset.n;try{ev.dataTransfer.setData('text/plain',String(mDrag));ev.dataTransfer.effectAllowed='move';}catch(e){}});
-document.addEventListener('dragover',function(ev){if(mDrag&&ev.target.closest&&ev.target.closest('[data-act=mslot]'))ev.preventDefault();});
-document.addEventListener('drop',function(ev){var el=ev.target.closest&&ev.target.closest('[data-act=mslot]');if(!el||!mDrag)return;ev.preventDefault();var n=+el.dataset.n;trocarPistas(mDrag,n);MSEL=n;mDrag=0;render();});
-document.addEventListener('dragend',function(){mDrag=0;});
+/* arrastar pistas desligado: no console, clicar só seleciona (ON/ARM e envios só pelos botões) */
 
 /* ───────── settings do Scorpio: JSON que preserva ordem e números ───────── */
 /* Objetos viram Map (ordem exata das chaves), números guardam o texto original (1.0 continua 1.0).
@@ -1701,7 +1697,7 @@ function bancoDe(n){var a=Math.floor((n-1)/8)*8+1;return [a,a+7];}
 
 /* tela do canal */
 function painelSlot(R,M){
-  if(!MSEL)return '<p class="hint">Toque numa pista para abrir a tela do canal, como no SD-Remote. No computador, dá para arrastar uma pista sobre a outra para trocar.</p>';
+  if(!MSEL)return '<p class="hint">Toque numa pista para abrir a tela do canal, como no SD-Remote. </p>';
   var s=R.S[MSEL-1],n=MSEL,ch=M.ch[n],o='<option value="">Vazio</option>';
   ['A','B'].forEach(function(t){var L=R[t];
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
