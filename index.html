@@ -191,7 +191,11 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .band.ctl.cl{background:#5e5034;color:#e6d9bd}
 .band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2f3a33}
 .strip{width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:grab}
-.strip.z2{background:#2b2430}.strip.z3{background:#232a25}
+.strip.k-host{background:#3b3524;border-color:#5a5034}.strip.k-mentor{background:#33293f;border-color:#4f3f61}
+.strip.k-tv{background:#3c2527;border-color:#5e383b}.strip.k-tz{background:#223049;border-color:#344a6e}
+.strip.k-boom{background:#1f3a39;border-color:#305957}.strip.k-goose{background:#363a22;border-color:#545a35}
+.mleg{display:flex;gap:.8rem;flex-wrap:wrap;font-size:.76rem;color:var(--ink2);margin:.45rem 0 0}
+.mleg i{display:inline-block;width:.8rem;height:.8rem;border-radius:2px;margin-right:.3rem;vertical-align:-1px}
 .strip .slab{width:100%;background:#0e0f11;border-radius:4px;font:700 .82rem/1 var(--fc);letter-spacing:.02em;padding:.35rem .15rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:clip}
 .strip .sph .av{width:2rem;height:2rem;font-size:.8rem}
 .strip .sph{height:2rem}
@@ -372,7 +376,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.6 · 23/10 16:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.7 · 23/10 16:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1034,10 +1038,17 @@ function avisosMix(R,ep){
   return W;
 }
 function zonaDe(n){for(var i=0;i<ZONAS.length;i++)if(n>=ZONAS[i][0]&&n<=ZONAS[i][1])return i;return 0;}
+/* cor de fundo do fader pela função: host, mentor, time, boom, gooseneck */
+function catStrip(s){
+  var p=s.p;if(!p)return '';
+  if(p.papel==='HOST')return ' k-host';if(p.papel==='MENTOR')return ' k-mentor';
+  if(p.papel==='FONTE')return /goose/i.test(p.id+p.nome)?' k-goose':' k-boom';
+  var t=s.e&&s.e.time;return t==='A'?' k-tv':t==='B'?' k-tz':' k-part';
+}
 function stripHtml(s,v,M){
   var p=s.p,nome=p?nomePista(p):'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
   var cap=s.n<=12?CAPS[s.n-1]:'';
-  var cls='strip z'+zonaDe(s.n)+(MSEL===s.n?' sel':'')+(COPIA&&COPIA.de!==s.n?' colavel':'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
+  var cls='strip z'+zonaDe(s.n)+catStrip(s)+(MSEL===s.n?' sel':'')+(COPIA&&COPIA.de!==s.n?' colavel':'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
   var sub=p?[s.t?txNome(s.t):'sem TX',s.t&&s.t.canal?s.t.canal:''].filter(Boolean).join(' · '):(s.motivo||'');
   var out=s.n>=17&&s.n<=22?'<span class="xout">X'+(s.n-16)+' → 633·'+(s.n-16)+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
@@ -1048,8 +1059,7 @@ function stripHtml(s,v,M){
     '<span class="sph">'+(p?avatar(p):'')+'</span>'+(inv?'<span class="sinv">'+invIcon(s.e.cap,1)+'</span>':'')+
     '<span class="ssub">'+esc(sub)+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
     '<span class="strk"><span class="scap'+(cap?'':' sd')+'" style="'+(cap?'background:'+cap:'')+'"></span></span>'+out+
-    '<span class="sfoot">Ch '+s.n+'</span></button>'+
-    '<span class="fitac '+(p?tc:'vz')+'"'+(nome.length>6?' style="font-size:'+Math.max(.62,1.02*6/nome.length).toFixed(2)+'rem"':'')+'>'+(p?esc(nome):'')+'</span>';
+    '<span class="sfoot">Ch '+s.n+'</span></button>';
 }
 function linhaMix(R,a,b,v,M){
   var S=R.S.slice(a-1,b),cols=b-a+1,h='<div class="mrow" style="grid-template-columns:repeat('+cols+',var(--sw))">';
@@ -1103,6 +1113,7 @@ function viewMix(){
   h+='<div class="console">';
   if(v[0]==='all')h+=linhaMix(R,1,16,v,M)+linhaMix(R,17,32,v,M);else h+=linhaMix(R,v[2],v[3],v,M);
   h+='</div>';
+  h+='<div class="mleg noprint">'+[['#3b3524','Host'],['#33293f','Mentores'],['#3c2527','Vermelho'],['#223049','Azul'],['#1f3a39','Boom'],['#363a22','Gooseneck']].map(function(x){return '<span><i style="background:'+x[0]+'"></i>'+x[1]+'</span>';}).join('')+'</div>';
   h+='<p class="hint noprint" style="margin:.4rem 0 0">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON (amarelo) e ARM (vermelho). Toque para trocar.</p>';
   var W=avisosMix(R,UI.ep);
   h+='<div class="alertas noprint" style="margin-top:.8rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>';
