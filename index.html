@@ -226,6 +226,7 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .card .rf{display:flex;gap:.45rem;align-items:baseline;flex-wrap:wrap;font-size:.92rem}
 .card .rf b{font:700 1.05rem/1 var(--fc)}
 .card .fq{white-space:nowrap}
+.card .cod{font-size:.78rem;color:var(--ink2);white-space:nowrap}
 .card .eq .tag{font-size:1rem;height:1.6rem;padding:.12rem .35rem 0}
 .card .eq{gap:.3rem}
 .card .blk{font:700 .95rem/1 var(--fc);border:1.5px solid var(--ink);border-radius:4px;padding:.15rem .35rem .08rem;letter-spacing:.02em}
@@ -645,7 +646,7 @@ function rxTxt(t){
 function cardHtml(x,col){
   var p=x.p,e=x.e,t=x.t,bad=x.av.some(function(a){return a.k==='bad';});
   var ch=col&&col.map[p.id],tc=x.ativo&&e?timeCls(e.time):'';
-  var rf=t&&t.num!=='GN'?'<span class="rf">'+(t.bloco?'<span class="blk">Bloco '+esc(t.bloco)+'</span>':'')+(isNaN(t.freq)?'':'<span class="fq"><b>'+mhz(t.freq)+'</b> MHz</span>')+'</span>':'';
+  var rf=t&&t.num!=='GN'?'<span class="rf">'+(t.bloco?'<span class="blk">Bloco '+esc(t.bloco)+'</span>':'')+(isNaN(t.freq)?'':'<span class="fq"><b>'+mhz(t.freq)+'</b> MHz</span>')+(t.cod?'<span class="cod" title="código">'+esc(t.cod)+'</span>':'')+'</span>':'';
   var rx=t?rxTxt(t):'';
   return '<button class="card'+(x.ativo?'':' fora')+(bad&&x.ativo?' bad':'')+(tc?' '+tc:'')+'" type="button" data-act="abrir" data-id="'+esc(p.id)+'" data-busca="'+esc(buscaTxt(x,ch))+'">'+
     fotoGrande(p)+'<span class="papel">'+esc(papelTxt(p))+(ch?' · '+ch:'')+'</span>'+(tc?'<span class="timefaixa">'+esc(timeNome(e.time))+'</span>':'')+
