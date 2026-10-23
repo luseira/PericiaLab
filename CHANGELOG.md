@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.17 · 2026-10-23
+- Copiar canal igual à tela "Copy Channel" do Scorpio: canal de origem, grade 1–32 de destinos (vários), "Settings to Copy" e botão Copy. Uma ação, um desfazer.
+- Tela do canal: saiu o "Trocar" (no computador continua arrastando uma pista sobre a outra); "Esvaziar" virou "Limpar canal".
+- Avisos do mixer recolhidos num item "Avisos (n)", com contador de importantes.
+
 ## v1.16 · 2026-10-23
 - Mixer: Delete (ou "Esvaziar pistas") esvazia as pistas selecionadas, com desfazer.
 - Nova cena com escolha do modelo: cópia completa de qualquer cena ou a estrutura base.
