@@ -320,6 +320,8 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .cp-body{padding:.8rem 1rem;max-width:34rem}.sd-grid.g8{grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}.sd-grid.g4{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 .cp-lbl{margin:.8rem 0 .35rem;color:#d2d2d6;font-size:.9rem}.cp-tit{font-weight:600;letter-spacing:.04em}.cp-de{max-width:12rem}
 .cp-pe{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-top:.8rem}
+.sd-pick{display:grid;grid-template-columns:7rem 1fr;gap:.5rem .6rem;padding:.6rem 1rem .9rem;border-bottom:1px solid var(--sdln);background:#18181a}
+.sd-pick .sd-l{padding-top:.4rem;font-size:.8rem;color:#a5a5ab}
 .sd-grid.w4{grid-template-columns:repeat(auto-fill,minmax(7.5rem,1fr))}
 .sd-k.origem{background:#3a3ad6;opacity:.45;color:#fff}
 .sd-grid.w2{grid-template-columns:repeat(2,minmax(5rem,7rem))}
@@ -413,7 +415,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.18 · 23/10 19:05</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.19 · 23/10 19:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1066,24 +1068,41 @@ function timeDe(ep,t,ordem){
     return nat(a.nome,b.nome);
   });
 }
+/* quem está em cada entrada (canal do gravador) neste episódio, pelo Carômetro */
+function mapaCanais(ep,EF){
+  var m={};EF=EF||efetivo(ep);
+  D.elenco.forEach(function(p){if(!ativo(p,ep))return;var e=EF[p.id];var t=e&&e.tx?D.txPor[e.tx]:null;if(!t)return;
+    if(t.canal&&!m[t.canal])m[t.canal]=p;if(t.canalM&&!m[t.canalM])m[t.canalM]=p;});
+  return m;
+}
+/* todas as entradas que o sistema usa (canal do gravador), em ordem de input */
+function listaCanais(){
+  var v={};D.tx.forEach(function(t){if(t.mon)return;if(t.canal)v[t.canal]=int(t.input)||99;if(t.canalM){var r=D.rx.filter(function(x){return x.canal===t.canalM;})[0];v[t.canalM]=r?int(r.input)||99:99;}});
+  return Object.keys(v).sort(function(a,b){return v[a]-v[b]||nat(a,b);});
+}
 function resolver(cena,ep){
-  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),C=colinhaMap(ep).lista,primeira={},onde={};
+  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
   var S=cena.pistas.map(function(tok,i){
-    var s={n:i+1,tok:tok||'',p:null,motivo:''};
+    var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
-    var m=/^([PABC]):(.+)$/.exec(tok);if(!m)return s;
+    var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return s;
+    if(m[1]==='S'){s.cn=m[2];s.p=porCanal[m[2]]||null;if(!s.p)s.motivo='ninguém em '+m[2];
+      if(s.p){var e0=EF[s.p.id]||{};s.e=e0;s.t=e0.tx?D.txPor[e0.tx]:null;(onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
+      if(primeira['c:'+s.cn])s.copia=primeira['c:'+s.cn];else primeira['c:'+s.cn]=s.n;
+      return s;}
     if(m[1]==='P'){var p=D.pPor[m[2]];if(!p)s.motivo='não está no elenco';else if(!ativo(p,ep))s.motivo=p.nome+' saiu após o EP '+p.elim;else s.p=p;}
     else if(m[1]==='C'){s.p=C[int(m[2])-1]||null;if(!s.p)s.motivo='colinha '+m[2]+': ninguém';}
     else{var L=m[1]==='A'?A:B,k=int(m[2]);s.p=L[k-1]||null;if(!s.p)s.motivo=timeNome(m[1])+' '+k+': ninguém';}
-    if(s.p){var e=EF[s.p.id]||{};s.e=e;s.t=e.tx?D.txPor[e.tx]:null;
-      if(primeira[s.p.id])s.copia=primeira[s.p.id];else primeira[s.p.id]=s.n;
+    if(s.p){var e=EF[s.p.id]||{};s.e=e;s.t=e.tx?D.txPor[e.tx]:null;s.cn=s.t?s.t.canal:'';
+      var kc=s.cn?'c:'+s.cn:'p:'+s.p.id;if(primeira[kc])s.copia=primeira[kc];else primeira[kc]=s.n;
       (onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
     return s;
   });
   return {S:S,A:A,B:B,C:C,EF:EF,onde:onde};
 }
 function rotuloTok(tok){
-  if(!tok)return 'vazio';var m=/^([PABC]):(.+)$/.exec(tok);if(!m)return tok;
+  if(!tok)return 'vazio';var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return tok;
+  if(m[1]==='S')return 'Source '+m[2];
   if(m[1]==='P'){var p=D.pPor[m[2]];return p?p.nome:m[2];}
   if(m[1]==='C')return 'Colinha · '+m[2]+'º';
   return timeNome(m[1])+' · '+m[2]+'º';
@@ -1122,7 +1141,7 @@ function stripHtml(s,v,M){
   var p=s.p,nome=p?nomePista(p):'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
   var cap=s.n<=12?CAPS[s.n-1]:'';
   var cls='strip z'+zonaDe(s.n)+catStrip(s)+(M&&p&&!M.ch[s.n].on?' off':'')+(M&&M.ch[s.n].arm?' armado':'')+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?(COPIA.para.indexOf(s.n)>=0?' destino':' colavel'):'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
-  var sub=p?[s.t?txNome(s.t):'sem TX',s.t&&s.t.canal?s.t.canal:''].filter(Boolean).join(' · '):(s.motivo||'');
+  var sub=p?[s.t?txNome(s.t):'sem TX',s.cn||''].filter(Boolean).join(' · '):(s.cn?s.cn+' · ninguém':(s.motivo||''));
   var out=s.n>=17&&s.n<=22?'<span class="xout">X'+(s.n-16)+' → 633·'+(s.n-16)+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
@@ -1163,8 +1182,9 @@ function logHtml(){
     (MLOG.length?'<ol>'+MLOG.slice(0,80).map(function(x){return '<li><time>'+esc(x.h)+'</time><i>EP '+x.ep+' · '+esc(x.cena)+'</i><span>'+esc(x.m)+'</span></li>';}).join('')+'</ol><div class="linha" style="margin-top:.4rem"><button class="btn sm" type="button" data-act="mlogclr">Limpar histórico</button></div>':'<p class="hint">Nada mudou ainda.</p>')+'</details>';
 }
 function nomeTok(tok,R){
-  if(!tok)return 'vazio';var m=/^([PABC]):(.+)$/.exec(tok);if(!m)return tok;
-  var who='';if(m[1]==='P'){var p=D.pPor[m[2]];return p?nomePista(p):m[2];}
+  if(!tok)return 'vazio';var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return tok;
+  if(m[1]==='S'){var ps=mapaCanais(UI.ep)[m[2]];return m[2]+(ps?' ('+nomePista(ps)+')':'');}
+  if(m[1]==='P'){var p=D.pPor[m[2]];return p?nomePista(p):m[2];}
   var L=m[1]==='A'?R.A:m[1]==='B'?R.B:R.C,x=L&&L[int(m[2])-1];
   return rotuloTok(tok)+(x?' ('+nomePista(x)+')':'');
 }
@@ -1224,7 +1244,9 @@ function viewMix(){
     '<span class="undo"><button class="btn sm" type="button" data-act="mundo" title="Desfazer (Ctrl+Z)"'+(UNDO.length?'':' disabled')+'>↶ Desfazer</button><button class="btn sm" type="button" data-act="mredo" title="Refazer (Ctrl+Shift+Z)"'+(REDO.length?'':' disabled')+'>↷ Refazer</button></span>'+
     '<span class="hint" id="nmbusca" style="margin:0"></span></div>';
   var M=mesaEf(c,R),pg=UI.mixp||'pistas';
-  h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas</p>';
+  var W0=avisosMix(R,UI.ep),g0=W0.filter(function(w){return w[0]==='bad';}).length;
+  h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
+    (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+'</p>';
   if(pg!=='pistas'){
     h+='<section class="doc'+(pg==='rota'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
       ({rota:viewRota,bus:viewBus,out:viewOut}[pg]?{rota:viewRota,bus:viewBus,out:viewOut}[pg](R,M):viewScorpio(c,R,M))+'</section>';
@@ -1236,7 +1258,7 @@ function viewMix(){
   h+='<div class="mleg noprint">'+CORES_ROT.map(function(x){return '<label title="Toque para escolher a cor"><input type="color" data-act="mcor" data-k="'+x[0]+'" value="'+esc(corFuncao(x[0]))+'">'+x[1]+'</label>';}).join('')+'<button class="btn sm" type="button" data-act="mcorreset">Cores padrão</button></div>';
   var W=avisosMix(R,UI.ep),graves=W.filter(function(w){return w[0]==='bad';}).length;
   h+='<div class="noprint">'+painelCopia(R)+(MSELS.length>1?painelGrupo(R,M):painelSlot(R,M))+'</div>';
-  h+='<details class="mlog noprint"'+(UI.avAberto?' open':'')+'><summary data-act="mavtog">Avisos ('+W.length+')'+(graves?' <span class="chip bad">'+graves+' importante'+(graves>1?'s':'')+'</span>':'')+'</summary><div class="alertas" style="margin-top:.5rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>'+
+  h+='<details class="mlog avisos noprint"'+(UI.avAberto?' open':'')+'><summary data-act="mavtog">Avisos ('+W.length+')'+(graves?' <span class="chip bad">'+graves+' importante'+(graves>1?'s':'')+'</span>':'')+'</summary><div class="alertas" style="margin-top:.5rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>'+
     '<p class="hint">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON e ARM. Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p></details>';
   return h+logHtml()+impressaoMix(R,c,M);
 }
@@ -1251,11 +1273,12 @@ function cliqueMix(a,el){
     if(EVK.shift&&(MSEL||MSELS.length)){var ini=MANC||MSEL||MSELS[0],lo=Math.min(ini,n),hi=Math.max(ini,n);MSELS=[];for(var q=lo;q<=hi;q++)MSELS.push(q);MANC=ini;MSEL=0;MTROCA=false;render();return true;}
     if(EVK.ctrl||MVARIOS){var cur=MSELS.length?MSELS.slice():(MSEL?[MSEL]:[]),ix=cur.indexOf(n);if(ix>=0)cur.splice(ix,1);else cur.push(n);cur.sort(function(x,y){return x-y;});
       MANC=n;if(cur.length>1){MSELS=cur;MSEL=0;}else{MSELS=[];MSEL=cur[0]||0;}render();return true;}
-    MSELS=[];MANC=n;MSEL=MSEL===n?0:n;MTROCA=false;render();return true;}
+    MSELS=[];MANC=n;MSEL=MSEL===n?0:n;MTROCA=false;PICK=null;render();return true;}
   if(a==='mcorreset'){UI.cores={};salvarUi();aplicarCores();render();return true;}
   if(a==='mlogclr'){MLOG=[];jset(KLOG,MLOG);render();return true;}
   if(a==='mlogtog'){UI.logAberto=!UI.logAberto;salvarUi();return false;}
   if(a==='mavtog'){UI.avAberto=!UI.avAberto;salvarUi();return false;}
+  if(a==='mavabrir'){UI.avAberto=true;salvarUi();render();var d=document.querySelector('details.avisos');if(d)d.scrollIntoView({behavior:'smooth',block:'center'});return true;}
   if(a==='mvarios'){MVARIOS=!MVARIOS;if(!MVARIOS&&MSELS.length<2)MSELS=[];render();return true;}
   if(a==='mgrpfim'){MSELS=[];MSEL=0;render();return true;}
   if(a==='mgrp'){grupoAplicar(el.dataset.k,el.dataset.v);return true;}
@@ -1269,6 +1292,9 @@ function cliqueMix(a,el){
   if(a==='mundo'){desfazerMix();return true;}
   if(a==='mredo'){refazerMix();return true;}
   if(a==='mnova'){CENAOP=CENAOP==='nova'?null:'nova';render();setTimeout(function(){var i=$('#cnnome');if(i)i.focus();},30);return true;}
+  if(a==='mpick'){PICK=PICK===el.dataset.v?null:el.dataset.v;render();return true;}
+  if(a==='mpnome'){PICK=null;mudarPista(MSEL,el.dataset.v?'P:'+el.dataset.v:'');return true;}
+  if(a==='mpsrc'){PICK=null;mudarPista(MSEL,'S:'+el.dataset.v);return true;}
   if(a==='mcolar'){CENAOP=CENAOP==='colar'?null:'colar';render();return true;}
   if(a==='mcenaopfim'){CENAOP=null;render();return true;}
   if(a==='mcriar'){var nome=($('#cnnome').value||'').trim();if(!nome){toast('Dê um nome para a cena',true);return true;}
@@ -1363,7 +1389,25 @@ var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
 var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
 var ROTA_CICLO=['','post','pre','send'];
 var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
-var COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null;
+var COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
+/* escolher quem está na pista: pelo nome (a fonte vem do Carômetro) */
+function pickNome(R,s){
+  var EF=R.EF,grupos=[['Host e mentores',function(p){return p.papel==='HOST'||p.papel==='MENTOR';}],['Time A',function(p){return (EF[p.id]||{}).time==='A';}],['Time B',function(p){return (EF[p.id]||{}).time==='B';}],
+    ['Sem time',function(p){return (p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')&&!(EF[p.id]||{}).time;}],['Boom e gooseneck',function(p){return p.papel==='FONTE';}]];
+  var h='<div class="sd-pick">';
+  grupos.forEach(function(g){var L=D.elenco.filter(function(p){return ativo(p,UI.ep)&&g[1](p);});if(!L.length)return;
+    h+='<span class="sd-l">'+g[0]+'</span><div class="sd-grid w4">'+L.map(function(p){var t=(EF[p.id]||{}).tx?D.txPor[EF[p.id].tx]:null;
+      return '<button type="button" class="sd-k'+(s.p&&s.p.id===p.id?' sel':'')+'" data-act="mpnome" data-v="'+esc(p.id)+'">'+esc(nomePista(p))+'<small>'+esc(t&&t.canal?t.canal:'sem TX')+'</small></button>';}).join('')+'</div>';});
+  h+='<span class="sd-l"></span><div><button type="button" class="sd-k" data-act="mpnome" data-v="">Nenhum (limpar canal)</button></div></div>';
+  return h;
+}
+/* escolher a fonte (entrada): a pessoa vem do Carômetro */
+function pickSrc(R,s){
+  var mapa=mapaCanais(UI.ep,R.EF),L=listaCanais();
+  return '<div class="sd-pick"><span class="sd-l">Inputs</span><div class="sd-grid w4">'+L.map(function(cn){var p=mapa[cn];
+    return '<button type="button" class="sd-k'+(s.cn===cn?' sel':'')+'" data-act="mpsrc" data-v="'+esc(cn)+'">'+esc(cn)+'<small>'+esc(p?nomePista(p):'—')+'</small></button>';}).join('')+'</div>'+
+    '<span class="sd-l"></span><p class="sd-nota" style="margin:0">Fonte fixa: a pista fica nessa entrada e mostra quem estiver com o transmissor dela no episódio.</p></div>';
+}
 function cenaOpHtml(L,c){
   if(CENAOP==='nova')return '<div class="painel noprint cenaop"><h3>Nova cena</h3><div class="linha"><label class="campo" style="flex:1;min-width:12rem">Nome<input type="text" id="cnnome" placeholder="ex.: QG equipes separadas"></label>'+
     '<label class="campo" style="flex:1;min-width:12rem">A partir de<select id="cnbase">'+L.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===c.id?' selected':'')+'>'+esc(x.nome)+' (cópia completa)</option>';}).join('')+'<option value="__base">Estrutura base, sem ajustes de canal</option></select></label></div>'+
@@ -1458,6 +1502,10 @@ function srcDoArquivo(source,chan){
 }
 var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV']];
 /* ───────── fonte do canal a partir do transmissor ───────── */
+function fonteSlot(s){return s&&s.cn?fonteDeCanal(s.cn,s.t):'';}
+function fonteDeCanal(cn,t){var tt={canal:cn,input:t&&t.canal===cn?t.input:''};
+  if(!tt.input){var x=D.tx.filter(function(y){return y.canal===cn;})[0];if(x)tt.input=x.input;else{var r=D.rx.filter(function(y){return y.canal===cn;})[0];if(r)tt.input=r.input;}}
+  return fonteCanal(tt);}
 function fonteCanal(t){
   if(!t)return '';var c=String(t.canal||'').toUpperCase(),m;
   if((m=/^LINE\s*(\d+)/.exec(c)))return 'Adc'+m[1];
@@ -1547,7 +1595,7 @@ function comparar(R,M,A){
   function rt(v){return ROTA_TXT[v||''];}
   R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');
     add(on,'Nome',nomeArquivoPista(s),A.nomes[n]);
-    add(on,'Fonte',s.p?fonteTxt(fonteCanal(s.t)||'—'):'sem fonte',fonteTxt(A.fonte[n]));
+    add(on,'Fonte',s.cn?fonteTxt(fonteSlot(s)||'—'):'sem fonte',fonteTxt(A.fonte[n]));
     add(on,'ON',c.on?'sim':'não',a.on?'sim':'não');add(on,'ARM',c.arm?'sim':'não',a.arm?'sim':'não');if(a.iso==='post')add(on,'ISO','pré (sempre)','pós');
     BUSES.forEach(function(b){add(on,'→ '+b,rt(c.r[b])+(c.r[b]==='send'?' '+(c.sg[b]||0)+' dB':''),rt(a.r[b])+(a.r[b]==='send'?' '+a.sg[b]+' dB':''));});
     if(c.trim!=null)add(on,'Trim',c.trim+' dB',a.trim+' dB');
@@ -1569,7 +1617,7 @@ function trazerDoArquivo(R,A){
 }
 function deduzidosUsados(M,R){
   var d=[];
-  if(R)R.S.forEach(function(x){var f=x.p?fonteCanal(x.t):'';if(/^AES3-[1-4]$/.test(f))d.push('Ch '+x.n+' ← '+f+' (fonte)');});
+  if(R)R.S.forEach(function(x){var f=x.cn?fonteSlot(x):'';if(/^AES3-[1-4]$/.test(f))d.push('Ch '+x.n+' ← '+f+' (fonte)');});
   SAIDAS.forEach(function(o){var s=M.out[o].src||'';if(/^bus:(?!3$)/.test(s)||s==='hp:R'||/^ret:(?!B1$)/.test(s)||s==='com:2')d.push(o+' ← '+s.replace(':',' '));});
   BUSES.forEach(function(b){var s=M.bus[b].src;if(s&&s!=='Bl')d.push('Bus '+b+' ← '+s);});
   return d;
@@ -1578,7 +1626,7 @@ function exportar(c,R,M,nome){
   var m=sjParse(SC.txt),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
   R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
     sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s));
-    sjSet(m,[k,'inputSrcName'],s.p?(fonteCanal(s.t)||sjGet(m,[k,'inputSrcName'])):'Nosource');
+    sjSet(m,[k,'inputSrcName'],s.cn?(fonteSlot(s)||sjGet(m,[k,'inputSrcName'])):'Nosource');
     sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);sjSet(m,[k,'isoPostFader'],false); /* pistas sempre ISO pré */
     BUSES.forEach(function(b){var v=ch.r[b]||'';
       /* send em −∞ já é "desligado": não mexe para não sujar o arquivo */
@@ -1623,7 +1671,7 @@ function resumoCanais(R,M){
   var h='<h3>Resumo por canal</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Ch</th><th>Pista</th><th>Fonte</th><th>ON</th><th>ARM</th><th>Routing</th><th>Trim</th><th>HPF</th><th>Fase</th><th>Delay</th></tr></thead><tbody>';
   R.S.forEach(function(s){var ch=M.ch[s.n];
     var rts=BUSES.filter(function(b){return ch.r[b];}).map(function(b){return b+' '+ROTA_TXT[ch.r[b]]+(ch.r[b]==='send'?' '+(ch.sg[b]||0)+'dB':'');}).join(', ');
-    h+='<tr class="'+(s.p?'':'vaz')+'"><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(s.p?nomePista(s.p):'—')+'</td><td>'+esc(s.p?fonteTxt(fonteCanal(s.t)):'')+'</td><td>'+(ch.on?'●':'')+'</td><td>'+(ch.arm?'<b class="armtxt">●</b>':'')+'</td><td class="w">'+esc(rts||'—')+'</td>'+
+    h+='<tr class="'+(s.p?'':'vaz')+'"><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(s.p?nomePista(s.p):'—')+'</td><td>'+esc(s.cn?fonteTxt(fonteSlot(s)):'')+'</td><td>'+(ch.on?'●':'')+'</td><td>'+(ch.arm?'<b class="armtxt">●</b>':'')+'</td><td class="w">'+esc(rts||'—')+'</td>'+
       '<td>'+(ch.trim==null?'':ch.trim+' dB')+'</td><td>'+(ch.hpf==null?'':ch.hpf?ch.hpf+' Hz':'desl.')+'</td><td>'+(ch.ph==null?'':ch.ph?'Ø':'normal')+'</td><td>'+(ch.dly==null?'':ch.dly+' ms')+'</td></tr>';});
   return h+'</tbody></table></div>';
 }
@@ -1703,7 +1751,7 @@ function painelSlot(R,M){
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   o+='<optgroup label="Colinha (ordem de transmissor)">'+[1,2,3,4,5,6,7,8,9,10].map(function(k){return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(R.C[k-1]?' ('+esc(R.C[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';
   o+='<optgroup label="Pessoa ou fonte fixa">'+D.elenco.map(function(p){return '<option value="P:'+esc(p.id)+'"'+(s.tok==='P:'+p.id?' selected':'')+'>'+esc(p.nome)+'</option>';}).join('')+'</optgroup>';
-  var p=s.p,e=s.e||{},t=s.t,fonte=p?fonteCanal(t):'';
+  var p=s.p,e=s.e||{},t=s.t,fonte=s.cn?fonteSlot(s):'';
   var h='<div class="sdr mpan2">';
   /* cabeçalho: número do canal + quem está nele */
   h+='<div class="sd-hd"><span class="sd-ch'+(ch.arm?' arm':'')+'">Ch '+n+'</span>';
@@ -1715,13 +1763,16 @@ function painelSlot(R,M){
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sd-cols"><div class="sd-col">';
   h+=sdRow('Name:',p?'<span class="sd-in nome"><input type="text" id="mpista" data-act="mpistac" maxlength="14" value="'+esc(nomePista(p))+'"></span>':'<span class="sd-dim">Ch '+n+'</span>');
-  h+=sdRow('Pista:','<select class="sd-sel" data-act="mtok">'+o+'</select>');
+  var auto=/^[ABC]:/.test(s.tok)?rotuloTok(s.tok):'';
+  h+=sdRow('Quem:','<button type="button" class="sd-btn'+(PICK==='nome'?' sel':'')+'" data-act="mpick" data-v="nome">'+esc(p?primeiroNome(p):'— escolher —')+'</button>'+(auto?'<i class="sd-dim" title="Esta pista segue automaticamente a ordem do time/colinha">auto: '+esc(auto)+'</i>':''));
+  if(PICK==='nome')h+=pickNome(R,s);
   h+=sdRow('Trim:',sdNum('mchn','trim',ch.trim,'dB'));
   h+=sdRow('ON:',sdSw(!!ch.on,'data-act="mled" data-n="'+n+'" data-k="on"'));
   h+=sdRow('Arm:',sdSw(!!ch.arm,'data-act="mled" data-n="'+n+'" data-k="arm"'));
   h+='<div class="sd-row sd-acts"><button class="sd-btn'+(COPIA?' sel':'')+'" type="button" data-act="mcopia">⧉ Copiar este canal…</button><button class="sd-btn" type="button" data-act="mlimpa" title="Tira a pessoa desta pista (tecla Delete)">Limpar canal</button></div>';
   h+='</div><div class="sd-col">';
-  h+=sdRow('Source:','<span class="sd-btn src">'+esc(p?fonteTxt(fonte||''):'sem fonte')+'</span>'+(/MIC/i.test(t&&t.canal||'')?'<span class="sd-tag">48V</span>':''));
+  h+=sdRow('Source:','<button type="button" class="sd-btn src'+(PICK==='src'?' sel':'')+'" data-act="mpick" data-v="src">'+esc(s.cn?s.cn:'escolher')+'</button>'+(/MIC/i.test(s.cn||'')?'<span class="sd-tag">48V</span>':''));
+  if(PICK==='src')h+=pickSrc(R,s);
   var hz=ch.hpf?ch.hpf:(ch.hpfhz||80);
   h+=sdRow('HPF:',sdNum('mhpfhz','hpfhz',ch.hpf===null||ch.hpf===undefined?(ch.hpfhz||''):hz,'Hz')+sdSw(ch.hpf==null?null:ch.hpf>0,'data-act="msw" data-k="hpf"'));
   h+=sdRow('Iso:','<span class="sd-btn pre" title="As pistas gravam sempre pré-fader">Pre</span><i class="sd-dim">sempre</i>');
@@ -1755,7 +1806,7 @@ function painelCopia(R){
 function viewRota(R,M){
   var h='<div class="sdr sd-mxw"><table class="sd-mx"><thead><tr><th class="sd-corner"><span>To</span><span>From</span></th>'+
     BUSES.map(function(b){return '<th class="'+(b==='L'||b==='R'?'lr':'')+'"><b>'+(b==='L'||b==='R'?b:'B'+b)+'</b><span class="vt">'+esc(busNome(b,M))+'</span></th>';}).join('')+'</tr></thead><tbody>';
-  R.S.forEach(function(s){var ch=M.ch[s.n],f=s.p?fonteTxt(fonteCanal(s.t)):'';
+  R.S.forEach(function(s){var ch=M.ch[s.n],f=s.cn?fonteTxt(fonteSlot(s)):'';
     h+='<tr><th class="rl'+(ch.arm?' arm':'')+'"><span>'+s.n+':</span> '+esc(s.p?nomePista(s.p):'—')+(f?'<i>['+esc(f)+']</i>':'')+'</th>'+
       BUSES.map(function(b){var v=ch.r[b]||'';return '<td><button type="button" class="mx '+rotaCls(v)+'" data-act="mrota" data-n="'+s.n+'" data-b="'+b+'" title="Ch '+s.n+' → '+esc(busNome(b,M))+': '+ROTA_TXT[v]+(v==='send'?' '+(ch.sg[b]||0)+' dB':'')+'">'+(v==='send'&&ch.sg[b]?esc(String(ch.sg[b])):'')+'</button></td>';}).join('')+'</tr>';});
   h+='</tbody></table></div>';

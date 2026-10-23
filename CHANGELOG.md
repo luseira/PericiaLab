@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.19 · 2026-10-23
+- Tela do canal: "Quem" (escolher pelo nome, por grupo: host e mentores, time A, time B, boom e gooseneck) e "Source" (escolher pela entrada: AES 1, LINE 2… LINE 13/14 da sala dos mentores, MIC). Pelo nome, a fonte vem do Carômetro; pela fonte, a pessoa vem do Carômetro.
+- Cópia de canal é detectada pela entrada (mesma fonte), não pela pessoa.
+- Indicador de avisos no topo do mixer (abre a lista de avisos).
+
 ## v1.18 · 2026-10-23
 - Mixer: arrastar uma pista não troca mais o conteúdo de lugar (era o que fazia canais "desligarem" ao tentar mexer no fader). Clicar no canal só seleciona.
 
