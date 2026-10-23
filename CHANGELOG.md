@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.6 · 2026-10-23
+- Código calculado pelo app: Lectrosonics em hex com ¼ ½ ¾ (e o bloco nos wideband), Sony UTX pelo canal de TV + passos de 125 kHz.
+- Aviso de frequência fora da grade do aparelho (passo do modelo) ou fora da faixa: no card e na prévia da importação do report.
+- Transmissores de monitoração (Sony) cadastrados com Uso = monitoração: não aparecem para personagens; ficam numa seção própria no fim da input list.
+- Input list traz também as saídas do Scorpio e os buses da cena atual.
+- Apps Script: a importação grava o código calculado na coluna Código.
+
+## v1.5 · 2026-10-23
+- Card do Carômetro com nome do transmissor, bloco, frequência, código, receptor com canal e fundo na cor do time.
+
 ## v1.4 · 2026-10-23
 - Tela do canal, Routing, Buses e Outputs redesenhados no estilo do SD-Remote (duas colunas, chaves, grade de fontes, abas embaixo; matriz com as mesmas cores: laranja pós, verde pré, azul send).
 - Barra do mixer embaixo, como no SD-Remote: 1–8, 9–16, 17–24, 25–32, 1–16, 17–32, CL-12, Tudo, Buses, Outputs, Routing, Scorpio.

@@ -200,7 +200,7 @@ function ajustado_(q) {
 // q.itens = [{tx, freq}], q.gerado = data do report, q.naoCasados = [nomes]
 function importar_(q) {
   const s = aba_(ABAS.tx);
-  const cF = col_(s, 'Freq. (MHz)'), cA = col_(s, 'Aparelho ajustado'), cR = col_(s, 'Report de origem');
+  const cF = col_(s, 'Freq. (MHz)'), cA = col_(s, 'Aparelho ajustado'), cR = col_(s, 'Report de origem'), cC = col_(s, 'Código');
   const mudancas = [];
   (q.itens || []).forEach(function (it) {
     const l = linhaPor_(s, 'TX', valorTx_(it.tx));
@@ -213,6 +213,7 @@ function importar_(q) {
       mudancas.push('TX ' + it.tx + ': ' + (antes ? antes.toFixed(3) : '—') + ' → ' + depois.toFixed(3));
     }
     s.getRange(l, cR).setValue("'" + (q.gerado || ''));
+    if (it.cod !== undefined && cC) s.getRange(l, cC).setValue("'" + it.cod);
   });
   aba_(ABAS.imp).appendRow([
     "'" + (q.gerado || ''), agora_(), q.por || 'app', (q.itens || []).length,
