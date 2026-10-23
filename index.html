@@ -241,9 +241,10 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .fita span.tv{background:#f2c4bd}.fita span.tz{background:#c3d5f3}
 .fita span{font-family:'Permanent Marker',var(--fc);font-weight:400}
 /* mesa */
-.leds{display:flex;gap:3px;width:var(--sw);margin-top:4px;justify-content:center}
+.leds{display:flex;gap:3px;width:var(--sw);margin-bottom:4px;justify-content:center}
+.leds.rts{background:#111316;border-radius:5px;padding:3px;gap:2px}
 .led{border:1px solid #3a3e45;background:#15171a;color:#6d737c;border-radius:3px;font:700 .56rem/1 var(--f);padding:.28rem 0;flex:1;min-width:0;cursor:pointer;letter-spacing:.02em}
-.led.on.aceso{background:#1f7a3a;color:#d9ffe4;box-shadow:0 0 6px #2ecc71;border-color:#2ecc71}
+.led.on.aceso{background:#b88a00;color:#fff6d0;box-shadow:0 0 6px #ffc61a;border-color:#ffc61a}
 .led.arm.aceso{background:#9b1c14;color:#ffe0dc;box-shadow:0 0 6px #ff4b3e;border-color:#ff4b3e}
 .led.rt.r-pre{background:#1f7a3a;color:#d9ffe4;border-color:#2ecc71;box-shadow:0 0 5px #2ecc71}
 .led.rt.r-post{background:#9a6a00;color:#fff3cf;border-color:#f0b429;box-shadow:0 0 5px #f0b429}
@@ -262,7 +263,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 .rcel select,.rcel input{min-height:1.9rem;padding:.15rem .3rem;font-size:.82rem;width:100%}
 .rcel.r-pre{background:#e8f7ec}.rcel.r-post{background:#fff5d9}.rcel.r-send{background:#e6f2fc}
 .ajs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem}
-.ledbtn.on.aceso{background:#1f7a3a;color:#fff;border-color:#1f7a3a}.ledbtn.arm.aceso{background:#b3261e;color:#fff;border-color:#b3261e}
+.ledbtn.on.aceso{background:#b88a00;color:#fff;border-color:#b88a00}.ledbtn.arm.aceso{background:#b3261e;color:#fff;border-color:#b3261e}
 .cks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.3rem .8rem;font-size:.9rem}
 .mpan.copia{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
 .strip.colavel{outline:2px dashed var(--accent);outline-offset:1px}
@@ -910,13 +911,13 @@ function stripHtml(s,v,M){
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
   var busca=p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'',inv?'ø inverter polaridade fase':'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
-  return '<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+(inv?' data-inv="1"':'')+' draggable="true" title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
+  return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+(inv?' data-inv="1"':'')+' draggable="true" title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
     '<span class="slab">'+(p?esc(estreito?corta16(nome):nome):'—')+'</span>'+
     '<span class="sph">'+(p?avatar(p):'')+'</span>'+(inv?'<span class="sinv">'+invIcon(s.e.cap,1)+'</span>':'')+
     '<span class="ssub">'+esc(sub)+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
     '<span class="strk"><span class="scap'+(cap?'':' sd')+'" style="'+(cap?'background:'+cap:'')+'"></span></span>'+out+
     '<span class="sfoot">Ch '+s.n+'</span></button>'+
-    (M?ledsHtml(s,M.ch[s.n]):'')+'<span class="fitac '+(p?tc:'vz')+'"'+(nome.length>6?' style="font-size:'+Math.max(.62,1.02*6/nome.length).toFixed(2)+'rem"':'')+'>'+(p?esc(nome):'')+'</span>';
+    '<span class="fitac '+(p?tc:'vz')+'"'+(nome.length>6?' style="font-size:'+Math.max(.62,1.02*6/nome.length).toFixed(2)+'rem"':'')+'>'+(p?esc(nome):'')+'</span>';
 }
 function linhaMix(R,a,b,v,M){
   var S=R.S.slice(a-1,b),cols=b-a+1,h='<div class="mrow" style="grid-template-columns:repeat('+cols+',var(--sw))">';
@@ -1000,7 +1001,7 @@ function viewMix(){
   h+='<div class="console">';
   if(v[0]==='all')h+=linhaMix(R,1,16,v,M)+linhaMix(R,17,32,v,M);else h+=linhaMix(R,v[2],v[3],v,M);
   h+='</div>';
-  h+='<p class="hint noprint" style="margin:.4rem 0 0">Embaixo de cada fader: ON e ARM como no CL-12, e os envios X1 · L · R · X2 (verde = pré, amarelo = pós). Toque para trocar.</p>';
+  h+='<p class="hint noprint" style="margin:.4rem 0 0">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON (amarelo) e ARM (vermelho). Toque para trocar.</p>';
   var W=avisosMix(R,UI.ep);
   h+='<div class="alertas noprint" style="margin-top:.8rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>';
   h+='<div class="noprint">'+painelCopia()+painelSlot(R,M)+'</div>';
@@ -1198,13 +1199,13 @@ function fonteCanal(t){
 function fonteTxt(f){var m;if(!f||f==='Nosource')return 'sem fonte';if((m=/^Adc(\d+)/.exec(f)))return 'Input '+m[1];if((m=/^AES3-(\d+)/.exec(f)))return 'AES '+m[1];if((m=/^Dante_(\d+)/.exec(f)))return 'Dante '+m[1];return f;}
 
 /* ───────── LEDs do CL-12 em cada pista ───────── */
+/* ordem do CL-12, de cima para baixo: X1 · L · R · X2, depois ON (amarelo) e ARM (vermelho) */
 function ledsHtml(s,ch){
-  var h='<span class="leds">'+
+  return '<span class="leds rts">'+CL_ROTAS.map(function(r){var v=ch.r[r[0]]||'';
+      return '<button type="button" class="led rt '+rotaCls(v)+'" data-act="mled" data-n="'+s.n+'" data-k="r:'+r[0]+'" title="'+r[1]+': '+ROTA_TXT[v]+' (toque para trocar)">'+r[1]+'</button>';}).join('')+'</span>'+
+    '<span class="leds">'+
     '<button type="button" class="led on'+(ch.on?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="on" title="ON (canal ligado)">ON</button>'+
-    '<button type="button" class="led arm'+(ch.arm?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="arm" title="ARM (grava a pista)">ARM</button></span>'+
-    '<span class="leds rts">'+CL_ROTAS.map(function(r){var v=ch.r[r[0]]||'';
-      return '<button type="button" class="led rt '+rotaCls(v)+'" data-act="mled" data-n="'+s.n+'" data-k="r:'+r[0]+'" title="'+r[1]+': '+ROTA_TXT[v]+' (toque para trocar)">'+r[1]+'</button>';}).join('')+'</span>';
-  return h;
+    '<button type="button" class="led arm'+(ch.arm?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="arm" title="ARM (grava a pista)">ARM</button></span>';
 }
 function cliqueLed(n,k){
   var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),ch=M.ch[n];
