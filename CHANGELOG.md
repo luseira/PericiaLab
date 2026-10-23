@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.16 · 2026-10-23
+- Mixer: Delete (ou "Esvaziar pistas") esvazia as pistas selecionadas, com desfazer.
+- Nova cena com escolha do modelo: cópia completa de qualquer cena ou a estrutura base.
+- "Colar de outra cena": copia pistas, canais e/ou buses e saídas de outra cena para a atual.
+- ARM em destaque: LED vermelho aceso e o número do canal em vermelho nas pistas armadas.
+- Canal com ON desligado fica esmaecido (v1.15).
+
 ## v1.14 · 2026-10-23
 - Times passam a se chamar Time A e Time B (na planilha: A e B; valores antigos ainda são lidos).
 - Mixer: cores de fundo por função configuráveis (host, mentores, time A, time B, boom, gooseneck), salvas no aparelho; os cards do Carômetro seguem as cores dos times.
