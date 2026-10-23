@@ -299,6 +299,7 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .sd-k small{display:block;font-size:.56rem;opacity:.8;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-k sup{position:absolute;top:1px;right:3px;font-size:.6rem;opacity:.7}
 .sd-k.sel{background:#3a3ad6;color:#fff}
+.sd-k.misto{background:repeating-linear-gradient(135deg,#5a5a5e 0 6px,#6e6e73 6px 12px)}
 .sd-k.r-post,.mx.r-post{background:#dca244;color:#2a1c00}.sd-k.r-pre,.mx.r-pre{background:#7a9c5c;color:#0e1a06}.sd-k.r-send,.mx.r-send{background:#b4c0ee;color:#1b2340}
 .sd-sends{display:flex;gap:.8rem;flex-wrap:wrap;font-size:.85rem}
 .sd-nota{color:#8d8d93;font-size:.78rem;margin:.2rem 1rem .7rem}
@@ -377,7 +378,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.8 · 23/10 16:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.9 · 23/10 17:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1049,7 +1050,7 @@ function catStrip(s){
 function stripHtml(s,v,M){
   var p=s.p,nome=p?nomePista(p):'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
   var cap=s.n<=12?CAPS[s.n-1]:'';
-  var cls='strip z'+zonaDe(s.n)+catStrip(s)+(MSEL===s.n?' sel':'')+(COPIA&&COPIA.de!==s.n?' colavel':'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
+  var cls='strip z'+zonaDe(s.n)+catStrip(s)+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?' colavel':'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
   var sub=p?[s.t?txNome(s.t):'sem TX',s.t&&s.t.canal?s.t.canal:''].filter(Boolean).join(' · '):(s.motivo||'');
   var out=s.n>=17&&s.n<=22?'<span class="xout">X'+(s.n-16)+' → 633·'+(s.n-16)+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
@@ -1101,6 +1102,7 @@ function viewMix(){
     '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="alfa"'+(c.ordem!=='tx'?' selected':'')+'>Alfabética</option><option value="tx"'+(c.ordem==='tx'?' selected':'')+'>Transmissor</option></select></label>'+
     '<span class="sp"></span><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button><button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
   h+='<div class="busca noprint"><input type="search" id="mbusca" data-act="mbusca" value="'+esc(MBUSCA)+'" placeholder="Achar no mixer: nome, TX, canal, cápsula…" aria-label="Buscar no mixer" autocomplete="off">'+
+    '<button class="btn sm'+(MVARIOS?' pri':'')+'" type="button" data-act="mvarios" title="Tocar em várias pistas para selecionar (no computador: Shift ou Ctrl + clique)">☐ Selecionar vários</button>'+
     '<button class="btn sm'+(MINV?' pri':'')+'" type="button" data-act="minv" title="Destacar quem precisa inverter a polaridade no transmissor">Ø polaridade</button>'+
     '<span class="undo"><button class="btn sm" type="button" data-act="mundo" title="Desfazer (Ctrl+Z)"'+(UNDO.length?'':' disabled')+'>↶ Desfazer</button><button class="btn sm" type="button" data-act="mredo" title="Refazer (Ctrl+Shift+Z)"'+(REDO.length?'':' disabled')+'>↷ Refazer</button></span>'+
     '<span class="hint" id="nmbusca" style="margin:0"></span></div>';
@@ -1118,7 +1120,7 @@ function viewMix(){
   h+='<p class="hint noprint" style="margin:.4rem 0 0">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON (amarelo) e ARM (vermelho). Toque para trocar.</p>';
   var W=avisosMix(R,UI.ep);
   h+='<div class="alertas noprint" style="margin-top:.8rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>';
-  h+='<div class="noprint">'+painelCopia()+painelSlot(R,M)+'</div>';
+  h+='<div class="noprint">'+painelCopia()+(MSELS.length>1?painelGrupo(R,M):painelSlot(R,M))+'</div>';
   h+='<p class="hint noprint">Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p>';
   return h+sdNav()+impressaoMix(R,c,M);
 }
@@ -1128,8 +1130,16 @@ function cliqueMix(a,el){
   var c;
   if(a==='mslot'&&COPIA){var nn=+el.dataset.n;if(nn!==COPIA.de){colarCanal(nn);render();}return true;}
   if(cliqueMesa(a,el))return true;
-  if(a==='mslot'){var n=+el.dataset.n;if(MTROCA&&MSEL&&MSEL!==n){trocarPistas(MSEL,n);MSEL=n;MTROCA=false;render();return true;}MSEL=MSEL===n?0:n;MTROCA=false;render();return true;}
-  if(a==='mfechar'){MSEL=0;MTROCA=false;render();return true;}
+  if(a==='mslot'){var n=+el.dataset.n;if(MTROCA&&MSEL&&MSEL!==n){trocarPistas(MSEL,n);MSEL=n;MTROCA=false;render();return true;}
+    /* Shift = de um canal até o outro; Ctrl/Cmd ou modo "vários" = soma ou tira um canal (como no CL-12) */
+    if(EVK.shift&&(MSEL||MSELS.length)){var ini=MANC||MSEL||MSELS[0],lo=Math.min(ini,n),hi=Math.max(ini,n);MSELS=[];for(var q=lo;q<=hi;q++)MSELS.push(q);MANC=ini;MSEL=0;MTROCA=false;render();return true;}
+    if(EVK.ctrl||MVARIOS){var cur=MSELS.length?MSELS.slice():(MSEL?[MSEL]:[]),ix=cur.indexOf(n);if(ix>=0)cur.splice(ix,1);else cur.push(n);cur.sort(function(x,y){return x-y;});
+      MANC=n;if(cur.length>1){MSELS=cur;MSEL=0;}else{MSELS=[];MSEL=cur[0]||0;}render();return true;}
+    MSELS=[];MANC=n;MSEL=MSEL===n?0:n;MTROCA=false;render();return true;}
+  if(a==='mvarios'){MVARIOS=!MVARIOS;if(!MVARIOS&&MSELS.length<2)MSELS=[];render();return true;}
+  if(a==='mgrpfim'){MSELS=[];MSEL=0;render();return true;}
+  if(a==='mgrp'){grupoAplicar(el.dataset.k,el.dataset.v);return true;}
+  if(a==='mfechar'){MSEL=0;MSELS=[];MTROCA=false;render();return true;}
   if(a==='mtroca'){MTROCA=!MTROCA;render();return true;}
   if(a==='mlimpa'){mudarPista(MSEL,'');return true;}
   if(a==='mcena'){UI.cena=el.dataset.v;MSEL=0;salvarUi();render();return true;}
@@ -1223,7 +1233,7 @@ var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
 var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
 var ROTA_CICLO=['','post','pre','send'];
 var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
-var COPIA=null;
+var COPIA=null,MSELS=[],MANC=0,MVARIOS=false;
 var COPIA_ITENS=[['conteudo','Fonte e nome (quem está na pista)'],['rota','Roteamento e sends'],['on','ON'],['arm','ARM'],['trim','Trim'],['hpf','HPF'],['ph','Fase'],['dly','Delay']];
 
 function busNome(b,M){var x=M&&M.bus[b];return (x&&x.nome)||(b==='L'||b==='R'?'Mix '+b:'Bus '+b);}
@@ -1320,10 +1330,36 @@ function ledsHtml(s,ch){
     '<button type="button" class="led arm'+(ch.arm?' aceso':'')+'" data-act="mled" data-n="'+s.n+'" data-k="arm" title="ARM (grava a pista)">ARM</button></span>';
 }
 function cliqueLed(n,k){
-  var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),ch=M.ch[n];
-  if(k==='on'||k==='arm'){var p={};p[k]=!ch[k];setCh(n,p);return;}
-  var b=k.slice(2),i=ROTA_CICLO.indexOf(ch.r[b]||''),nx=ROTA_CICLO[(i+1)%3],r={};r[b]=nx;setCh(n,{r:r});
+  var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),ch=M.ch[n],p={};
+  if(k==='on'||k==='arm')p[k]=!ch[k];
+  else{var b=k.slice(2),i=ROTA_CICLO.indexOf(ch.r[b]||'');p.r={};p.r[b]=ROTA_CICLO[(i+1)%3];}
+  /* canal dentro de uma seleção: o mesmo valor vai para todos os selecionados */
+  if(MSELS.length>1&&MSELS.indexOf(n)>=0){setChVarios(MSELS,p);return;}
+  setCh(n,p);
 }
+function setChVarios(ns,patch){mudarMesa(function(m){ns.forEach(function(n){var x=m.ch[n]=m.ch[n]||{};
+  Object.keys(patch).forEach(function(k){if(k==='r'||k==='sg')x[k]=Object.assign({},x[k]||{},patch[k]);else x[k]=patch[k];});});});}
+function grupoAplicar(k,v){
+  var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),ns=MSELS,p={};
+  if(k==='on'||k==='arm'){p[k]=v==='1';}
+  else if(k==='r'){var b=v,tudo=function(x){return ns.every(function(n){return (M.ch[n].r[b]||'')===x;});};
+    p.r={};p.r[b]=tudo('post')?'pre':tudo('pre')?'':'post';}
+  else if(k==='rset'){var a2=v.split(':');p.r={};p.r[a2[0]]=a2[1];}
+  setChVarios(ns,p);
+}
+/* painel da seleção de vários canais */
+function painelGrupo(R,M){
+  var ns=MSELS,h='<div class="sdr mpan2"><div class="sd-hd"><span class="sd-ch sel">'+ns.length+' canais</span><div class="sd-who"><b>'+esc(faixaTxt(ns))+'</b><span>'+esc(ns.map(function(n){var s=R.S[n-1];return s.p?nomePista(s.p):'—';}).join(' · '))+'</span></div><span class="sp" style="flex:1"></span><button class="sd-btn sel" type="button" data-act="mgrpfim">Limpar seleção</button></div>';
+  function est(f){var v=ns.map(f),a=v.filter(Boolean).length;return a===ns.length?'todos':a?'alguns':'nenhum';}
+  h+=sdRow('ON:','<span class="sd-dim">'+est(function(n){return M.ch[n].on;})+'</span><button class="sd-btn" type="button" data-act="mgrp" data-k="on" data-v="1">Ligar</button><button class="sd-btn" type="button" data-act="mgrp" data-k="on" data-v="0">Desligar</button>');
+  h+=sdRow('Arm:','<span class="sd-dim">'+est(function(n){return M.ch[n].arm;})+'</span><button class="sd-btn" type="button" data-act="mgrp" data-k="arm" data-v="1">Armar</button><button class="sd-btn" type="button" data-act="mgrp" data-k="arm" data-v="0">Desarmar</button>');
+  h+='<div class="sd-src one"><span class="sd-l">Envios</span><div class="sd-grid b12">'+BUSES.map(function(b){
+      var vs=ns.map(function(n){return M.ch[n].r[b]||'';}),u=vs.every(function(x){return x===vs[0];})?vs[0]:'mix';
+      return '<button type="button" class="sd-k '+(u==='mix'?'misto':rotaCls(u))+'" data-act="mgrp" data-k="r" data-v="'+b+'" title="'+esc(busNome(b,M))+': '+(u==='mix'?'misto':ROTA_TXT[u])+'">'+(b==='L'||b==='R'?b:'B'+b)+'<small>'+esc(M.bus[b].nome||'')+'</small></button>';}).join('')+'</div></div>';
+  h+='<p class="sd-nota">Toque num envio para mudar todos juntos: desligado → pós → pré → desligado. Os LEDs acima de qualquer fader selecionado também valem para todos. Shift + clique escolhe de um canal até outro; Ctrl/Cmd + clique soma ou tira um canal.</p></div>';
+  return h;
+}
+function faixaTxt(ns){var out=[],i=0;while(i<ns.length){var a=ns[i],b=a;while(ns[i+1]===b+1){i++;b=ns[i];}out.push(a===b?'Ch '+a:'Ch '+a+'–'+b);i++;}return out.join(', ');}
 
 function colarCanal(n){
   var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),de=COPIA.de,src=M.ch[de],k=COPIA.k;
@@ -1642,7 +1678,9 @@ function renderSeguro(){
 document.addEventListener('focusout',function(){setTimeout(function(){if(renderSeguro.pend){var a=document.activeElement;if(!(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))){renderSeguro.pend=false;render();}}},80);});
 
 /* ───────── eventos ───────── */
+var EVK={shift:false,ctrl:false};
 document.addEventListener('click',function(ev){
+  EVK={shift:ev.shiftKey,ctrl:ev.ctrlKey||ev.metaKey};
   var el=ev.target.closest('[data-act]');if(!el)return;
   var a=el.dataset.act,v=el.dataset.v;
   if(el.tagName==='INPUT'||el.tagName==='SELECT')return;
