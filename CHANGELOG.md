@@ -1,5 +1,12 @@
 # Changelog
 
+
+## v1.21 · 23/10/2026
+- Source do canal mostra todas as entradas do gravador: IN 1–16, AES 1/2/5/6, Retornos A1–C2, SL-6 A1–C2 e Dante 1–32 (recolhido). Embaixo de cada uma, quem está com o transmissor dela no episódio.
+- Pista com fonte sem pessoa (ex.: RTN B1) aparece com o nome da entrada, em cinza tracejado.
+- Códigos de settings dos Retornos e SL-6 como fonte de canal ainda não confirmados: o export mantém a fonte que já está no gravador.
+- Ctrl+C / Ctrl+V nas pistas: copia as selecionadas (quem/fonte + ajustes) e cola a partir da pista clicada, em sequência, como células de planilha. Também por botões Copiar/Colar. Um Ctrl+Z desfaz a colagem inteira e dá para colar em outra cena.
+
 ## v1.20 · 2026-10-23
 - Cenas em ordem definida: botões ◀ ▶ no mixer movem a cena atual (a ordem vai para a planilha, coluna Posição da aba Cenas).
 

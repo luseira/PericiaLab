@@ -269,6 +269,11 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .strip.k-tz{background:color-mix(in srgb,var(--c-B) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-B) 45%,#1c1e22)}
 .strip.k-boom{background:color-mix(in srgb,var(--c-boom) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-boom) 45%,#1c1e22)}
 .strip.k-goose{background:color-mix(in srgb,var(--c-goose) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-goose) 45%,#1c1e22)}
+.strip.k-fonte{background:#2a2d33;border-color:#4a4f58;border-style:dashed}
+.strip.k-fonte .slab{color:#cfd6df;letter-spacing:.04em}
+.sd-pick details{grid-column:1/-1}.sd-pick details summary{cursor:pointer;font-size:12px;color:var(--mut,#9aa3ad);padding:4px 0}
+.sd-k.sem small{opacity:.55}
+.sd-k.acod{border-style:dashed}
 .card.tv{border-color:color-mix(in srgb,var(--c-A) 45%,#fff);background:color-mix(in srgb,var(--c-A) 12%,#fff)}
 .card.tz{border-color:color-mix(in srgb,var(--c-B) 45%,#fff);background:color-mix(in srgb,var(--c-B) 12%,#fff)}
 .card.tv .ft,.card.tz .ft{border-bottom:6px solid}.card.tv .ft{border-color:var(--c-A)}.card.tz .ft{border-color:var(--c-B)}
@@ -415,7 +420,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.20 · 23/10 19:40</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.21 · 23/10 17:27</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1086,7 +1091,7 @@ function resolver(cena,ep){
     var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
     var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return s;
-    if(m[1]==='S'){s.cn=m[2];s.p=porCanal[m[2]]||null;if(!s.p)s.motivo='ninguém em '+m[2];
+    if(m[1]==='S'){s.cn=m[2];s.p=porCanal[m[2]]||null;if(!s.p){if(listaCanais().indexOf(m[2])>=0)s.motivo='ninguém em '+m[2];else s.fx=true;}
       if(s.p){var e0=EF[s.p.id]||{};s.e=e0;s.t=e0.tx?D.txPor[e0.tx]:null;(onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
       if(primeira['c:'+s.cn])s.copia=primeira['c:'+s.cn];else primeira['c:'+s.cn]=s.n;
       return s;}
@@ -1132,22 +1137,22 @@ function avisosMix(R,ep){
 function zonaDe(n){for(var i=0;i<ZONAS.length;i++)if(n>=ZONAS[i][0]&&n<=ZONAS[i][1])return i;return 0;}
 /* cor de fundo do fader pela função: host, mentor, time, boom, gooseneck */
 function catStrip(s){
-  var p=s.p;if(!p)return '';
+  var p=s.p;if(!p)return s.fx?' k-fonte':'';
   if(p.papel==='HOST')return ' k-host';if(p.papel==='MENTOR')return ' k-mentor';
   if(p.papel==='FONTE')return /goose/i.test(p.id+p.nome)?' k-goose':' k-boom';
   var t=s.e&&s.e.time;return t==='A'?' k-tv':t==='B'?' k-tz':' k-part';
 }
 function stripHtml(s,v,M){
-  var p=s.p,nome=p?nomePista(p):'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
+  var p=s.p,fx=!p&&s.fx,nome=p?nomePista(p):fx?s.cn:'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
   var cap=s.n<=12?CAPS[s.n-1]:'';
-  var cls='strip z'+zonaDe(s.n)+catStrip(s)+(M&&p&&!M.ch[s.n].on?' off':'')+(M&&M.ch[s.n].arm?' armado':'')+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?(COPIA.para.indexOf(s.n)>=0?' destino':' colavel'):'')+(p?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
-  var sub=p?[s.t?txNome(s.t):'sem TX',s.cn||''].filter(Boolean).join(' · '):(s.cn?s.cn+' · ninguém':(s.motivo||''));
+  var cls='strip z'+zonaDe(s.n)+catStrip(s)+(M&&(p||fx)&&!M.ch[s.n].on?' off':'')+(M&&M.ch[s.n].arm?' armado':'')+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?(COPIA.para.indexOf(s.n)>=0?' destino':' colavel'):'')+(p||fx?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
+  var sub=p?[s.t?txNome(s.t):'sem TX',s.cn||''].filter(Boolean).join(' · '):fx?(fonteSlot(s)?fonteTxt(fonteSlot(s)):'fonte do gravador'):(s.cn?s.cn+' · ninguém':(s.motivo||''));
   var out=s.n>=17&&s.n<=22?'<span class="xout">X'+(s.n-16)+' → 633·'+(s.n-16)+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
-  var busca=p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'',inv?'ø inverter polaridade fase':'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
+  var busca=fx?semAcento(s.cn+' '+fonteTxt(fonteSlot(s)||'')+' ch '+s.n).toLowerCase():p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'',inv?'ø inverter polaridade fase':'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
   return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+(inv?' data-inv="1"':'')+' title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
-    '<span class="slab">'+(p?esc(estreito?corta16(nome):nome):'—')+'</span>'+
+    '<span class="slab">'+(p||fx?esc(estreito?corta16(nome):nome):'—')+'</span>'+
     '<span class="sph">'+(p?avatar(p):'')+'</span>'+(inv?'<span class="sinv">'+invIcon(s.e.cap,1)+'</span>':'')+
     '<span class="ssub">'+esc(sub)+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
     '<span class="strk"><span class="scap'+(cap?'':' sd')+'" style="'+(cap?'background:'+cap:'')+'"></span></span>'+out+
@@ -1311,6 +1316,8 @@ function cliqueMix(a,el){
     if(!it.length){toast('Marque o que colar',true);return true;}
     logMix(['Colado de "'+fonte.nome+'": '+it.join(', ')]);salvarCenaMix(alvo);CENAOP=null;render();return true;}
   if(a==='mesvaziar'){esvaziarSel();return true;}
+  if(a==='mclipc'){copiarSel();return true;}
+  if(a==='mclipv'){colarSel();return true;}
   if(a==='mren'){c=clone(cenaAtual());var nn=prompt('Novo nome da cena:',c.nome);if(nn){c.nome=nn.trim();salvarCena(c);}return true;}
   if(a==='mdel'){c=cenaAtual();if(confirm('Excluir a cena "'+c.nome+'"?')){logMix(['Cena excluída: '+c.nome]);salvarCena(c,true);UI.cena='';salvarUi();render();}return true;}
   if(a==='mpista'){var s=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(s&&s.p){fazer({acao:'pessoa',id:s.p.id,pista:semAcento($('#mpista').value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
@@ -1391,7 +1398,7 @@ var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
 var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
 var ROTA_CICLO=['','post','pre','send'];
 var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
-var COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
+var CLIP=null,COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
 /* escolher quem está na pista: pelo nome (a fonte vem do Carômetro) */
 function pickNome(R,s){
   var EF=R.EF,grupos=[['Host e mentores',function(p){return p.papel==='HOST'||p.papel==='MENTOR';}],['Time A',function(p){return (EF[p.id]||{}).time==='A';}],['Time B',function(p){return (EF[p.id]||{}).time==='B';}],
@@ -1404,11 +1411,31 @@ function pickNome(R,s){
   return h;
 }
 /* escolher a fonte (entrada): a pessoa vem do Carômetro */
+/* todas as entradas do gravador, por grupo. Valor = nome do canal na planilha quando existe (assim a pessoa aparece embaixo) */
+function todasFontes(){
+  var porCod={};listaCanais().forEach(function(cn){var f=fonteDeCanal(cn);if(f&&!porCod[f])porCod[f]=cn;});
+  function it(lbl,cod){return {v:(cod&&porCod[cod])||lbl,lbl:lbl,cod:cod};}
+  var G=[],i;
+  var an=[];for(i=1;i<=16;i++)an.push(it('IN '+i,'Adc'+i));G.push(['Entradas 1–16 (mic/line)',an]);
+  G.push(['AES',[1,2,5,6].map(function(n){return it('AES '+n,'AES3-'+n);})]);
+  G.push(['Retornos',['A1','A2','B1','B2','C1','C2'].map(function(x){return it('RTN '+x,FONTE_COD['RTN '+x]||'');})]);
+  G.push(['SL-6',['A1','A2','B1','B2','C1','C2'].map(function(x){return it('SL6 '+x,FONTE_COD['SL6 '+x]||'');})]);
+  var dn=[];for(i=1;i<=32;i++)dn.push(it('DANTE '+i,'Dante_'+i));G.push(['Dante',dn,1]);
+  /* canais da planilha que não caíram em nenhum grupo */
+  var vistos={};G.forEach(function(g){g[1].forEach(function(x){vistos[x.v]=1;});});
+  var resto=listaCanais().filter(function(cn){return !vistos[cn];}).map(function(cn){return {v:cn,lbl:cn,cod:fonteDeCanal(cn)};});
+  if(resto.length)G.unshift(['Da planilha',resto]);
+  return G;
+}
 function pickSrc(R,s){
-  var mapa=mapaCanais(UI.ep,R.EF),L=listaCanais();
-  return '<div class="sd-pick"><span class="sd-l">Inputs</span><div class="sd-grid w4">'+L.map(function(cn){var p=mapa[cn];
-    return '<button type="button" class="sd-k'+(s.cn===cn?' sel':'')+'" data-act="mpsrc" data-v="'+esc(cn)+'">'+esc(cn)+'<small>'+esc(p?nomePista(p):'—')+'</small></button>';}).join('')+'</div>'+
-    '<span class="sd-l"></span><p class="sd-nota" style="margin:0">Fonte fixa: a pista fica nessa entrada e mostra quem estiver com o transmissor dela no episódio.</p></div>';
+  var mapa=mapaCanais(UI.ep,R.EF);
+  function bt(x){var p=mapa[x.v],nm=p?nomePista(p):(x.v!==x.lbl?x.v:'');
+    return '<button type="button" class="sd-k'+(s.cn===x.v?' sel':'')+(p?'':' sem')+(x.cod?'':' acod')+'" data-act="mpsrc" data-v="'+esc(x.v)+'" title="'+esc(x.lbl+(x.cod?' · '+x.cod:' · código no settings a confirmar'))+'">'+esc(x.lbl)+'<small>'+esc(nm||'—')+'</small></button>';}
+  return '<div class="sd-pick">'+todasFontes().map(function(g){
+    var grid='<div class="sd-grid w4">'+g[1].map(bt).join('')+'</div>';
+    if(g[2]&&!g[1].some(function(x){return x.v===s.cn;}))return '<details><summary>'+esc(g[0])+'</summary><span class="sd-l"></span>'+grid+'</details>';
+    return '<span class="sd-l">'+esc(g[0])+'</span>'+grid;}).join('')+
+    '<span class="sd-l"></span><p class="sd-nota" style="margin:0">O nome embaixo é quem está com o transmissor dessa entrada no episódio. Fontes sem pessoa (retorno, Dante…) aparecem com o nome da entrada. Borda tracejada: código do settings ainda não confirmado, o export mantém a fonte que já está no gravador.</p></div>';
 }
 function cenaOpHtml(L,c){
   if(CENAOP==='nova')return '<div class="painel noprint cenaop"><h3>Nova cena</h3><div class="linha"><label class="campo" style="flex:1;min-width:12rem">Nome<input type="text" id="cnnome" placeholder="ex.: QG equipes separadas"></label>'+
@@ -1421,6 +1448,22 @@ function cenaOpHtml(L,c){
     '<p class="hint">Substitui o que estiver marcado nesta cena. Dá para desfazer com Ctrl+Z.</p><div class="linha"><button class="btn pri" type="button" data-act="mcolarok">Colar</button><button class="btn" type="button" data-act="mcenaopfim">Cancelar</button></div></div>';
 }
 /* esvaziar as pistas selecionadas (Delete no teclado) */
+/* Ctrl+C / Ctrl+V: copia as pistas selecionadas (quem/fonte + ajustes do canal) e cola a partir da pista clicada, uma ao lado da outra, como células numa planilha */
+function copiarSel(){
+  var ns=MSELS.length>1?MSELS.slice():(MSEL?[MSEL]:[]);if(!ns.length){toast('Selecione uma ou mais pistas antes de copiar');return;}
+  var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R);
+  CLIP={de:faixaTxt(ns),cena:c.nome||c.id,it:ns.map(function(n){return {tok:c.pistas[n-1]||'',ch:clone(M.ch[n])};})};
+  render();toast(ns.length+' pista(s) copiada(s) · clique onde começa e Ctrl+V');
+}
+function colarSel(){
+  if(!CLIP){toast('Nada copiado ainda (Ctrl+C)');return;}
+  var ini=MSEL||(MSELS.length?Math.min.apply(null,MSELS):0);if(!ini){toast('Clique na pista onde a colagem começa');return;}
+  var cc=clone(cenaAtual()),feitos=[];cc.mesa=cc.mesa||{};cc.mesa.ch=cc.mesa.ch||{};
+  CLIP.it.forEach(function(x,i){var n=ini+i;if(n>32)return;cc.pistas[n-1]=x.tok;var ch=clone(x.ch);if(n>16){delete ch.ph;delete ch.dly;}cc.mesa.ch[n]=ch;feitos.push(n);});
+  var sobra=CLIP.it.length-feitos.length;
+  salvarCenaMix(cc);MSEL=0;MSELS=feitos.length>1?feitos:[];if(feitos.length===1)MSEL=feitos[0];MANC=ini;render();
+  toast('Colado em '+faixaTxt(feitos)+(sobra?' · '+sobra+' não coube (passou do Ch 32)':'')+' · Ctrl+Z desfaz');
+}
 function esvaziarSel(){
   var ns=MSELS.length>1?MSELS.slice():(MSEL?[MSEL]:[]);if(!ns.length)return;
   var c=clone(cenaAtual()),n0=0;ns.forEach(function(n){if(c.pistas[n-1]){c.pistas[n-1]='';n0++;}});
@@ -1512,10 +1555,15 @@ function fonteCanal(t){
   if(!t)return '';var c=String(t.canal||'').toUpperCase(),m;
   if((m=/^LINE\s*(\d+)/.exec(c)))return 'Adc'+m[1];
   if((m=/^AES\s*(\d+)/.exec(c)))return 'AES3-'+m[1];
+  if((m=/^IN\s*(\d+)/.exec(c)))return 'Adc'+m[1];
+  if((m=/^DANTE\s*(\d+)/.exec(c)))return 'Dante_'+m[1];
+  if((m=/^(RTN|SL6)\s*([ABC][12])/.exec(c)))return FONTE_COD[m[1]+' '+m[2]]||'';
   if(/MIC/.test(c)&&t.input)return 'Adc'+t.input;
   return '';
 }
-function fonteTxt(f){var m;if(!f||f==='Nosource')return 'sem fonte';if((m=/^Adc(\d+)/.exec(f)))return 'Input '+m[1];if((m=/^AES3-(\d+)/.exec(f)))return 'AES '+m[1];if((m=/^Dante_(\d+)/.exec(f)))return 'Dante '+m[1];return f;}
+function fonteTxt(f){var m;if(!f||f==='Nosource')return 'sem fonte';if((m=/^Adc(\d+)/.exec(f)))return 'Input '+m[1];if((m=/^AES3-(\d+)/.exec(f)))return 'AES '+m[1];if((m=/^Dante_(\d+)/.exec(f)))return 'Dante '+m[1];var k=Object.keys(FONTE_COD).filter(function(x){return FONTE_COD[x]===f;})[0];return k||f;}
+/* códigos de settings ainda não vistos num arquivo real: preencher quando o Scorpio gravar um */
+var FONTE_COD={};
 
 /* ───────── LEDs do CL-12 em cada pista ───────── */
 /* ordem do CL-12, de cima para baixo: X1 · L · R · X2, depois ON (amarelo) e ARM (vermelho) */
@@ -1546,7 +1594,7 @@ function grupoAplicar(k,v){
 }
 /* painel da seleção de vários canais */
 function painelGrupo(R,M){
-  var ns=MSELS,h='<div class="sdr mpan2"><div class="sd-hd"><span class="sd-ch sel">'+ns.length+' canais</span><div class="sd-who"><b>'+esc(faixaTxt(ns))+'</b><span>'+esc(ns.map(function(n){var s=R.S[n-1];return s.p?nomePista(s.p):'—';}).join(' · '))+'</span></div><span class="sp" style="flex:1"></span><button class="sd-btn" type="button" data-act="mesvaziar" title="Tecla Delete">Limpar canais</button><button class="sd-btn sel" type="button" data-act="mgrpfim">Limpar seleção</button></div>';
+  var ns=MSELS,h='<div class="sdr mpan2"><div class="sd-hd"><span class="sd-ch sel">'+ns.length+' canais</span><div class="sd-who"><b>'+esc(faixaTxt(ns))+'</b><span>'+esc(ns.map(function(n){var s=R.S[n-1];return s.p?nomePista(s.p):'—';}).join(' · '))+'</span></div><span class="sp" style="flex:1"></span><button class="sd-btn" type="button" data-act="mclipc" title="Ctrl+C">Copiar</button>'+(CLIP?'<button class="sd-btn" type="button" data-act="mclipv" title="Ctrl+V: cola a partir do Ch '+Math.min.apply(null,ns)+'">Colar ('+CLIP.it.length+')</button>':'')+'<button class="sd-btn" type="button" data-act="mesvaziar" title="Tecla Delete">Limpar canais</button><button class="sd-btn sel" type="button" data-act="mgrpfim">Limpar seleção</button></div>';
   function est(f){var v=ns.map(f),a=v.filter(Boolean).length;return a===ns.length?'todos':a?'alguns':'nenhum';}
   h+=sdRow('ON:','<span class="sd-dim">'+est(function(n){return M.ch[n].on;})+'</span><button class="sd-btn" type="button" data-act="mgrp" data-k="on" data-v="1">Ligar</button><button class="sd-btn" type="button" data-act="mgrp" data-k="on" data-v="0">Desligar</button>');
   h+=sdRow('Arm:','<span class="sd-dim">'+est(function(n){return M.ch[n].arm;})+'</span><button class="sd-btn" type="button" data-act="mgrp" data-k="arm" data-v="1">Armar</button><button class="sd-btn" type="button" data-act="mgrp" data-k="arm" data-v="0">Desarmar</button>');
@@ -1597,7 +1645,7 @@ function comparar(R,M,A){
   function rt(v){return ROTA_TXT[v||''];}
   R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');
     add(on,'Nome',nomeArquivoPista(s),A.nomes[n]);
-    add(on,'Fonte',s.cn?fonteTxt(fonteSlot(s)||'—'):'sem fonte',fonteTxt(A.fonte[n]));
+    add(on,'Fonte',s.cn?(fonteSlot(s)?fonteTxt(fonteSlot(s)):s.cn+' (código a confirmar)'):'sem fonte',fonteTxt(A.fonte[n]));
     add(on,'ON',c.on?'sim':'não',a.on?'sim':'não');add(on,'ARM',c.arm?'sim':'não',a.arm?'sim':'não');if(a.iso==='post')add(on,'ISO','pré (sempre)','pós');
     BUSES.forEach(function(b){add(on,'→ '+b,rt(c.r[b])+(c.r[b]==='send'?' '+(c.sg[b]||0)+' dB':''),rt(a.r[b])+(a.r[b]==='send'?' '+a.sg[b]+' dB':''));});
     if(c.trim!=null)add(on,'Trim',c.trim+' dB',a.trim+' dB');
@@ -1760,6 +1808,7 @@ function painelSlot(R,M){
   if(p){var outras=(R.onde[p.id]||[]).filter(function(x){return x!==n;});
     h+=avatar(p,'sd-av')+'<div class="sd-who"><b>'+esc(p.nome)+'</b><span>'+[e.tx?'TX '+e.tx:'sem TX',t?t.nome:'',t?t.rx:'',t&&t.canal?t.canal:'',t&&t.num!=='GN'&&!isNaN(t.freq)?mhz(t.freq)+' MHz':''].filter(Boolean).map(esc).join(' · ')+'</span>'+
       '<span>'+(e.cap?bolinha(e.cap)+esc(e.cap)+' ':'')+(capInv(e.cap)?invIcon(e.cap,1)+' inverter no TX ':'')+timeChip(e.time)+(s.copia?' <i>cópia do Ch '+s.copia+'</i>':'')+(outras.length?' <i>também em '+outras.map(function(x){return 'Ch '+x;}).join(', ')+'</i>':'')+'</span></div>';}
+  else if(s.fx)h+='<div class="sd-who"><b>'+esc(s.cn)+'</b><span>Fonte do gravador, sem pessoa'+(fonteSlot(s)?' · '+esc(fonteTxt(fonteSlot(s))):' · código no settings ainda a confirmar')+(s.copia?' · <i>cópia do Ch '+s.copia+'</i>':'')+'</span></div>';
   else h+='<div class="sd-who"><b>—</b><span>'+esc(s.motivo||'pista vazia')+'</span></div>';
   h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(n>=17&&n<=22?'<span class="sd-tag">X'+(n-16)+' → 633·'+(n-16)+'</span>':'')+
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
@@ -1771,7 +1820,7 @@ function painelSlot(R,M){
   h+=sdRow('Trim:',sdNum('mchn','trim',ch.trim,'dB'));
   h+=sdRow('ON:',sdSw(!!ch.on,'data-act="mled" data-n="'+n+'" data-k="on"'));
   h+=sdRow('Arm:',sdSw(!!ch.arm,'data-act="mled" data-n="'+n+'" data-k="arm"'));
-  h+='<div class="sd-row sd-acts"><button class="sd-btn'+(COPIA?' sel':'')+'" type="button" data-act="mcopia">⧉ Copiar este canal…</button><button class="sd-btn" type="button" data-act="mlimpa" title="Tira a pessoa desta pista (tecla Delete)">Limpar canal</button></div>';
+  h+='<div class="sd-row sd-acts"><button class="sd-btn'+(COPIA?' sel':'')+'" type="button" data-act="mcopia">⧉ Copiar este canal…</button><button class="sd-btn" type="button" data-act="mlimpa" title="Tira a pessoa desta pista (tecla Delete)">Limpar canal</button><button class="sd-btn" type="button" data-act="mclipc" title="Ctrl+C">Copiar</button>'+(CLIP?'<button class="sd-btn" type="button" data-act="mclipv" title="Ctrl+V">Colar '+CLIP.it.length+' pista(s) a partir daqui</button>':'')+'</div>';
   h+='</div><div class="sd-col">';
   h+=sdRow('Source:','<button type="button" class="sd-btn src'+(PICK==='src'?' sel':'')+'" data-act="mpick" data-v="src">'+esc(s.cn?s.cn:'escolher')+'</button>'+(/MIC/i.test(s.cn||'')?'<span class="sd-tag">48V</span>':''));
   if(PICK==='src')h+=pickSrc(R,s);
@@ -1940,6 +1989,8 @@ document.addEventListener('keydown',function(ev){
   var tg=ev.target&&ev.target.tagName;if(UI.view!=='mix'||/^(INPUT|SELECT|TEXTAREA)$/.test(tg||''))return;
   if((ev.ctrlKey||ev.metaKey)&&(ev.key==='z'||ev.key==='Z')){ev.preventDefault();if(ev.shiftKey)refazerMix();else desfazerMix();}
   else if((ev.ctrlKey||ev.metaKey)&&(ev.key==='y'||ev.key==='Y')){ev.preventDefault();refazerMix();}
+  else if((ev.ctrlKey||ev.metaKey)&&(ev.key==='c'||ev.key==='C')&&(MSEL||MSELS.length)&&!String(window.getSelection&&window.getSelection()||'')){ev.preventDefault();copiarSel();}
+  else if((ev.ctrlKey||ev.metaKey)&&(ev.key==='v'||ev.key==='V')&&CLIP){ev.preventDefault();colarSel();}
 });
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&MODO==='api')buscar();});
 
