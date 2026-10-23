@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4 · 2026-10-23
+- Tela do canal, Routing, Buses e Outputs redesenhados no estilo do SD-Remote (duas colunas, chaves, grade de fontes, abas embaixo; matriz com as mesmas cores: laranja pós, verde pré, azul send).
+- Barra do mixer embaixo, como no SD-Remote: 1–8, 9–16, 17–24, 25–32, 1–16, 17–32, CL-12, Tudo, Buses, Outputs, Routing, Scorpio.
+- ISO das pistas é sempre pré: a opção de ISO pós saiu do app, e o settings exportado grava pré em todas as pistas.
+- Retorno "Bl" no bus confirmado como Return B1 (print do SD-Remote).
+
 ## v1.2 · 2026-10-23
 - Mixer, aba Pistas: ON e ARM como no CL-12 e envios X1 · L · R · X2 (verde pré, amarelo pós) embaixo de cada fader; contagem de pistas armadas e ligadas; impressão marca ARM e envios.
 - Painel da pista: ON, ARM, ISO pré/pós, roteamento para L, R e buses 1–10 (pós, pré ou send com ganho), trim, HPF, fase e delay (fase e delay só 1–16). Campos vazios = não mexer no gravador.

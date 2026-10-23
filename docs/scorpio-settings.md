@@ -22,5 +22,7 @@ linkedToOutput: "nAnalogOutputs" = unlinked; else name of the pair leader (X7/X8
 
 Bus send per channel: InputChannelN.busK = { routeState: Prefader|Postfader|PostSend|Unrouted, dB10thsSendGain }
 Bus names: OutputBusControl.obusK.userName
-Bus input sources: SlateMicAndReturns.busK = "" | "_1" (Com Rtn 1, inferred) | "Bl" (Return B L) ...
+Bus input sources: SlateMicAndReturns.busK = "" | "_1" (Com Rtn 1, inferred) | "Bl" = Return B1 (confirmed by SD-Remote screenshot of Bus 5); Al/Ar/Br/Cl/Cr = A1/A2/B2/C1/C2 (inferred)
 DanteOutputs.DanteN / AESOutputs.AESN use the same {source, chan}.
+
+ISO of the recorded tracks: always pre-fader. The app never offers ISO post and exports isoPostFader=false for all 32 channels.
