@@ -1,0 +1,7 @@
+# Dados ficam no Drive, nunca no repositório
+*.json
+!package.json
+fotos/
+*.zip
+*.xlsx
+.DS_Store
