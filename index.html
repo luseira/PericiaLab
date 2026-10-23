@@ -415,7 +415,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.19 · 23/10 19:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.20 · 23/10 19:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -529,7 +529,7 @@ function normalizar(R){
   d.eps=linhas(R,'eps').map(function(o){return {ep:int(o['EP']),a:int(campo(o,['Time A','Vermelho','Equipe A'])),b:int(campo(o,['Time B','Azul','Equipe B'])),data:str(o['Data de gravação'])};}).filter(function(e){return e.ep;}).sort(function(a,b){return a.ep-b.ep;});
   if(!d.eps.length)for(var i=1;i<=8;i++)d.eps.push({ep:i,a:0,b:0,data:''});
   d.imp=linhas(R,'imp').map(function(o){return {gerado:str(o['Report gerado em']),em:str(o['Importado em']),por:str(o['Por']),n:str(o['Transmissores atualizados']),mud:str(o['Mudanças']),nao:str(o['Nomes sem correspondência'])};});
-  d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}if(pp&&!Array.isArray(pp)){mm=pp.m||null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;return c;}).filter(function(c){return c.id;}):null;
+  d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}var pos=null;if(pp&&!Array.isArray(pp)){mm=pp.m||null;pos=pp.pos!=null?+pp.pos:null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;if(pos==null&&str(o['Posição'])!=='')pos=num(o['Posição']);if(pos!=null&&!isNaN(pos))c.pos=pos;return c;}).filter(function(c){return c.id;}):null;
   d.lidoEm=str(R&&R.lidoEm);d.planilha=str(R&&R.planilha);
   return d;
 }
@@ -1028,7 +1028,7 @@ function cenasCompartilhadas(){return D.cenas!==null;}
 function cenasLista(){
   var L=cenasCompartilhadas()?D.cenas:jget(K.cenas,[]);
   L=(L||[]).filter(function(c){return c&&c.id&&Array.isArray(c.pistas);}).map(migrarColinha);
-  var ord={base:0,interrog:1};L=L.slice().sort(function(x,y){return (ord[x.id]==null?9:ord[x.id])-(ord[y.id]==null?9:ord[y.id]);});
+  var ord={base:0,interrog:1};L=L.slice().sort(function(x,y){var px=x.pos!=null?x.pos:(ord[x.id]!=null?ord[x.id]:50),py=y.pos!=null?y.pos:(ord[y.id]!=null?ord[y.id]:50);return px-py||nat(x.nome,y.nome);});
   return L.length?L:cenasPadrao();
 }
 /* cenas antigas tinham a colinha fixa por pessoa (P:...) em 23–32: passa para a colinha automática */
@@ -1041,7 +1041,7 @@ function migrarColinha(c){
 }
 function cenaAtual(){var L=cenasLista();return L.filter(function(c){return c.id===UI.cena;})[0]||L[0];}
 function gravarCena(c,apagar){
-  if(cenasCompartilhadas()){fazer({acao:'cena',id:c.id,nome:c.nome,ordem:c.ordem,pistas:JSON.stringify(c.mesa?{p:c.pistas,m:c.mesa}:c.pistas),apagar:!!apagar});return;}
+  if(cenasCompartilhadas()){fazer({acao:'cena',id:c.id,nome:c.nome,ordem:c.ordem,pistas:JSON.stringify(c.mesa||c.pos!=null?{p:c.pistas,m:c.mesa||{},pos:c.pos}:c.pistas),apagar:!!apagar});return;}
   var L=(jget(K.cenas,[])||[]).filter(function(x){return x.id!==c.id;});
   if(!apagar)L.push(c);
   jset(K.cenas,L);
@@ -1233,7 +1233,7 @@ function viewMix(){
   var h=epBar();
   if(!cenasCompartilhadas()&&MODO==='api')h+='<div class="banner">As cenas estão ficando só neste aparelho. Para salvar na planilha, atualize o Apps Script com o novo Codigo.gs (Implantar › Gerenciar implantações › Nova versão).</div>';
   h+='<div class="bar"><span class="seg" role="group" aria-label="Cena">'+L.map(function(x){return '<button type="button" data-act="mcena" data-v="'+esc(x.id)+'" aria-pressed="'+(x.id===c.id)+'">'+esc(x.nome)+'</button>';}).join('')+'</span>'+
-    '<button class="btn sm'+(CENAOP==='nova'?' pri':'')+'" type="button" data-act="mnova">＋ Nova cena</button><button class="btn sm'+(CENAOP==='colar'?' pri':'')+'" type="button" data-act="mcolar">⧉ Colar de outra cena</button><button class="btn sm" type="button" data-act="mren">Renomear</button>'+(L.length>1?'<button class="btn sm dan" type="button" data-act="mdel">Excluir</button>':'')+'</div>';
+    '<button class="btn sm'+(CENAOP==='nova'?' pri':'')+'" type="button" data-act="mnova">＋ Nova cena</button><button class="btn sm'+(CENAOP==='colar'?' pri':'')+'" type="button" data-act="mcolar">⧉ Colar de outra cena</button><button class="btn sm" type="button" data-act="mren">Renomear</button>'+(L.length>1?'<span class="seg"><button type="button" data-act="mmover" data-v="-1" title="Mover a cena para a esquerda">◀</button><button type="button" data-act="mmover" data-v="1" title="Mover a cena para a direita">▶</button></span>':'')+''+(L.length>1?'<button class="btn sm dan" type="button" data-act="mdel">Excluir</button>':'')+'</div>';
   if(CENAOP)h+=cenaOpHtml(L,c);
   h+='<div class="bar">'+
     '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="alfa"'+(c.ordem!=='tx'?' selected':'')+'>Alfabética</option><option value="tx"'+(c.ordem==='tx'?' selected':'')+'>Transmissor</option></select></label>'+
@@ -1292,6 +1292,8 @@ function cliqueMix(a,el){
   if(a==='mundo'){desfazerMix();return true;}
   if(a==='mredo'){refazerMix();return true;}
   if(a==='mnova'){CENAOP=CENAOP==='nova'?null:'nova';render();setTimeout(function(){var i=$('#cnnome');if(i)i.focus();},30);return true;}
+  if(a==='mmover'){var Lm=cenasLista(),im=Lm.map(function(x){return x.id;}).indexOf(UI.cena),dv=+el.dataset.v;if(im<0)im=0;var jm=im+dv;if(jm<0||jm>=Lm.length)return true;
+    var tmp=Lm[im];Lm[im]=Lm[jm];Lm[jm]=tmp;Lm.forEach(function(x,k){if(x.pos!==k){var y=clone(x);y.pos=k;gravarCena(y);}});logMix(['Cena "'+tmp.nome+'" movida']);if(!cenasCompartilhadas())render();return true;}
   if(a==='mpick'){PICK=PICK===el.dataset.v?null:el.dataset.v;render();return true;}
   if(a==='mpnome'){PICK=null;mudarPista(MSEL,el.dataset.v?'P:'+el.dataset.v:'');return true;}
   if(a==='mpsrc'){PICK=null;mudarPista(MSEL,'S:'+el.dataset.v);return true;}

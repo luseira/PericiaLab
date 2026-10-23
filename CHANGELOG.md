@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.20 · 2026-10-23
+- Cenas em ordem definida: botões ◀ ▶ no mixer movem a cena atual (a ordem vai para a planilha, coluna Posição da aba Cenas).
+
 ## v1.19 · 2026-10-23
 - Tela do canal: "Quem" (escolher pelo nome, por grupo: host e mentores, time A, time B, boom e gooseneck) e "Source" (escolher pela entrada: AES 1, LINE 2… LINE 13/14 da sala dos mentores, MIC). Pelo nome, a fonte vem do Carômetro; pela fonte, a pessoa vem do Carômetro.
 - Cópia de canal é detectada pela entrada (mesma fonte), não pela pessoa.
