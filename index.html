@@ -54,6 +54,12 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .ep[aria-pressed=true] span{color:#b9bfc7}
 .ep .dot{display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:var(--bad);margin-left:.25rem;vertical-align:middle}
 
+.chip{font:inherit}button.chip{cursor:pointer;border:0}
+.avpainel{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:.6rem .7rem;margin:0 0 .9rem}
+.avhd{display:flex;gap:.4rem;align-items:center;margin-bottom:.4rem;flex-wrap:wrap}
+.avit{display:flex;gap:.6rem;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:.4rem .1rem;cursor:pointer}
+.avit b{min-width:5.5rem}.avit span{display:flex;flex-wrap:wrap;gap:.2rem .7rem;font-size:.84rem}
+.avit i{font-style:normal}.avit i.bad{color:#b3261e}.avit i.warn,.avit i.pend{color:var(--ink2)}
 .sumario{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:-.2rem 0 .9rem;font-size:.86rem;color:var(--ink2)}
 .chip{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.08rem .55rem;font-size:.76rem;font-weight:600;white-space:nowrap}
 .chip.bad{background:var(--badbg);color:var(--bad)}
@@ -115,6 +121,10 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .opt[aria-pressed=true] span{color:#c6cbd2}
 .opt[aria-pressed=true] b i{color:var(--ink)}
 .opt:disabled{opacity:.42;cursor:not-allowed;background:var(--pendbg)}
+.opt.cap-bege{background:#d8c3a2;border-color:#bfa87f;color:#2a2116}.opt.cap-bege span{color:#5a4a33}
+.opt.cap-preto{background:#262a30;border-color:#3a3f47;color:#fff}.opt.cap-preto span{color:#c6cbd2}
+.opt.cap-marrom{background:#6a4630;border-color:#563826;color:#fff}.opt.cap-marrom span{color:#e0cdbd}
+.opt[class*=cap-][aria-pressed=true]{outline:3px solid var(--ink);outline-offset:1px}
 .opt.comad{border-style:dashed}
 .opt.limpar{justify-content:center;align-items:center;color:var(--ink2);border-style:dashed}
 .det{display:grid;grid-template-columns:auto 1fr;gap:.25rem .9rem;margin:.2rem 0;font-size:.92rem}
@@ -420,7 +430,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.21 · 23/10 17:27</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.22 · 23/10 17:33</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -698,6 +708,9 @@ function epBar(){
   }).join('')+'</div>';
 }
 function corDe(id){var c=D.capPor[id];return c&&/^(bege|preto|marrom)$/.test(c.cor)?c.cor:'';}
+/* nome sem a letra da cor (COS11 B bege → COS11): a cor aparece na bolinha e no fundo */
+function capNome(id){var c=D.capPor[id];if(!c)return id;var m=/^(.*\S)\s+([BPM])$/.exec(c.id);
+  if(m&&((m[2]==='B'&&c.cor==='bege')||(m[2]==='P'&&c.cor==='preto')||(m[2]==='M'&&c.cor==='marrom')))return m[1];return c.id;}
 function bolinha(id){var c=corDe(id);return c?'<span class="cor '+c+'" title="'+c+'"></span>':'';}
 function papelTxt(p){return {HOST:'host',MENTOR:'mentor',PARTICIPANTE:'participante',CONVIDADO:'convidado',FONTE:'fonte'}[p.papel]||p.papel.toLowerCase();}
 function chips(av,max){
@@ -757,10 +770,10 @@ function cardHtml(x,col){
   var rf=t&&t.num!=='GN'?'<span class="rf">'+(t.bloco?'<span class="blk">Bloco '+esc(t.bloco)+'</span>':'')+(isNaN(t.freq)?'':'<span class="fq"><b>'+mhz(t.freq)+'</b> MHz</span>')+(t.cod?'<span class="cod" title="código">'+esc(t.cod)+'</span>':'')+'</span>':'';
   var rx=t?rxTxt(t):'';
   return '<button class="card'+(x.ativo?'':' fora')+(bad&&x.ativo?' bad':'')+(tc?' '+tc:'')+'" type="button" data-act="abrir" data-id="'+esc(p.id)+'" data-busca="'+esc(buscaTxt(x,ch))+'">'+
-    fotoGrande(p)+'<span class="papel">'+esc(papelTxt(p))+(ch?' · '+ch:'')+'</span>'+(tc?'<span class="timefaixa">'+esc(timeNome(e.time))+'</span>':'')+
+    fotoGrande(p)+(function(){var r=/^(HOST|MENTOR)$/.test(p.papel)?papelTxt(p):'';var tx=r;return tx?'<span class="papel">'+esc(tx)+'</span>':'';})()+(tc?'<span class="timefaixa">'+esc(timeNome(e.time))+'</span>':'')+
     '<span class="bd"><span class="nm" title="'+esc(p.nome)+'">'+esc(primeiroNome(p))+'</span>'+
     (x.ativo?'<span class="eq">'+(e&&e.tx?'<span class="tag" title="TX '+esc(e.tx)+'">'+esc(txNome(t,e.tx))+'</span>':'<span class="tag vazio">TX –</span>')+
-      (e&&e.cap?'<span class="tag cap '+(corDe(e.cap)||'semcor')+'">'+esc(e.cap)+'</span>'+invIcon(e.cap)+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?'<span class="chip pend" title="adaptador MicroDot → '+esc(k.ad)+'">+AD '+esc(k.ad)+'</span>':'';})():'')+'</span>'+
+      (e&&e.cap?'<span class="tag cap '+(corDe(e.cap)||'semcor')+'" title="'+esc(e.cap)+'">'+esc(capNome(e.cap))+'</span>'+invIcon(e.cap)+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?'<span class="chip pend" title="adaptador MicroDot → '+esc(k.ad)+'">+AD '+esc(k.ad)+'</span>':'';})():'')+'</span>'+
       rf+
       (t?'<span class="ligacao">'+(rx?'<span class="rxt">'+esc(rx)+'</span>':'')+(t.canal?'<span class="inp">'+esc(t.canal)+'</span>':'')+'</span>':'')+
       (x.av.length?'<span class="al">'+chips(x.av,2)+'</span>':'')
@@ -781,13 +794,22 @@ function aplicarBusca(){
 }
 
 /* ───────── views ───────── */
+var AVOPEN='';
+function avisosPainel(s){
+  if(!AVOPEN)return '';
+  var only=AVOPEN==='bad',n=0,h='';
+  s.pessoas.forEach(function(x){var L=x.av.filter(function(a){return !only||a.k==='bad';});if(!L.length)return;n+=L.length;
+    h+='<button type="button" class="avit" data-act="abrir" data-id="'+esc(x.p.id)+'"><b>'+esc(primeiroNome(x.p))+'</b><span>'+L.map(function(a){return '<i class="'+a.k+'">'+esc(a.t)+'</i>';}).join('')+'</span></button>';});
+  return '<div class="avpainel noprint"><div class="avhd"><b>'+(only?'Problemas':'Problemas e avisos')+' ('+n+')</b><span class="sp"></span>'+
+    '<button type="button" class="btn sm" data-act="avtoggle" data-v="'+(only?'all':'bad')+'">'+(only?'ver também os avisos':'só os problemas')+'</button><button type="button" class="btn sm" data-act="avtoggle" data-v="">fechar</button></div>'+(h||'<p class="hint">Nada por aqui.</p>')+'<p class="hint" style="margin:.4rem 0 0">Toque numa pessoa para abrir e resolver.</p></div>';
+}
 function viewCar(){
   var s=situacao(UI.ep),h=epBar();
   var ep=D.eps.filter(function(e){return e.ep===UI.ep;})[0]||{};
   h+='<div class="sumario"><span><b>EP '+UI.ep+'</b>'+(ep.a||ep.b?' · time A '+ep.a+' × '+ep.b+' time B':'')+(ep.data?' · '+esc(ep.data):'')+'</span>'+
-    (s.graves?'<span class="chip bad">'+s.graves+' problema(s)</span>':'')+
-    (s.avisos-s.graves?'<span class="chip warn">'+(s.avisos-s.graves)+' aviso(s)</span>':'')+
-    (!s.avisos?'<span class="chip ok">tudo certo</span>':'')+'</div>';
+    (s.graves?'<button type="button" class="chip bad" data-act="avtoggle" data-v="bad">'+s.graves+' problema(s)</button>':'')+
+    (s.avisos-s.graves?'<button type="button" class="chip warn" data-act="avtoggle" data-v="all">'+(s.avisos-s.graves)+' aviso(s)</button>':'')+
+    (!s.avisos?'<span class="chip ok">tudo certo</span>':'')+'</div>'+avisosPainel(s);
   var col=colinhaMap(UI.ep);
   h+='<div class="busca noprint"><input type="search" id="busca" data-act="busca" value="'+esc(BUSCA)+'" placeholder="Buscar nome, TX, modelo, canal, cápsula…" aria-label="Buscar" autocomplete="off">'+
     '<span class="seg" role="group" aria-label="Time">'+[['','Todos',''],['A','Time A','tv'],['B','Time B','tz'],['-','Sem time','']].map(function(o){return '<button type="button" class="'+o[2]+'" data-act="ft" data-v="'+o[0]+'" aria-pressed="'+((UI.ft||'')===o[0])+'">'+o[1]+'</button>';}).join('')+'</span>'+
@@ -932,8 +954,8 @@ function editorHtml(){
     var quem=(s.uso.cap[c.id]||[]).filter(function(id){return id!==p.id;}),dev=c.dev&&ep>c.dev,sel=e.cap===c.id;
     var k=compatCap(c,t),livres=k.ad&&D.capPor[k.adId]?D.capPor[k.adId].qtd-(usoAd[k.adId]||0):0,semAd=k.ok&&k.ad&&livres<=0;
     var bloq=(dev||quem.length||!k.ok||semAd)&&!sel;
-    var info=dev?'devolvida':quem.length?'com '+D.pPor[quem[0]].nome:!k.ok?k.motivo:semAd?'sem adaptador → '+k.ad+' livre':[c.cor,(c.modelo&&c.modelo!=='a definir'&&c.modelo!==c.id?c.modelo:''),c.term,k.ad?'+ adaptador → '+k.ad+' ('+livres+' livre'+(livres===1?'':'s')+')':'',c.soAna?'só analógico':'',c.manut?'⚠ manutenção':'',(!c.modelo||c.modelo==='a definir')?c.dono:''].filter(Boolean).join(' · ');
-    return '<button class="opt'+(k.ad&&!bloq?' comad':'')+'" type="button" data-act="cap" data-v="'+esc(c.id)+'" aria-pressed="'+sel+'"'+(bloq?' disabled':'')+'><b>'+bolinha(c.id)+esc(c.id)+(c.inv?' '+invIcon(c.id,1):'')+'</b><span>'+esc(info)+'</span></button>';
+    var info=dev?'devolvida':quem.length?'com '+D.pPor[quem[0]].nome:!k.ok?k.motivo:semAd?'sem adaptador → '+k.ad+' livre':[(c.modelo&&c.modelo!=='a definir'&&c.modelo!==c.id?c.modelo:''),c.term,k.ad?'+ adaptador → '+k.ad+' ('+livres+' livre'+(livres===1?'':'s')+')':'',c.soAna?'só analógico':'',c.manut?'⚠ manutenção':'',(!c.modelo||c.modelo==='a definir')?c.dono:''].filter(Boolean).join(' · ');
+    return '<button class="opt cap-'+(corDe(c.id)||'semcor')+(k.ad&&!bloq?' comad':'')+'" type="button" data-act="cap" data-v="'+esc(c.id)+'" title="'+esc(c.id)+'" aria-pressed="'+sel+'"'+(bloq?' disabled':'')+'><b>'+esc(capNome(c.id))+(c.inv?' '+invIcon(c.id,1):'')+'</b><span>'+esc(info)+'</span></button>';
   }).join('')+(e.cap?'<button class="opt limpar" type="button" data-act="cap" data-v="">Tirar cápsula</button>':'')+'</div>';
   // ligação
   if(t){
@@ -1943,6 +1965,7 @@ document.addEventListener('click',function(ev){
   if(a==='fecharfora'){if(ev.target===el)fechar();return;}
   if(a==='view'){UI.view=v;salvarUi();render();window.scrollTo(0,0);}
   else if(a==='ep'){UI.ep=+el.dataset.ep;salvarUi();render();}
+  else if(a==='avtoggle'){AVOPEN=AVOPEN===el.dataset.v&&el.dataset.v==='bad'?'':el.dataset.v;render();}
   else if(a==='abrir')abrir(el.dataset.id);
   else if(a==='fechar')fechar();
   else if(a==='sync'){if(MODO==='api')buscar();else{UI.view='tec';render();}}

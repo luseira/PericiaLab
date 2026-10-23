@@ -1,6 +1,12 @@
 # Changelog
 
 
+
+## v1.22 · 23/10/2026
+- Carômetro: os chips "problema(s)" e "aviso(s)" abrem a lista, pessoa por pessoa, com o texto de cada um; tocar na pessoa abre o editor.
+- Card: some o "participante 23"; fica só host e mentor.
+- Cápsulas: o nome perde a letra da cor (COS11 B bege vira COS11) e, na escolha, o card do botão fica na cor da lapela (bege, preta ou marrom).
+
 ## v1.21 · 23/10/2026
 - Source do canal mostra todas as entradas do gravador: IN 1–16, AES 1/2/5/6, Retornos A1–C2, SL-6 A1–C2 e Dante 1–32 (recolhido). Embaixo de cada uma, quem está com o transmissor dela no episódio.
 - Pista com fonte sem pessoa (ex.: RTN B1) aparece com o nome da entrada, em cinza tracejado.
