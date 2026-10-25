@@ -5,6 +5,9 @@
 
 
 
+## v1.30 · 25/10/2026
+- Corrigido: o mixer não abria (tela em branco) quando havia uma pista só com fonte, como Retorno B, nos canais 1–16.
+
 ## v1.29 · 25/10/2026
 - A simulação da DAW saiu do menu de baixo e ficou fixa embaixo do console do mixer: faixas como numa DAW (em ordem de canal, só as armadas), na cor de cada função, acompanhando a cena escolhida. Mixdown (Retorno B1/B2) entra como faixa laranja.
 - Cena base nova: Retorno B1 e B2 em 21–22, armados, para o mixdown. Cenas já salvas não mudam: ponha o Source das pistas 21 e 22 em Retorno B1 e B2.

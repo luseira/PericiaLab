@@ -439,7 +439,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.29 · 25/10 01:40</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.30 · 25/10 01:32</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1544,7 +1544,7 @@ function saidasPadrao(){
 function chPadrao(s){
   var occ=!!(s.p||s.fx),r={};BUSES.forEach(function(b){r[b]='';});
   if(occ&&s.n<=16&&!s.copia){r.L='post';r.R='post';r['3']='post';
-    if(s.p.id==='TELMA')r['4']='pre';if(s.p.id==='SALADA')r['5']='pre';}
+    if(s.p&&s.p.id==='TELMA')r['4']='pre';if(s.p&&s.p.id==='SALADA')r['5']='pre';}
   return {on:occ,arm:occ,r:r,sg:{},iso:'pre',trim:null,hpf:null,ph:null,dly:null};
 }
 function mesaEf(c,R){
