@@ -60,14 +60,6 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .avit{display:flex;gap:.6rem;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:.4rem .1rem;cursor:pointer}
 .avit b{min-width:5.5rem}.avit span{display:flex;flex-wrap:wrap;gap:.2rem .7rem;font-size:.84rem}
 .avit i{font-style:normal}.avit i.bad{color:#b3261e}.avit i.warn,.avit i.pend{color:var(--ink2)}
-.dawrow{display:flex;gap:.35rem;overflow-x:auto;padding:.2rem 0 .5rem}
-.dawtrk{flex:none;min-width:5.2rem;background:#2a2d33;border:1px solid #454a53;border-radius:6px;padding:.3rem .45rem;color:#e8eaee;display:flex;flex-direction:column;gap:.05rem}
-.dawtrk i{font-style:normal;font:700 .72rem var(--f);color:#aeb4bd}.dawtrk b{font:700 .85rem var(--fc);text-transform:uppercase}.dawtrk small{font-size:.7rem;color:#aeb4bd}
-.dawtrk.k-host,td.k-host{box-shadow:inset 0 3px var(--c-host,#c9a227)}.dawtrk.k-mentor,td.k-mentor{box-shadow:inset 0 3px var(--c-mentor,#8e5cc4)}
-.dawtrk.k-tv,td.k-tv{box-shadow:inset 0 3px var(--c-A,#d0362b)}.dawtrk.k-tz,td.k-tz{box-shadow:inset 0 3px var(--c-B,#2e6fd6)}
-.dawtrk.k-boom,td.k-boom{box-shadow:inset 0 3px var(--c-boom,#2aa198)}.dawtrk.k-goose,td.k-goose{box-shadow:inset 0 3px var(--c-goose,#8a9a2e)}
-table.daw td{font-size:.82rem;white-space:nowrap}table.daw td small{color:var(--ink2)}table.daw td.mov{background:#fff1c9;outline:1.5px solid #e0a800}table.daw tfoot td{font-weight:700}
-table.daw th.atual,table.daw td.atual b{text-decoration:underline}
 .sumario{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:-.2rem 0 .9rem;font-size:.86rem;color:var(--ink2)}
 .chip{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.08rem .55rem;font-size:.76rem;font-weight:600;white-space:nowrap}
 .chip.bad{background:var(--badbg);color:var(--bad)}
@@ -208,7 +200,16 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .band{margin-bottom:4px;font:600 .66rem/1 var(--f);letter-spacing:.05em;text-transform:uppercase;padding:.3rem .45rem;border-radius:4px;color:#d7dbe0;white-space:nowrap;overflow:hidden}
 .band.ctl{background:#2a2d33;color:#9aa1ab}
 .band.ctl.cl{background:#5e5034;color:#e6d9bd}
-.band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2f3a33}.band.zb.z4{background:#2b2f36}.band.zb.z5{background:#2f3a33}
+.band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2b2f36}.band.zb.z4{background:#2f3a33}
+.dawbox{background:#1f2227;border:1px solid #3a3f48;border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;max-width:34rem;color:#e8eaee}
+.dawh{font:600 .78rem var(--f);margin-bottom:.35rem;color:#c9ced6}.dawh b{color:#fff}.dawav{color:#f0b44c}
+.dawlanes{display:flex;flex-direction:column;gap:2px}
+.dl{--lc:#6b7280;display:grid;grid-template-columns:1.3rem 7.2rem 2.6rem 1fr;align-items:center;height:1.1rem;background:#2a2d33;border-radius:3px;font-size:.7rem;overflow:hidden}
+.dl .dn{text-align:center;color:#8d939d;font-weight:700}.dl .dt{font:700 .74rem var(--fc);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:.3rem}.dl .dc{color:#8d939d}
+.dl .clip{height:100%;background:linear-gradient(90deg,transparent 0 2px,var(--lc) 2px);opacity:.85;position:relative;border-radius:2px;
+ -webkit-mask:repeating-linear-gradient(90deg,#000 0 3px,rgba(0,0,0,.55) 3px 4px);mask:repeating-linear-gradient(90deg,#000 0 3px,rgba(0,0,0,.55) 3px 4px)}
+.dl.k-host{--lc:var(--c-host,#c9a227)}.dl.k-mentor{--lc:var(--c-mentor,#8e5cc4)}.dl.k-tv{--lc:var(--c-A,#d0362b)}.dl.k-tz{--lc:var(--c-B,#2e6fd6)}
+.dl.k-boom{--lc:var(--c-boom,#2aa198)}.dl.k-goose{--lc:var(--c-goose,#8a9a2e)}.dl.k-mix{--lc:#d9822b}.dl.k-fonte{--lc:#8a8f98}
 .strip{user-select:none;-webkit-user-select:none;width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:pointer}
 .strip.k-host{background:#3b3524;border-color:#5a5034}.strip.k-mentor{background:#33293f;border-color:#4f3f61}
 .strip.k-tv{background:#3c2527;border-color:#5e383b}.strip.k-tz{background:#223049;border-color:#344a6e}
@@ -438,7 +439,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.28 · 25/10 01:16</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.29 · 25/10 01:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1051,7 +1052,7 @@ function reduzirFoto(file,cb){
 var CAPS=['#4a1f26','#1f2b5c','#b9bcc0','#6b2fa0','#e2401c','#f2d01a','#1f9a54','#1e4fc4','#f07a1e','#ea6f95','#f2f0ea','#15181d'];
 var CAPNOME=['vinho','marinho','cinza','roxo','vermelho','amarelo','verde','azul','laranja','rosa','branco','preto'];
 var MIXV=[['cl','CL-12',1,12],['b1','1–8',1,8],['b2','9–16',9,16],['b3','17–24',17,24],['b4','25–32',25,32],['s1','1–16',1,16],['s2','17–32',17,32],['all','Tudo',1,32]];
-var ZONAS=[[1,3,'Fixos'],[4,8,'Time da frente'],[9,14,'Time de trás · Clara'],[15,16,'Goose e reserva'],[17,22,'Livres'],[23,32,'Colinha']];
+var ZONAS=[[1,3,'Principais'],[4,8,'Time da frente'],[9,14,'Time de trás · Clara'],[15,22,'Livres'],[23,32,'Colinha']];
 var MSEL=0,MTROCA=false;
 
 function cenaBase(){
@@ -1059,6 +1060,7 @@ function cenaBase(){
   p[0]='P:RAMIRO';p[1]='P:TELMA';p[2]='P:SALADA';
   for(i=0;i<5;i++){p[3+i]='F:'+(i+1);p[8+i]='T:'+(i+1);}
   p[13]='P:BOOM';p[14]='P:GOOSENECK';
+  p[20]='S:RTN B1';p[21]='S:RTN B2';
   for(i=0;i<10;i++)p[22+i]='C:'+(i+1);
   return p;
 }
@@ -1167,8 +1169,6 @@ function avisosMix(R,ep){
   if(cortes.length)W.push(['pend','Nomes cortados na visão de 16 faders: '+cortes.map(function(s){return nomePista(s.p)+' → '+corta16(nomePista(s.p));}).join(', ')+'. Toque na pista para encurtar.']);
   var vis={};S.forEach(function(s){if(s.p&&!s.copia){var k=nomePista(s.p);(vis[k]=vis[k]||[]).push(s.n);}});
   Object.keys(vis).forEach(function(k){if(vis[k].length>1)W.push(['bad','Nome de pista repetido: '+k+' (Ch '+vis[k].join(', ')+').']);});
-  var inv=[],vi={};S.forEach(function(s){if(s.p&&s.e&&s.e.cap&&capInv(s.e.cap)&&!vi[s.p.id]){vi[s.p.id]=1;inv.push(nomePista(s.p)+' ('+s.e.cap+(s.t?', TX '+s.t.num:'')+')');}});
-  if(inv.length)W.push(['warn','Ø Inverter a polaridade no transmissor: '+inv.join(', ')+'.']);
   var vagos=S.filter(function(s){return s.tok&&!s.p&&s.n<=22;});
   if(vagos.length)W.push(['pend','Pistas vazias neste EP: '+vagos.map(function(s){return 'Ch '+s.n;}).join(', ')+'.']);
   return W;
@@ -1191,10 +1191,10 @@ function stripHtml(s,v,M){
   var xk=xDaClara(M,s.n),out=xk?'<span class="xout">X'+xk+' → 633·'+xk+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
-  var busca=fx?semAcento(s.cn+' '+fonteTxt(fonteSlot(s)||'')+' ch '+s.n).toLowerCase():p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'',inv?'ø inverter polaridade fase':'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
-  return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+(inv?' data-inv="1"':'')+' title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
+  var busca=fx?semAcento(s.cn+' '+fonteTxt(fonteSlot(s)||'')+' ch '+s.n).toLowerCase():p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
+  return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+' title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
     '<span class="slab">'+(p||fx?esc(estreito?corta16(nome):nome):'—')+'</span>'+
-    '<span class="sph">'+(p?avatar(p):'')+'</span>'+(inv?'<span class="sinv">'+invIcon(s.e.cap,1)+'</span>':'')+
+    '<span class="sph">'+(p?avatar(p):'')+'</span>'+
     '<span class="ssub">'+esc(sub)+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
     '<span class="strk"><span class="scap'+(cap?'':' sd')+'" style="'+(cap?'background:'+cap:'')+'"></span></span>'+out+
     '<span class="sfoot">Ch '+s.n+'</span></button>';
@@ -1210,9 +1210,9 @@ function linhaMix(R,a,b,v,M){
   return h+'</div>';
 }
 function aplicarBuscaMix(){
-  var q=termos(MBUSCA),ativo=q.length||MINV,n=0;
+  var q=termos(MBUSCA),ativo=q.length,n=0;
   document.querySelectorAll('.strip[data-busca]').forEach(function(el){
-    var ok=ativo&&casa(el.dataset.busca,q)&&(!MINV||el.dataset.inv==='1');
+    var ok=ativo&&casa(el.dataset.busca,q);
     el.classList.toggle('achado',!!ok);el.classList.toggle('fosco',!!ativo&&!ok);if(ok)n++;});
   var c=$('#nmbusca');if(c)c.textContent=ativo?n+' pista(s)':'';
 }
@@ -1287,21 +1287,20 @@ function viewMix(){
     '<span class="sp"></span><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button><button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
   h+='<div class="busca noprint"><input type="search" id="mbusca" data-act="mbusca" value="'+esc(MBUSCA)+'" placeholder="Achar no mixer: nome, TX, canal, cápsula…" aria-label="Buscar no mixer" autocomplete="off">'+
     '<button class="btn sm'+(MVARIOS?' pri':'')+'" type="button" data-act="mvarios" title="Tocar em várias pistas para selecionar (no computador: Shift ou Ctrl + clique)">☐ Selecionar vários</button>'+
-    '<button class="btn sm'+(MINV?' pri':'')+'" type="button" data-act="minv" title="Destacar quem precisa inverter a polaridade no transmissor">Ø polaridade</button>'+
     '<span class="undo"><button class="btn sm" type="button" data-act="mundo" title="Desfazer (Ctrl+Z)"'+(UNDO.length?'':' disabled')+'>↶ Desfazer</button><button class="btn sm" type="button" data-act="mredo" title="Refazer (Ctrl+Shift+Z)"'+(REDO.length?'':' disabled')+'>↷ Refazer</button></span>'+
     '<span class="hint" id="nmbusca" style="margin:0"></span></div>';
-  var M=mesaEf(c,R),pg=UI.mixp||'pistas';
+  var M=mesaEf(c,R),pg=UI.mixp||'pistas';if(pg==='daw')pg='pistas';
   var W0=avisosMix(R,UI.ep),g0=W0.filter(function(w){return w[0]==='bad';}).length;
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+'</p>';
   if(pg!=='pistas'){
-    h+='<section class="doc'+(pg==='rota'||pg==='daw'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',daw:'Como fica na DAW',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
-      ({rota:viewRota,bus:viewBus,out:viewOut,daw:viewDaw}[pg]?{rota:viewRota,bus:viewBus,out:viewOut,daw:viewDaw}[pg](R,M):viewScorpio(c,R,M))+'</section>';
+    h+='<section class="doc'+(pg==='rota'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
+      ({rota:viewRota,bus:viewBus,out:viewOut}[pg]?{rota:viewRota,bus:viewBus,out:viewOut}[pg](R,M):viewScorpio(c,R,M))+'</section>';
     return h+sdNav(true)+logHtml();
   }
   h+='<div class="console">';
   if(v[0]==='all')h+=linhaMix(R,1,16,v,M)+linhaMix(R,17,32,v,M);else h+=linhaMix(R,v[2],v[3],v,M);
-  h+='</div>'+sdNav();
+  h+='</div>'+sdNav()+dawStrip(R,M);
   h+='<div class="mleg noprint">'+CORES_ROT.map(function(x){return '<label title="Toque para escolher a cor"><input type="color" data-act="mcor" data-k="'+x[0]+'" value="'+esc(corFuncao(x[0]))+'">'+x[1]+'</label>';}).join('')+'<button class="btn sm" type="button" data-act="mcorreset">Cores padrão</button></div>';
   var W=avisosMix(R,UI.ep),graves=W.filter(function(w){return w[0]==='bad';}).length;
   h+='<div class="noprint">'+painelCopia(R)+(MSELS.length>1?painelGrupo(R,M):painelSlot(R,M))+'</div>';
@@ -1309,32 +1308,20 @@ function viewMix(){
     '<p class="hint">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON e ARM. Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p></details>';
   return h+logHtml()+impressaoMix(R,c,M);
 }
-/* ───────── como as pistas ficam na DAW (só as armadas entram no arquivo, em ordem de canal) ───────── */
-function dawLista(c,ep){
-  var R=resolver(c,ep),M=mesaEf(c,R),L=[];
-  R.S.forEach(function(s){var ch=M.ch[s.n];if(!ch||!ch.arm||!(s.p||s.fx))return;
-    L.push({pos:L.length+1,n:s.n,nome:s.p?nomePista(s.p):s.cn,key:(s.p?'p:'+s.p.id:'s:'+s.cn)+(s.copia?'#cópia':''),cat:catStrip(s).trim(),time:s.e&&s.e.time||''});});
-  var fora=R.S.filter(function(s){var ch=M.ch[s.n];return (s.p||s.fx)&&ch&&!ch.arm;}).map(function(s){return {n:s.n,nome:s.p?nomePista(s.p):s.cn};});
+/* ───────── simulação da DAW: só as pistas armadas viram faixa, em ordem de canal ───────── */
+function dawFaixas(R,M){
+  var L=[],fora=[];
+  R.S.forEach(function(s){var ch=M.ch[s.n];if(!(s.p||s.fx)||!ch)return;
+    if(!ch.arm){fora.push({n:s.n,nome:s.p?nomePista(s.p):s.cn});return;}
+    var mix=!s.p&&/^RTN\s*B/i.test(s.cn||'');
+    L.push({n:s.n,nome:s.p?nomePista(s.p):mix?'Mixdown '+s.cn.replace(/^RTN\s*/i,''):s.cn,cat:mix?' k-mix':catStrip(s),copia:s.copia,mix:mix});});
   return {L:L,fora:fora};
 }
-function viewDaw(R,M){
-  var c=cenaAtual(),eps=D.eps.map(function(e){return e.ep;}).sort(function(a,b){return a-b;});
-  if(!eps.length)eps=[UI.ep];
-  var cur=dawLista(c,UI.ep),h='';
-  h+='<h3 style="margin:.2rem 0 .5rem">Episódio '+UI.ep+' · '+cur.L.length+' pistas no arquivo</h3>'+
-    '<div class="dawrow">'+cur.L.map(function(x){return '<div class="dawtrk '+x.cat+'" title="Canal '+x.n+' do Scorpio"><i>'+x.pos+'</i><b>'+esc(x.nome)+'</b><small>Ch '+x.n+'</small></div>';}).join('')+'</div>'+
-    (cur.fora.length?'<p class="hint">Fora do arquivo (desarmadas): '+cur.fora.map(function(x){return 'Ch '+x.n+' '+esc(x.nome);}).join(', ')+'.</p>':'')+
-    '<p class="hint">Só as pistas armadas viram faixa, em ordem de canal; as desarmadas somem e as seguintes sobem. Mudar o arm no meio do take corta o arquivo.</p>';
-  var T=eps.map(function(ep){return dawLista(c,ep);}),max=Math.max.apply(null,T.map(function(t){return t.L.length;}).concat([1]));
-  var movs=T.map(function(t,i){if(!i)return 0;var prev={};T[i-1].L.forEach(function(x){prev[x.key]=x.pos;});return t.L.filter(function(x){return prev[x.key]!=null&&prev[x.key]!==x.pos;}).length;});
-  h+='<h3 style="margin:1.1rem 0 .4rem">Como as faixas andam entre os episódios</h3>'+
-    '<p class="hint">Mesma cena em cada episódio. Em destaque: quem mudou de posição no arquivo em relação ao episódio anterior.</p>'+
-    '<div class="tabwrap"><table class="tab daw"><thead><tr><th>Faixa</th>'+eps.map(function(ep){return '<th'+(ep===UI.ep?' class="atual"':'')+'>EP '+ep+'</th>';}).join('')+'</tr></thead><tbody>';
-  for(var i=0;i<max;i++){h+='<tr><td><span class="tag sm">'+(i+1)+'</span></td>'+T.map(function(t,k){var x=t.L[i];if(!x)return '<td class="vaz"></td>';
-    var mv=false;if(k){var pv=T[k-1].L.filter(function(y){return y.key===x.key;})[0];mv=!!pv&&pv.pos!==x.pos;}
-    return '<td class="'+x.cat+(mv?' mov':'')+(eps[k]===UI.ep?' atual':'')+'"><b>'+esc(x.nome)+'</b> <small>Ch '+x.n+'</small></td>';}).join('')+'</tr>';}
-  h+='</tbody><tfoot><tr><td>Mudaram</td>'+movs.map(function(m,k){return '<td'+(m?' class="mov"':'')+'>'+(k?m:'—')+'</td>';}).join('')+'</tr></tfoot></table></div>';
-  return h;
+function dawStrip(R,M){
+  var d=dawFaixas(R,M),temMix=d.L.some(function(x){return x.mix;});
+  return '<div class="dawbox noprint"><div class="dawh"><b>Na DAW</b> · '+d.L.length+' faixas no arquivo'+(temMix?'':' · <span class="dawav">sem mixdown nesta cena: ponha Retorno B1 e B2 em duas pistas (Source) e arme</span>')+'</div>'+
+    '<div class="dawlanes">'+d.L.map(function(x,i){return '<div class="dl'+x.cat+'" title="Canal '+x.n+' do Scorpio"><span class="dn">'+(i+1)+'</span><span class="dt">'+esc(x.nome)+'</span><span class="dc">Ch '+x.n+'</span><span class="clip"></span></div>';}).join('')+'</div>'+
+    (d.fora.length?'<p class="hint" style="margin:.35rem 0 0">Desarmadas, fora do arquivo: '+d.fora.map(function(x){return 'Ch '+x.n+' '+esc(x.nome);}).join(', ')+'.</p>':'')+'</div>';
 }
 function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
 function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
@@ -1466,7 +1453,7 @@ var SAIDAS=['L','R','X1','X2','X3','X4','X5','X6','X7','X8','X9','X10'];
 var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
 var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
 var ROTA_CICLO=['','post','pre','send'];
-var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['daw','Na DAW'],['scorpio','Scorpio']];
+var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
 var CLIP=null,COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
 /* escolher quem está na pista: pelo nome (a fonte vem do Carômetro) */
 function pickNome(R,s){
@@ -1846,7 +1833,7 @@ function mudancaMesa(a,el){
 }
 
 /* ───────── telas no estilo do SD-Remote ───────── */
-var SDNAV=[['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g'],['daw','Na DAW','g'],['scorpio','Scorpio','d']];
+var SDNAV=[['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g'],['scorpio','Scorpio','d']];
 var SDICO={f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="3" height="12" rx="1"/><rect x="8" y="4" width="3" height="17" rx="1"/><rect x="13" y="7" width="3" height="14" rx="1"/><rect x="18" y="11" width="3" height="10" rx="1"/></svg>',
   g:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h18M3 16h18" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>',
   d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
@@ -1899,7 +1886,7 @@ function painelSlot(R,M){
   h+=sdRow('HPF:',sdNum('mhpfhz','hpfhz',ch.hpf===null||ch.hpf===undefined?(ch.hpfhz||''):hz,'Hz')+sdSw(ch.hpf==null?null:ch.hpf>0,'data-act="msw" data-k="hpf"'));
   h+=sdRow('Iso:','<span class="sd-btn pre" title="As pistas gravam sempre pré-fader">Pre</span><i class="sd-dim">sempre</i>');
   h+=sdRow('Delay:',sdNum('mchn','dly',ch.dly,'ms',n>16));
-  h+=sdRow('Phase:',sdSw(ch.ph,'data-act="msw" data-k="ph"',n>16)+(n>16?'<i class="sd-dim">só 1–16</i>':''));
+  h+=sdRow('Phase:',sdSw(ch.ph,'data-act="msw" data-k="ph"',n>16)+(n>16?'<i class="sd-dim">só 1–16</i>':(s.p&&s.e&&s.e.cap&&capInv(s.e.cap)?'<i class="sd-dim">cápsula '+esc(capNome(s.e.cap))+' é invertida (Ø)</i>':'')));
   h+='</div></div>';
   /* envios */
   h+='<div class="sd-src one"><span class="sd-l">Envios</span><div class="sd-grid b12">'+BUSES.map(function(b){var v=ch.r[b]||'';
@@ -1997,7 +1984,7 @@ function render(){
   $('#app').innerHTML=pre+({car:viewCar,doc:viewDoc,mix:viewMix,dev:viewDev,tec:viewTec}[UI.view]||viewCar)();
   if(EDIT)renderModal();
   if(UI.view==='car'&&BUSCA)aplicarBusca();
-  if(UI.view==='mix'&&(MBUSCA||MINV))aplicarBuscaMix();
+  if(UI.view==='mix'&&(MBUSCA))aplicarBuscaMix();
   setStatus();
 }
 function renderSeguro(){

@@ -5,6 +5,12 @@
 
 
 
+## v1.29 · 25/10/2026
+- A simulação da DAW saiu do menu de baixo e ficou fixa embaixo do console do mixer: faixas como numa DAW (em ordem de canal, só as armadas), na cor de cada função, acompanhando a cena escolhida. Mixdown (Retorno B1/B2) entra como faixa laranja.
+- Cena base nova: Retorno B1 e B2 em 21–22, armados, para o mixdown. Cenas já salvas não mudam: ponha o Source das pistas 21 e 22 em Retorno B1 e B2.
+- Saiu o botão "Ø polaridade" e as marcas de polaridade do mixer (continuam no Carômetro e na Input list); no canal, a tela avisa que a cápsula é invertida.
+- Faixas do mixer: "Fixos" virou "Principais"; a faixa "Goose e reserva" saiu (15–22 são "Livres").
+
 ## v1.28 · 25/10/2026
 - O endereço da planilha agora vem embutido no app: aparelhos novos pedem só a senha. Um endereço antigo guardado no aparelho ainda tem prioridade (use Desconectar na aba Técnico para limpar).
 
