@@ -5,6 +5,10 @@
 
 
 
+## v1.26 · 24/10/2026
+- Senha da planilha: se a propriedade SENHA existir no Apps Script, o app pede a senha em cada aparelho (guardada só ali). Sem a propriedade, tudo segue aberto como antes.
+- Aba Técnico: painel "Senha da planilha" (guardar / apagar deste aparelho). Se a senha estiver errada, as alterações pendentes ficam na fila até acertar.
+
 ## v1.25 · 24/10/2026
 - Faixa "Time de trás · Clara" agora cobre os canais 9–14 (antes 17–22); goose e reserva em 15–16.
 - Nova tela "Na DAW" no mixer (barra de baixo): as pistas armadas na ordem em que entram no arquivo (1, 2, 3…), com o canal de origem, e uma grade com os episódios nas colunas mostrando quem mudou de posição em relação ao episódio anterior. Pistas desarmadas somem do arquivo e as seguintes sobem.

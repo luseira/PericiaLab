@@ -25,7 +25,18 @@ const ABA_CENAS = 'Cenas';
 
 /* ───────── entrada ───────── */
 
-function doGet() {
+/* Senha: defina a propriedade SENHA em Configurações do projeto › Propriedades do script.
+   Sem a propriedade, a planilha responde a qualquer pessoa que tenha o endereço /exec. */
+function senhaOk_(k) {
+  const s = PropertiesService.getScriptProperties().getProperty('SENHA');
+  return !s || String(k || '') === s;
+}
+function negado_() {
+  return json_({ ok: false, senha: true, erro: 'Senha necessária' });
+}
+
+function doGet(e) {
+  if (!senhaOk_(e && e.parameter && e.parameter.k)) return negado_();
   try {
     return json_({ ok: true, dados: lerTudo_() });
   } catch (err) {
@@ -34,10 +45,13 @@ function doGet() {
 }
 
 function doPost(e) {
+  let q0;
+  try { q0 = JSON.parse(e.postData.contents); } catch (err) { q0 = {}; }
+  if (!senhaOk_(q0.k)) return negado_();
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
-    const q = JSON.parse(e.postData.contents);
+    const q = q0;
     const acoes = { escalar: escalar_, eliminar: eliminar_, ajustado: ajustado_, importar: importar_, foto: foto_, pessoa: pessoa_, cena: cena_ };
     const fn = acoes[q.acao];
     if (!fn) throw new Error('Ação desconhecida: ' + q.acao);
