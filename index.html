@@ -438,7 +438,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.26 · 24/10 23:38</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.27 · 25/10 01:12</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -676,10 +676,10 @@ function buscar(){
   return fetch(urlApi(),{redirect:'follow'}).then(function(r){return r.json();}).then(function(j){
     if(!j.ok&&j.senha){PRECISA_SENHA=true;NET='off';render();return;}
     if(!j.ok)throw new Error(j.erro||'erro');
-    PRECISA_SENHA=false;
+    var estavaOff=PRECISA_SENHA||!!document.querySelector('#app .banner.err');PRECISA_SENHA=false;
     var antes=JSON.stringify(RAW&&Object.assign({},RAW,{lidoEm:''}));
     RAW=j.dados;jset(K.cache,RAW);NET='';
-    if(JSON.stringify(Object.assign({},RAW,{lidoEm:''}))!==antes){recalcular();renderSeguro();}
+    if(estavaOff||JSON.stringify(Object.assign({},RAW,{lidoEm:''}))!==antes){recalcular();renderSeguro();}
     else{recalcular();}
   }).catch(function(e){NET='off';}).then(function(){setStatus();if(FILA.length)enviar();});
 }
@@ -1993,7 +1993,7 @@ function render(){
   }
   if(!D.eps.some(function(e){return e.ep===UI.ep;}))UI.ep=1;
   var pre=senhaBanner()+(MODO==='demo'&&UI.view!=='tec'?'<div class="banner">Modo demonstração com dados de exemplo. Para ligar na planilha, abra a aba Técnico.</div>':'');
-  if(MODO==='api'&&NET==='off')pre='<div class="banner err">Sem conexão. Mostrando os dados de '+esc(D.lidoEm||'—')+(FILA.length?'; '+FILA.length+' alteração(ões) serão enviadas quando a conexão voltar':'')+'.</div>';
+  if(MODO==='api'&&NET==='off'&&!PRECISA_SENHA)pre='<div class="banner err">Sem conexão. Mostrando os dados de '+esc(D.lidoEm||'—')+(FILA.length?'; '+FILA.length+' alteração(ões) serão enviadas quando a conexão voltar':'')+'.</div>';
   $('#app').innerHTML=pre+({car:viewCar,doc:viewDoc,mix:viewMix,dev:viewDev,tec:viewTec}[UI.view]||viewCar)();
   if(EDIT)renderModal();
   if(UI.view==='car'&&BUSCA)aplicarBusca();

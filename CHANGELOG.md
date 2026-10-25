@@ -5,6 +5,9 @@
 
 
 
+## v1.27 · 25/10/2026
+- Corrigido: com dados já guardados no aparelho, o aviso "Sem conexão" escondia o campo da senha. Agora o campo da senha aparece.
+
 ## v1.26 · 24/10/2026
 - Senha da planilha: se a propriedade SENHA existir no Apps Script, o app pede a senha em cada aparelho (guardada só ali). Sem a propriedade, tudo segue aberto como antes.
 - Aba Técnico: painel "Senha da planilha" (guardar / apagar deste aparelho). Se a senha estiver errada, as alterações pendentes ficam na fila até acertar.
