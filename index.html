@@ -439,7 +439,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.31 · 25/10 01:48</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.32 · 25/10 01:58</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1300,10 +1300,10 @@ function viewMix(){
   }
   h+='<div class="console">';
   if(v[0]==='all')h+=linhaMix(R,1,16,v,M)+linhaMix(R,17,32,v,M);else h+=linhaMix(R,v[2],v[3],v,M);
-  h+='</div>'+sdNav()+dawStrip(R,M);
+  h+='</div>'+sdNav();
   h+='<div class="mleg noprint">'+CORES_ROT.map(function(x){return '<label title="Toque para escolher a cor"><input type="color" data-act="mcor" data-k="'+x[0]+'" value="'+esc(corFuncao(x[0]))+'">'+x[1]+'</label>';}).join('')+'<button class="btn sm" type="button" data-act="mcorreset">Cores padrão</button></div>';
   var W=avisosMix(R,UI.ep),graves=W.filter(function(w){return w[0]==='bad';}).length;
-  h+='<div class="noprint">'+painelCopia(R)+(MSELS.length>1?painelGrupo(R,M):painelSlot(R,M))+'</div>';
+  h+='<div class="noprint">'+painelCopia(R)+(MSELS.length>1?painelGrupo(R,M):painelSlot(R,M))+'</div>'+dawStrip(R,M);
   h+='<details class="mlog avisos noprint"'+(UI.avAberto?' open':'')+'><summary data-act="mavtog">Avisos ('+W.length+')'+(graves?' <span class="chip bad">'+graves+' importante'+(graves>1?'s':'')+'</span>':'')+'</summary><div class="alertas" style="margin-top:.5rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>'+
     '<p class="hint">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON e ARM. Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p></details>';
   return h+logHtml()+impressaoMix(R,c,M);

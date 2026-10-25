@@ -5,6 +5,9 @@
 
 
 
+## v1.32 · 25/10/2026
+- Ordem vertical do mixer: console, depois a tela do canal selecionado e, por último, a simulação da DAW.
+
 ## v1.31 · 25/10/2026
 - Simulação da DAW: Mix L e Mix R (bus L/R do Scorpio) como as duas primeiras faixas; o retorno B vira Mix L-B e Mix R-B; sai o texto das pistas desarmadas e o aviso de mixdown; a caixa pode ser recolhida (fica lembrado neste aparelho).
 
