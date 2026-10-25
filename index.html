@@ -60,6 +60,14 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .avit{display:flex;gap:.6rem;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:.4rem .1rem;cursor:pointer}
 .avit b{min-width:5.5rem}.avit span{display:flex;flex-wrap:wrap;gap:.2rem .7rem;font-size:.84rem}
 .avit i{font-style:normal}.avit i.bad{color:#b3261e}.avit i.warn,.avit i.pend{color:var(--ink2)}
+.dawrow{display:flex;gap:.35rem;overflow-x:auto;padding:.2rem 0 .5rem}
+.dawtrk{flex:none;min-width:5.2rem;background:#2a2d33;border:1px solid #454a53;border-radius:6px;padding:.3rem .45rem;color:#e8eaee;display:flex;flex-direction:column;gap:.05rem}
+.dawtrk i{font-style:normal;font:700 .72rem var(--f);color:#aeb4bd}.dawtrk b{font:700 .85rem var(--fc);text-transform:uppercase}.dawtrk small{font-size:.7rem;color:#aeb4bd}
+.dawtrk.k-host,td.k-host{box-shadow:inset 0 3px var(--c-host,#c9a227)}.dawtrk.k-mentor,td.k-mentor{box-shadow:inset 0 3px var(--c-mentor,#8e5cc4)}
+.dawtrk.k-tv,td.k-tv{box-shadow:inset 0 3px var(--c-A,#d0362b)}.dawtrk.k-tz,td.k-tz{box-shadow:inset 0 3px var(--c-B,#2e6fd6)}
+.dawtrk.k-boom,td.k-boom{box-shadow:inset 0 3px var(--c-boom,#2aa198)}.dawtrk.k-goose,td.k-goose{box-shadow:inset 0 3px var(--c-goose,#8a9a2e)}
+table.daw td{font-size:.82rem;white-space:nowrap}table.daw td small{color:var(--ink2)}table.daw td.mov{background:#fff1c9;outline:1.5px solid #e0a800}table.daw tfoot td{font-weight:700}
+table.daw th.atual,table.daw td.atual b{text-decoration:underline}
 .sumario{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:-.2rem 0 .9rem;font-size:.86rem;color:var(--ink2)}
 .chip{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.08rem .55rem;font-size:.76rem;font-weight:600;white-space:nowrap}
 .chip.bad{background:var(--badbg);color:var(--bad)}
@@ -430,7 +438,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.24 · 24/10 22:57</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.25 · 24/10 23:02</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1036,7 +1044,7 @@ function reduzirFoto(file,cb){
 var CAPS=['#4a1f26','#1f2b5c','#b9bcc0','#6b2fa0','#e2401c','#f2d01a','#1f9a54','#1e4fc4','#f07a1e','#ea6f95','#f2f0ea','#15181d'];
 var CAPNOME=['vinho','marinho','cinza','roxo','vermelho','amarelo','verde','azul','laranja','rosa','branco','preto'];
 var MIXV=[['cl','CL-12',1,12],['b1','1–8',1,8],['b2','9–16',9,16],['b3','17–24',17,24],['b4','25–32',25,32],['s1','1–16',1,16],['s2','17–32',17,32],['all','Tudo',1,32]];
-var ZONAS=[[1,3,'Fixos'],[4,8,'Time da frente'],[9,13,'Time de trás · Clara'],[14,16,'Boom e goose'],[17,22,'Livres'],[23,32,'Colinha']];
+var ZONAS=[[1,3,'Fixos'],[4,8,'Time da frente'],[9,14,'Time de trás · Clara'],[15,16,'Goose e reserva'],[17,22,'Livres'],[23,32,'Colinha']];
 var MSEL=0,MTROCA=false;
 
 function cenaBase(){
@@ -1280,8 +1288,8 @@ function viewMix(){
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+'</p>';
   if(pg!=='pistas'){
-    h+='<section class="doc'+(pg==='rota'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
-      ({rota:viewRota,bus:viewBus,out:viewOut}[pg]?{rota:viewRota,bus:viewBus,out:viewOut}[pg](R,M):viewScorpio(c,R,M))+'</section>';
+    h+='<section class="doc'+(pg==='rota'||pg==='daw'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',daw:'Como fica na DAW',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
+      ({rota:viewRota,bus:viewBus,out:viewOut,daw:viewDaw}[pg]?{rota:viewRota,bus:viewBus,out:viewOut,daw:viewDaw}[pg](R,M):viewScorpio(c,R,M))+'</section>';
     return h+sdNav(true)+logHtml();
   }
   h+='<div class="console">';
@@ -1293,6 +1301,33 @@ function viewMix(){
   h+='<details class="mlog avisos noprint"'+(UI.avAberto?' open':'')+'><summary data-act="mavtog">Avisos ('+W.length+')'+(graves?' <span class="chip bad">'+graves+' importante'+(graves>1?'s':'')+'</span>':'')+'</summary><div class="alertas" style="margin-top:.5rem">'+(W.length?W.map(function(w){return '<div class="alerta '+w[0]+'">'+esc(w[1])+'</div>';}).join(''):'<div class="alerta ok">Tudo no lugar para o EP '+UI.ep+'.</div>')+'</div>'+
     '<p class="hint">Acima de cada pista, na ordem do CL-12: envios X1 · L · R · X2 (verde = pré, amarelo = pós), depois ON e ARM. Rtn B (mix da Clara vindo do 633) não ocupa pista: monitore pelo botão RTN B do CL-12.</p></details>';
   return h+logHtml()+impressaoMix(R,c,M);
+}
+/* ───────── como as pistas ficam na DAW (só as armadas entram no arquivo, em ordem de canal) ───────── */
+function dawLista(c,ep){
+  var R=resolver(c,ep),M=mesaEf(c,R),L=[];
+  R.S.forEach(function(s){var ch=M.ch[s.n];if(!ch||!ch.arm||!(s.p||s.fx))return;
+    L.push({pos:L.length+1,n:s.n,nome:s.p?nomePista(s.p):s.cn,key:(s.p?'p:'+s.p.id:'s:'+s.cn)+(s.copia?'#cópia':''),cat:catStrip(s).trim(),time:s.e&&s.e.time||''});});
+  var fora=R.S.filter(function(s){var ch=M.ch[s.n];return (s.p||s.fx)&&ch&&!ch.arm;}).map(function(s){return {n:s.n,nome:s.p?nomePista(s.p):s.cn};});
+  return {L:L,fora:fora};
+}
+function viewDaw(R,M){
+  var c=cenaAtual(),eps=D.eps.map(function(e){return e.ep;}).sort(function(a,b){return a-b;});
+  if(!eps.length)eps=[UI.ep];
+  var cur=dawLista(c,UI.ep),h='';
+  h+='<h3 style="margin:.2rem 0 .5rem">Episódio '+UI.ep+' · '+cur.L.length+' pistas no arquivo</h3>'+
+    '<div class="dawrow">'+cur.L.map(function(x){return '<div class="dawtrk '+x.cat+'" title="Canal '+x.n+' do Scorpio"><i>'+x.pos+'</i><b>'+esc(x.nome)+'</b><small>Ch '+x.n+'</small></div>';}).join('')+'</div>'+
+    (cur.fora.length?'<p class="hint">Fora do arquivo (desarmadas): '+cur.fora.map(function(x){return 'Ch '+x.n+' '+esc(x.nome);}).join(', ')+'.</p>':'')+
+    '<p class="hint">Só as pistas armadas viram faixa, em ordem de canal; as desarmadas somem e as seguintes sobem. Mudar o arm no meio do take corta o arquivo.</p>';
+  var T=eps.map(function(ep){return dawLista(c,ep);}),max=Math.max.apply(null,T.map(function(t){return t.L.length;}).concat([1]));
+  var movs=T.map(function(t,i){if(!i)return 0;var prev={};T[i-1].L.forEach(function(x){prev[x.key]=x.pos;});return t.L.filter(function(x){return prev[x.key]!=null&&prev[x.key]!==x.pos;}).length;});
+  h+='<h3 style="margin:1.1rem 0 .4rem">Como as faixas andam entre os episódios</h3>'+
+    '<p class="hint">Mesma cena em cada episódio. Em destaque: quem mudou de posição no arquivo em relação ao episódio anterior.</p>'+
+    '<div class="tabwrap"><table class="tab daw"><thead><tr><th>Faixa</th>'+eps.map(function(ep){return '<th'+(ep===UI.ep?' class="atual"':'')+'>EP '+ep+'</th>';}).join('')+'</tr></thead><tbody>';
+  for(var i=0;i<max;i++){h+='<tr><td><span class="tag sm">'+(i+1)+'</span></td>'+T.map(function(t,k){var x=t.L[i];if(!x)return '<td class="vaz"></td>';
+    var mv=false;if(k){var pv=T[k-1].L.filter(function(y){return y.key===x.key;})[0];mv=!!pv&&pv.pos!==x.pos;}
+    return '<td class="'+x.cat+(mv?' mov':'')+(eps[k]===UI.ep?' atual':'')+'"><b>'+esc(x.nome)+'</b> <small>Ch '+x.n+'</small></td>';}).join('')+'</tr>';}
+  h+='</tbody><tfoot><tr><td>Mudaram</td>'+movs.map(function(m,k){return '<td'+(m?' class="mov"':'')+'>'+(k?m:'—')+'</td>';}).join('')+'</tr></tfoot></table></div>';
+  return h;
 }
 function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
 function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
@@ -1424,7 +1459,7 @@ var SAIDAS=['L','R','X1','X2','X3','X4','X5','X6','X7','X8','X9','X10'];
 var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
 var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
 var ROTA_CICLO=['','post','pre','send'];
-var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
+var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['daw','Na DAW'],['scorpio','Scorpio']];
 var CLIP=null,COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
 /* escolher quem está na pista: pelo nome (a fonte vem do Carômetro) */
 function pickNome(R,s){
@@ -1804,7 +1839,7 @@ function mudancaMesa(a,el){
 }
 
 /* ───────── telas no estilo do SD-Remote ───────── */
-var SDNAV=[['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g'],['scorpio','Scorpio','d']];
+var SDNAV=[['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g'],['daw','Na DAW','g'],['scorpio','Scorpio','d']];
 var SDICO={f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="3" height="12" rx="1"/><rect x="8" y="4" width="3" height="17" rx="1"/><rect x="13" y="7" width="3" height="14" rx="1"/><rect x="18" y="11" width="3" height="10" rx="1"/></svg>',
   g:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h18M3 16h18" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>',
   d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
