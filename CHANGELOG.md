@@ -5,6 +5,9 @@
 
 
 
+## v1.28 · 25/10/2026
+- O endereço da planilha agora vem embutido no app: aparelhos novos pedem só a senha. Um endereço antigo guardado no aparelho ainda tem prioridade (use Desconectar na aba Técnico para limpar).
+
 ## v1.27 · 25/10/2026
 - Corrigido: com dados já guardados no aparelho, o aviso "Sem conexão" escondia o campo da senha. Agora o campo da senha aparece.
 
