@@ -430,7 +430,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.22 · 23/10 17:33</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.23 · 24/10 22:26</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1508,7 +1508,7 @@ function saidasPadrao(){
 }
 /* rascunho inicial de cada canal: pistas 1–16 ocupadas vão para L, R e MIX; Telma e Salada também pré no bus delas */
 function chPadrao(s){
-  var occ=!!s.p,r={};BUSES.forEach(function(b){r[b]='';});
+  var occ=!!(s.p||s.fx),r={};BUSES.forEach(function(b){r[b]='';});
   if(occ&&s.n<=16&&!s.copia){r.L='post';r.R='post';r['3']='post';
     if(s.p.id==='TELMA')r['4']='pre';if(s.p.id==='SALADA')r['5']='pre';}
   return {on:occ,arm:occ,r:r,sg:{},iso:'pre',trim:null,hpf:null,ph:null,dly:null};

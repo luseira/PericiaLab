@@ -2,6 +2,10 @@
 
 
 
+
+## v1.23 · 24/10/2026
+- Pista com fonte sem pessoa (ex.: RTN B1) já nasce ligada e armada, como as outras.
+
 ## v1.22 · 23/10/2026
 - Carômetro: os chips "problema(s)" e "aviso(s)" abrem a lista, pessoa por pessoa, com o texto de cada um; tocar na pessoa abre o editor.
 - Card: some o "participante 23"; fica só host e mentor.
