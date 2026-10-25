@@ -3,6 +3,13 @@
 
 
 
+
+## v1.24 · 24/10/2026
+- Novo layout padrão do mixer: fixos 1–3, time da frente 4–8, time de trás 9–13 (o bloco da Clara), boom 14, gooseneck 15, livres 17–22 e colinha 23–32. Sem cópias.
+- Posições novas "Time da frente" (o time com mais gente no episódio; empate: Time A) e "Time de trás". O app resolve por episódio, então o mesmo layout vale em todos.
+- Saídas X1–X5 para o 633 passam a sair do ISO dos canais 9–13. A marca "X → 633" aparece nos canais que alimentam essas saídas, e o aviso da Clara confere isso.
+- Cenas já salvas não são alteradas.
+
 ## v1.23 · 24/10/2026
 - Pista com fonte sem pessoa (ex.: RTN B1) já nasce ligada e armada, como as outras.
 

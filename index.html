@@ -200,7 +200,7 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .band{margin-bottom:4px;font:600 .66rem/1 var(--f);letter-spacing:.05em;text-transform:uppercase;padding:.3rem .45rem;border-radius:4px;color:#d7dbe0;white-space:nowrap;overflow:hidden}
 .band.ctl{background:#2a2d33;color:#9aa1ab}
 .band.ctl.cl{background:#5e5034;color:#e6d9bd}
-.band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2f3a33}
+.band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2f3a33}.band.zb.z4{background:#2b2f36}.band.zb.z5{background:#2f3a33}
 .strip{user-select:none;-webkit-user-select:none;width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:pointer}
 .strip.k-host{background:#3b3524;border-color:#5a5034}.strip.k-mentor{background:#33293f;border-color:#4f3f61}
 .strip.k-tv{background:#3c2527;border-color:#5e383b}.strip.k-tz{background:#223049;border-color:#344a6e}
@@ -430,7 +430,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.23 · 24/10 22:26</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.24 · 24/10 22:57</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1036,13 +1036,13 @@ function reduzirFoto(file,cb){
 var CAPS=['#4a1f26','#1f2b5c','#b9bcc0','#6b2fa0','#e2401c','#f2d01a','#1f9a54','#1e4fc4','#f07a1e','#ea6f95','#f2f0ea','#15181d'];
 var CAPNOME=['vinho','marinho','cinza','roxo','vermelho','amarelo','verde','azul','laranja','rosa','branco','preto'];
 var MIXV=[['cl','CL-12',1,12],['b1','1–8',1,8],['b2','9–16',9,16],['b3','17–24',17,24],['b4','25–32',25,32],['s1','1–16',1,16],['s2','17–32',17,32],['all','Tudo',1,32]];
-var ZONAS=[[1,3,'Fixos'],[4,16,'Rotativas'],[17,22,'Clara → 633'],[23,32,'Colinha']];
+var ZONAS=[[1,3,'Fixos'],[4,8,'Time da frente'],[9,13,'Time de trás · Clara'],[14,16,'Boom e goose'],[17,22,'Livres'],[23,32,'Colinha']];
 var MSEL=0,MTROCA=false;
 
 function cenaBase(){
   var p=[];for(var i=0;i<32;i++)p.push('');
   p[0]='P:RAMIRO';p[1]='P:TELMA';p[2]='P:SALADA';
-  for(i=0;i<5;i++){p[3+i]='A:'+(i+1);p[8+i]='B:'+(i+1);p[16+i]='B:'+(i+1);}
+  for(i=0;i<5;i++){p[3+i]='F:'+(i+1);p[8+i]='T:'+(i+1);}
   p[13]='P:BOOM';p[14]='P:GOOSENECK';
   for(i=0;i<10;i++)p[22+i]='C:'+(i+1);
   return p;
@@ -1108,30 +1108,32 @@ function listaCanais(){
   return Object.keys(v).sort(function(a,b){return v[a]-v[b]||nat(a,b);});
 }
 function resolver(cena,ep){
-  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
+  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),fr=A.length>=B.length?'A':'B',F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
   var S=cena.pistas.map(function(tok,i){
     var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
-    var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return s;
+    var m=/^([PABCSFT]):(.+)$/.exec(tok);if(!m)return s;
     if(m[1]==='S'){s.cn=m[2];s.p=porCanal[m[2]]||null;if(!s.p){if(listaCanais().indexOf(m[2])>=0)s.motivo='ninguém em '+m[2];else s.fx=true;}
       if(s.p){var e0=EF[s.p.id]||{};s.e=e0;s.t=e0.tx?D.txPor[e0.tx]:null;(onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
       if(primeira['c:'+s.cn])s.copia=primeira['c:'+s.cn];else primeira['c:'+s.cn]=s.n;
       return s;}
     if(m[1]==='P'){var p=D.pPor[m[2]];if(!p)s.motivo='não está no elenco';else if(!ativo(p,ep))s.motivo=p.nome+' saiu após o EP '+p.elim;else s.p=p;}
     else if(m[1]==='C'){s.p=C[int(m[2])-1]||null;if(!s.p)s.motivo='colinha '+m[2]+': ninguém';}
-    else{var L=m[1]==='A'?A:B,k=int(m[2]);s.p=L[k-1]||null;if(!s.p)s.motivo=timeNome(m[1])+' '+k+': ninguém';}
+    else{var L=m[1]==='F'?F:m[1]==='T'?T:m[1]==='A'?A:B,k=int(m[2]);s.p=L[k-1]||null;if(!s.p)s.motivo=(m[1]==='F'?'time da frente':m[1]==='T'?'time de trás':timeNome(m[1]))+' '+k+': ninguém';}
     if(s.p){var e=EF[s.p.id]||{};s.e=e;s.t=e.tx?D.txPor[e.tx]:null;s.cn=s.t?s.t.canal:'';
       var kc=s.cn?'c:'+s.cn:'p:'+s.p.id;if(primeira[kc])s.copia=primeira[kc];else primeira[kc]=s.n;
       (onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
     return s;
   });
-  return {S:S,A:A,B:B,C:C,EF:EF,onde:onde};
+  return {S:S,A:A,B:B,F:F,T:T,frente:fr,C:C,EF:EF,onde:onde};
 }
 function rotuloTok(tok){
-  if(!tok)return 'vazio';var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return tok;
+  if(!tok)return 'vazio';var m=/^([PABCSFT]):(.+)$/.exec(tok);if(!m)return tok;
   if(m[1]==='S')return 'Source '+m[2];
   if(m[1]==='P'){var p=D.pPor[m[2]];return p?p.nome:m[2];}
   if(m[1]==='C')return 'Colinha · '+m[2]+'º';
+  if(m[1]==='F')return 'Time da frente · '+m[2]+'º';
+  if(m[1]==='T')return 'Time de trás · '+m[2]+'º';
   return timeNome(m[1])+' · '+m[2]+'º';
 }
 function avisosMix(R,ep){
@@ -1140,9 +1142,9 @@ function avisosMix(R,ep){
   if(semTime.length)W.push(['bad','Sem time (A/B) marcado no Carômetro: '+semTime.map(function(p){return p.nome;}).join(', ')+'. Eles não entram nas pistas de time.']);
   var foraCL=S.filter(function(s){return s.n>=13&&s.n<=16&&s.p&&!s.copia;});
   if(foraCL.length)W.push(['warn','Fora do CL-12, só no iPad: '+foraCL.map(function(s){return 'Ch '+s.n+' '+nomePista(s.p);}).join(', ')+'.']);
-  var naClara={};S.forEach(function(s){if(s.n>=17&&s.n<=22&&s.p)naClara[s.p.id]=1;});
-  var faltam=R.B.filter(function(p){return !naClara[p.id];});
-  if(faltam.length)W.push(['warn','A Clara não recebe (fora das pistas 17–22): '+faltam.map(function(p){return p.nome;}).join(', ')+'.']);
+  var Mw=mesaEf(cenaAtual(),R);
+  var faltam=S.filter(function(s){return s.n>=9&&s.n<=13&&s.p&&!s.copia&&!xDaClara(Mw,s.n);});
+  if(faltam.length)W.push(['warn','A Clara não recebe (nenhuma saída X1–X5 sai destes canais): '+faltam.map(function(s){return 'Ch '+s.n+' '+nomePista(s.p);}).join(', ')+'.']);
   var noMix={};S.forEach(function(s){if(s.n<=16&&s.p)noMix[s.p.id]=1;});
   var fora=R.A.concat(R.B).filter(function(p){return !noMix[p.id];});
   if(fora.length)W.push(['bad','Não estão em nenhuma pista de 1 a 16: '+fora.map(function(p){return p.nome;}).join(', ')+'.']);
@@ -1158,6 +1160,8 @@ function avisosMix(R,ep){
 }
 function zonaDe(n){for(var i=0;i<ZONAS.length;i++)if(n>=ZONAS[i][0]&&n<=ZONAS[i][1])return i;return 0;}
 /* cor de fundo do fader pela função: host, mentor, time, boom, gooseneck */
+/* qual saída X1–X5 (para o 633 da Clara) sai do ISO deste canal; 0 se nenhuma */
+function xDaClara(M,n){if(!M||!M.out)return 0;for(var i=1;i<=5;i++){var o=M.out['X'+i];if(o&&String(o.src).indexOf('iso:'+n+':')===0)return i;}return 0;}
 function catStrip(s){
   var p=s.p;if(!p)return s.fx?' k-fonte':'';
   if(p.papel==='HOST')return ' k-host';if(p.papel==='MENTOR')return ' k-mentor';
@@ -1169,7 +1173,7 @@ function stripHtml(s,v,M){
   var cap=s.n<=12?CAPS[s.n-1]:'';
   var cls='strip z'+zonaDe(s.n)+catStrip(s)+(M&&(p||fx)&&!M.ch[s.n].on?' off':'')+(M&&M.ch[s.n].arm?' armado':'')+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?(COPIA.para.indexOf(s.n)>=0?' destino':' colavel'):'')+(p||fx?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
   var sub=p?[s.t?txNome(s.t):'sem TX',s.cn||''].filter(Boolean).join(' · '):fx?(fonteSlot(s)?fonteTxt(fonteSlot(s)):'fonte do gravador'):(s.cn?s.cn+' · ninguém':(s.motivo||''));
-  var out=s.n>=17&&s.n<=22?'<span class="xout">X'+(s.n-16)+' → 633·'+(s.n-16)+'</span>':'';
+  var xk=xDaClara(M,s.n),out=xk?'<span class="xout">X'+xk+' → 633·'+xk+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
   var busca=fx?semAcento(s.cn+' '+fonteTxt(fonteSlot(s)||'')+' ch '+s.n).toLowerCase():p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'',inv?'ø inverter polaridade fase':'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
@@ -1185,7 +1189,8 @@ function linhaMix(R,a,b,v,M){
   [[1,12,'CL-12'],[13,32,'só iPad']].forEach(function(z){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
-    h+='<span class="band zb z'+i+'" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
+    var zl=i===1?'Frente · '+timeNome(R.frente)+' ('+R.F.length+')':i===2?'Trás · '+timeNome(R.frente==='A'?'B':'A')+' ('+R.T.length+') · Clara':z[2];
+    h+='<span class="band zb z'+i+'" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
   S.forEach(function(s,i){h+='<span style="grid-row:3;grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
   return h+'</div>';
 }
@@ -1209,10 +1214,10 @@ function logHtml(){
     (MLOG.length?'<ol>'+MLOG.slice(0,80).map(function(x){return '<li><time>'+esc(x.h)+'</time><i>EP '+x.ep+' · '+esc(x.cena)+'</i><span>'+esc(x.m)+'</span></li>';}).join('')+'</ol><div class="linha" style="margin-top:.4rem"><button class="btn sm" type="button" data-act="mlogclr">Limpar histórico</button></div>':'<p class="hint">Nada mudou ainda.</p>')+'</details>';
 }
 function nomeTok(tok,R){
-  if(!tok)return 'vazio';var m=/^([PABCS]):(.+)$/.exec(tok);if(!m)return tok;
+  if(!tok)return 'vazio';var m=/^([PABCSFT]):(.+)$/.exec(tok);if(!m)return tok;
   if(m[1]==='S'){var ps=mapaCanais(UI.ep)[m[2]];return m[2]+(ps?' ('+nomePista(ps)+')':'');}
   if(m[1]==='P'){var p=D.pPor[m[2]];return p?nomePista(p):m[2];}
-  var L=m[1]==='A'?R.A:m[1]==='B'?R.B:R.C,x=L&&L[int(m[2])-1];
+  var L=m[1]==='A'?R.A:m[1]==='B'?R.B:m[1]==='F'?R.F:m[1]==='T'?R.T:R.C,x=L&&L[int(m[2])-1];
   return rotuloTok(tok)+(x?' ('+nomePista(x)+')':'');
 }
 /* descreve o que mudou entre duas versões de uma cena */
@@ -1250,7 +1255,7 @@ function desfazerMix(){var prev=UNDO.pop();if(!prev){toast('Nada para desfazer')
 function refazerMix(){var nx=REDO.pop();if(!nx){toast('Nada para refazer');return;}var at=cenaPorId(nx.id);if(at){UNDO.push(clone(at));try{logMix(diffCena(at,nx).map(function(m){return '↷ refeito: '+m;}));}catch(e){}}UI.cena=nx.id;salvarUi();salvarCena(nx);render();}
 function impressaoMix(R,c,M){
   var linhas=R.S.filter(function(s){return s.p||s.tok||(M&&M.ch[s.n].arm);}).map(function(s){var p=s.p;
-    return '<tr><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(p?nomePista(p):'—')+'</td><td>'+esc(p?p.nome:(s.motivo||rotuloTok(s.tok)))+'</td><td>'+esc(s.t?txNome(s.t):'')+'</td><td><b>'+esc(s.t?s.t.canal:'')+'</b></td><td>'+(s.e&&s.e.cap?esc(s.e.cap)+(capInv(s.e.cap)?' '+invIcon(s.e.cap,1):''):'')+'</td><td>'+esc(s.e?timeNome(s.e.time):'')+'</td><td>'+(M&&M.ch[s.n].on?'●':'')+'</td><td>'+(M&&M.ch[s.n].arm?'<b class="armtxt">● ARM</b>':'')+'</td><td>'+(M?CL_ROTAS.map(function(r){var x=M.ch[s.n].r[r[0]];return x?r[1]+' '+ROTA_TXT[x]:'';}).filter(Boolean).join(' · '):'')+'</td><td>'+esc(s.copia?'cópia do Ch '+s.copia:'')+(s.n>=17&&s.n<=22?' X'+(s.n-16)+' → 633·'+(s.n-16):'')+'</td></tr>';}).join('');
+    return '<tr><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(p?nomePista(p):'—')+'</td><td>'+esc(p?p.nome:(s.motivo||rotuloTok(s.tok)))+'</td><td>'+esc(s.t?txNome(s.t):'')+'</td><td><b>'+esc(s.t?s.t.canal:'')+'</b></td><td>'+(s.e&&s.e.cap?esc(s.e.cap)+(capInv(s.e.cap)?' '+invIcon(s.e.cap,1):''):'')+'</td><td>'+esc(s.e?timeNome(s.e.time):'')+'</td><td>'+(M&&M.ch[s.n].on?'●':'')+'</td><td>'+(M&&M.ch[s.n].arm?'<b class="armtxt">● ARM</b>':'')+'</td><td>'+(M?CL_ROTAS.map(function(r){var x=M.ch[s.n].r[r[0]];return x?r[1]+' '+ROTA_TXT[x]:'';}).filter(Boolean).join(' · '):'')+'</td><td>'+esc(s.copia?'cópia do Ch '+s.copia:'')+(function(){var k=xDaClara(M,s.n);return k?' X'+k+' → 633·'+k:'';})()+'</td></tr>';}).join('');
   var fita='<div class="fita">'+R.S.slice(0,12).map(function(s){return '<span class="'+(s.p&&s.e?timeCls(s.e.time):'')+'" style="border-top:6px solid '+CAPS[s.n-1]+'">'+esc(s.p?nomePista(s.p):'')+'<i>'+s.n+'</i></span>';}).join('')+'</div>';
   return '<section class="doc soimpr"><div class="dochead"><div><h1>Cena · '+esc(c.nome)+'</h1><p>EP '+UI.ep+' · ordem nos times: '+(c.ordem==='tx'?'transmissor':'alfabética')+' · colinha em ordem de transmissor</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
     '<h3>Fita do CL-12</h3>'+fita+'<h3>Pistas do Scorpio</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Ch</th><th>Nome de pista</th><th>Quem</th><th>TX</th><th>Canal</th><th>Cápsula</th><th>Time</th><th>ON</th><th>ARM</th><th>X1 · L · R · X2</th><th>Obs.</th></tr></thead><tbody>'+linhas+'</tbody></table></div></section>';
@@ -1502,7 +1507,7 @@ function busPadrao(){
 }
 function saidasPadrao(){
   var o={L:{nome:'CTRL A',src:'bus:L'},R:{nome:'CTRL B',src:'bus:R'},X6:{nome:'CAM',src:'bus:3'},X7:{nome:'ASSIST 1',src:'bus:6'},X8:{nome:'ASSIST 2',src:'bus:7'},X9:{nome:'CTK 1',src:'bus:1'},X10:{nome:'CTK 2',src:'bus:2'}};
-  for(var i=1;i<=5;i++)o['X'+i]={nome:'ISO B'+i,src:'iso:'+(16+i)+':pre'};
+  for(var i=1;i<=5;i++)o['X'+i]={nome:'ISO B'+i,src:'iso:'+(8+i)+':pre'};
   SAIDAS.forEach(function(k){o[k]=Object.assign({nome:'',src:'',nivel:'',gain:null,dly:null},o[k]||{});});
   return o;
 }
@@ -1821,6 +1826,8 @@ function painelSlot(R,M){
   var s=R.S[MSEL-1],n=MSEL,ch=M.ch[n],o='<option value="">Vazio</option>';
   ['A','B'].forEach(function(t){var L=R[t];
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
+  [['F','Time da frente'],['T','Time de trás']].forEach(function(g){var L=R[g[0]];
+    o+='<optgroup label="'+g[1]+' (o '+(g[0]==='F'?'maior':'menor')+') · '+timeNome(g[0]==='F'?R.frente:(R.frente==='A'?'B':'A'))+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   o+='<optgroup label="Colinha (ordem de transmissor)">'+[1,2,3,4,5,6,7,8,9,10].map(function(k){return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(R.C[k-1]?' ('+esc(R.C[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';
   o+='<optgroup label="Pessoa ou fonte fixa">'+D.elenco.map(function(p){return '<option value="P:'+esc(p.id)+'"'+(s.tok==='P:'+p.id?' selected':'')+'>'+esc(p.nome)+'</option>';}).join('')+'</optgroup>';
   var p=s.p,e=s.e||{},t=s.t,fonte=s.cn?fonteSlot(s):'';
@@ -1832,11 +1839,11 @@ function painelSlot(R,M){
       '<span>'+(e.cap?bolinha(e.cap)+esc(e.cap)+' ':'')+(capInv(e.cap)?invIcon(e.cap,1)+' inverter no TX ':'')+timeChip(e.time)+(s.copia?' <i>cópia do Ch '+s.copia+'</i>':'')+(outras.length?' <i>também em '+outras.map(function(x){return 'Ch '+x;}).join(', ')+'</i>':'')+'</span></div>';}
   else if(s.fx)h+='<div class="sd-who"><b>'+esc(s.cn)+'</b><span>Fonte do gravador, sem pessoa'+(fonteSlot(s)?' · '+esc(fonteTxt(fonteSlot(s))):' · código no settings ainda a confirmar')+(s.copia?' · <i>cópia do Ch '+s.copia+'</i>':'')+'</span></div>';
   else h+='<div class="sd-who"><b>—</b><span>'+esc(s.motivo||'pista vazia')+'</span></div>';
-  h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(n>=17&&n<=22?'<span class="sd-tag">X'+(n-16)+' → 633·'+(n-16)+'</span>':'')+
+  h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(function(){var k=xDaClara(M,n);return k?'<span class="sd-tag">X'+k+' → 633·'+k+'</span>':'';})()+
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sd-cols"><div class="sd-col">';
   h+=sdRow('Name:',p?'<span class="sd-in nome"><input type="text" id="mpista" data-act="mpistac" maxlength="14" value="'+esc(nomePista(p))+'"></span>':'<span class="sd-dim">Ch '+n+'</span>');
-  var auto=/^[ABC]:/.test(s.tok)?rotuloTok(s.tok):'';
+  var auto=/^[ABCFT]:/.test(s.tok)?rotuloTok(s.tok):'';
   h+=sdRow('Quem:','<button type="button" class="sd-btn'+(PICK==='nome'?' sel':'')+'" data-act="mpick" data-v="nome">'+esc(p?primeiroNome(p):'— escolher —')+'</button>'+(auto?'<i class="sd-dim" title="Esta pista segue automaticamente a ordem do time/colinha">auto: '+esc(auto)+'</i>':''));
   if(PICK==='nome')h+=pickNome(R,s);
   h+=sdRow('Trim:',sdNum('mchn','trim',ch.trim,'dB'));
