@@ -439,7 +439,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.32 · 25/10 01:58</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.33 · 25/10 02:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1060,7 +1060,7 @@ function cenaBase(){
   p[0]='P:RAMIRO';p[1]='P:TELMA';p[2]='P:SALADA';
   for(i=0;i<5;i++){p[3+i]='F:'+(i+1);p[8+i]='T:'+(i+1);}
   p[13]='P:BOOM';p[14]='P:GOOSENECK';
-  p[20]='S:RTN B1';p[21]='S:RTN B2';
+  p[16]='S:RTN B1';p[17]='S:RTN B2';
   for(i=0;i<10;i++)p[22+i]='C:'+(i+1);
   return p;
 }
@@ -1184,7 +1184,7 @@ function catStrip(s){
   var t=s.e&&s.e.time;return t==='A'?' k-tv':t==='B'?' k-tz':' k-part';
 }
 function stripHtml(s,v,M){
-  var p=s.p,fx=!p&&s.fx,nome=p?nomePista(p):fx?s.cn:'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
+  var p=s.p,fx=!p&&s.fx,nome=p?nomePista(p):fx?nomeFx(s,M):'',estreito=v[0]==='s1'||v[0]==='s2'||v[0]==='all';
   var cap=s.n<=12?CAPS[s.n-1]:'';
   var cls='strip z'+zonaDe(s.n)+catStrip(s)+(M&&(p||fx)&&!M.ch[s.n].on?' off':'')+(M&&M.ch[s.n].arm?' armado':'')+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?(COPIA.para.indexOf(s.n)>=0?' destino':' colavel'):'')+(p||fx?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
   var sub=p?[s.t?txNome(s.t):'sem TX',s.cn||''].filter(Boolean).join(' · '):fx?(fonteSlot(s)?fonteTxt(fonteSlot(s)):'fonte do gravador'):(s.cn?s.cn+' · ninguém':(s.motivo||''));
@@ -1309,12 +1309,16 @@ function viewMix(){
   return h+logHtml()+impressaoMix(R,c,M);
 }
 /* ───────── simulação da DAW: só as pistas armadas viram faixa, em ordem de canal ───────── */
+function nomeFx(s,M){
+  var ch=M&&M.ch&&M.ch[s.n];if(ch&&ch.nome)return ch.nome;
+  var c=s.cn||'';if(/^RTN\s*B\s*1/i.test(c))return 'Mix L-B';if(/^RTN\s*B\s*2/i.test(c))return 'Mix R-B';return c;
+}
 function dawFaixas(R,M){
   var L=[],fora=[];
   R.S.forEach(function(s){var ch=M.ch[s.n];if(!(s.p||s.fx)||!ch)return;
     if(!ch.arm){fora.push({n:s.n,nome:s.p?nomePista(s.p):s.cn});return;}
     var mix=!s.p&&/^RTN\s*B/i.test(s.cn||'');
-    L.push({n:s.n,nome:s.p?nomePista(s.p):mix?(/B\s*1/i.test(s.cn)?'Mix L-B':/B\s*2/i.test(s.cn)?'Mix R-B':s.cn):s.cn,cat:mix?' k-mix':catStrip(s),copia:s.copia,mix:mix});});
+    L.push({n:s.n,nome:s.p?nomePista(s.p):nomeFx(s,M),cat:mix?' k-mix':catStrip(s),copia:s.copia,mix:mix});});
   return {L:L,fora:fora};
 }
 function dawStrip(R,M){
@@ -1545,7 +1549,7 @@ function chPadrao(s){
   var occ=!!(s.p||s.fx),r={};BUSES.forEach(function(b){r[b]='';});
   if(occ&&s.n<=16&&!s.copia){r.L='post';r.R='post';r['3']='post';
     if(s.p&&s.p.id==='TELMA')r['4']='pre';if(s.p&&s.p.id==='SALADA')r['5']='pre';}
-  return {on:occ,arm:occ,r:r,sg:{},iso:'pre',trim:null,hpf:null,ph:null,dly:null};
+  return {on:occ,arm:occ&&!/^C:/.test(s.tok||''),r:r,sg:{},iso:'pre',trim:null,hpf:null,ph:null,dly:null};
 }
 function mesaEf(c,R){
   var m=c.mesa||{},chs=m.ch||{},M={ch:[],bus:busPadrao(),out:saidasPadrao()};
@@ -1822,6 +1826,7 @@ function mudancaMesa(a,el){
   if(a==='mchn'){p={};p[k]=el.value===''?null:parseFloat(el.value);if(p[k]!==null&&isNaN(p[k]))return true;setCh(MSEL,p);return true;}
   if(a==='mchs'){p={};p[k]=el.value===''?null:el.value==='1';setCh(MSEL,p);return true;}
   if(a==='mcopiade'){COPIA.de=+el.value;COPIA.para=COPIA.para.filter(function(n){return n!==COPIA.de;});render();return true;}
+  if(a==='mfxnome'){setCh(MSEL,{nome:semAcento(el.value.trim()).toUpperCase()});return true;}
   if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){logMix(['Nome de pista: '+nomePista(sp.p)+' → '+semAcento(el.value.trim()).toUpperCase()]);fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   if(a==='mhpfhz'){var hzv=el.value===''?null:parseFloat(el.value),cH=cenaAtual(),chH=mesaEf(cH,resolver(cH,UI.ep)).ch[MSEL],pt={hpfhz:hzv};if(chH.hpf>0&&hzv>0)pt.hpf=hzv;setCh(MSEL,pt);return true;}
   if(a==='mbusnome'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{nome:el.value.trim().toUpperCase()});});return true;}
@@ -1871,7 +1876,7 @@ function painelSlot(R,M){
   h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(function(){var k=xDaClara(M,n);return k?'<span class="sd-tag">X'+k+' → 633·'+k+'</span>':'';})()+
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sd-cols"><div class="sd-col">';
-  h+=sdRow('Name:',p?'<span class="sd-in nome"><input type="text" id="mpista" data-act="mpistac" maxlength="14" value="'+esc(nomePista(p))+'"></span>':'<span class="sd-dim">Ch '+n+'</span>');
+  h+=sdRow('Name:',p?'<span class="sd-in nome"><input type="text" id="mpista" data-act="mpistac" maxlength="14" value="'+esc(nomePista(p))+'"></span>':(s.fx?'<span class="sd-in nome"><input type="text" data-act="mfxnome" maxlength="14" value="'+esc(nomeFx(s,M))+'"></span>':'<span class="sd-dim">Ch '+n+'</span>'));
   var auto=/^[ABCFT]:/.test(s.tok)?rotuloTok(s.tok):'';
   h+=sdRow('Quem:','<button type="button" class="sd-btn'+(PICK==='nome'?' sel':'')+'" data-act="mpick" data-v="nome">'+esc(p?primeiroNome(p):'— escolher —')+'</button>'+(auto?'<i class="sd-dim" title="Esta pista segue automaticamente a ordem do time/colinha">auto: '+esc(auto)+'</i>':''));
   if(PICK==='nome')h+=pickNome(R,s);

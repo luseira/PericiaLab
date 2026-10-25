@@ -5,6 +5,10 @@
 
 
 
+## v1.33 · 25/10/2026
+- Pistas só com fonte (ex.: Retorno B1) agora têm campo Name na tela do canal; Retorno B1 e B2 chamam-se Mix L-B e Mix R-B por padrão. O nome vale no app e na DAW (o export do Scorpio não grava nomes de canal).
+- Cena base: mixdown B nos canais 17 e 18; a colinha (23–32) não vem armada, então não entra na DAW.
+
 ## v1.32 · 25/10/2026
 - Ordem vertical do mixer: console, depois a tela do canal selecionado e, por último, a simulação da DAW.
 
