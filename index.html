@@ -202,14 +202,14 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .band.ctl.cl{background:#5e5034;color:#e6d9bd}
 .band.zb.z0{background:#3a3f48}.band.zb.z1{background:#2e3a4c}.band.zb.z2{background:#4b2f45}.band.zb.z3{background:#2b2f36}.band.zb.z4{background:#2f3a33}
 .dawbox{background:#1f2227;border:1px solid #3a3f48;border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;max-width:34rem;color:#e8eaee}
-.dawh{font:600 .78rem var(--f);margin-bottom:.35rem;color:#c9ced6}.dawh b{color:#fff}.dawav{color:#f0b44c}
+.dawbox summary{cursor:pointer;font:600 .78rem var(--f);color:#c9ced6;list-style:none}.dawbox summary::-webkit-details-marker{display:none}.dawbox summary::before{content:'▾ ';color:#8d939d}.dawbox:not([open]) summary::before{content:'▸ '}.dawbox summary b{color:#fff}.dawbox[open] summary{margin-bottom:.35rem}
 .dawlanes{display:flex;flex-direction:column;gap:2px}
 .dl{--lc:#6b7280;display:grid;grid-template-columns:1.3rem 7.2rem 2.6rem 1fr;align-items:center;height:1.1rem;background:#2a2d33;border-radius:3px;font-size:.7rem;overflow:hidden}
 .dl .dn{text-align:center;color:#8d939d;font-weight:700}.dl .dt{font:700 .74rem var(--fc);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:.3rem}.dl .dc{color:#8d939d}
 .dl .clip{height:100%;background:linear-gradient(90deg,transparent 0 2px,var(--lc) 2px);opacity:.85;position:relative;border-radius:2px;
  -webkit-mask:repeating-linear-gradient(90deg,#000 0 3px,rgba(0,0,0,.55) 3px 4px);mask:repeating-linear-gradient(90deg,#000 0 3px,rgba(0,0,0,.55) 3px 4px)}
 .dl.k-host{--lc:var(--c-host,#c9a227)}.dl.k-mentor{--lc:var(--c-mentor,#8e5cc4)}.dl.k-tv{--lc:var(--c-A,#d0362b)}.dl.k-tz{--lc:var(--c-B,#2e6fd6)}
-.dl.k-boom{--lc:var(--c-boom,#2aa198)}.dl.k-goose{--lc:var(--c-goose,#8a9a2e)}.dl.k-mix{--lc:#d9822b}.dl.k-fonte{--lc:#8a8f98}
+.dl.k-boom{--lc:var(--c-boom,#2aa198)}.dl.k-goose{--lc:var(--c-goose,#8a9a2e)}.dl.k-mix{--lc:#d9822b}.dl.k-bus{--lc:#4fa3c7}.dl.k-fonte{--lc:#8a8f98}
 .strip{user-select:none;-webkit-user-select:none;width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:pointer}
 .strip.k-host{background:#3b3524;border-color:#5a5034}.strip.k-mentor{background:#33293f;border-color:#4f3f61}
 .strip.k-tv{background:#3c2527;border-color:#5e383b}.strip.k-tz{background:#223049;border-color:#344a6e}
@@ -439,7 +439,7 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.30 · 25/10 01:32</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.31 · 25/10 01:48</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1314,14 +1314,13 @@ function dawFaixas(R,M){
   R.S.forEach(function(s){var ch=M.ch[s.n];if(!(s.p||s.fx)||!ch)return;
     if(!ch.arm){fora.push({n:s.n,nome:s.p?nomePista(s.p):s.cn});return;}
     var mix=!s.p&&/^RTN\s*B/i.test(s.cn||'');
-    L.push({n:s.n,nome:s.p?nomePista(s.p):mix?'Mixdown '+s.cn.replace(/^RTN\s*/i,''):s.cn,cat:mix?' k-mix':catStrip(s),copia:s.copia,mix:mix});});
+    L.push({n:s.n,nome:s.p?nomePista(s.p):mix?(/B\s*1/i.test(s.cn)?'Mix L-B':/B\s*2/i.test(s.cn)?'Mix R-B':s.cn):s.cn,cat:mix?' k-mix':catStrip(s),copia:s.copia,mix:mix});});
   return {L:L,fora:fora};
 }
 function dawStrip(R,M){
-  var d=dawFaixas(R,M),temMix=d.L.some(function(x){return x.mix;});
-  return '<div class="dawbox noprint"><div class="dawh"><b>Na DAW</b> · '+d.L.length+' faixas no arquivo'+(temMix?'':' · <span class="dawav">sem mixdown nesta cena: ponha Retorno B1 e B2 em duas pistas (Source) e arme</span>')+'</div>'+
-    '<div class="dawlanes">'+d.L.map(function(x,i){return '<div class="dl'+x.cat+'" title="Canal '+x.n+' do Scorpio"><span class="dn">'+(i+1)+'</span><span class="dt">'+esc(x.nome)+'</span><span class="dc">Ch '+x.n+'</span><span class="clip"></span></div>';}).join('')+'</div>'+
-    (d.fora.length?'<p class="hint" style="margin:.35rem 0 0">Desarmadas, fora do arquivo: '+d.fora.map(function(x){return 'Ch '+x.n+' '+esc(x.nome);}).join(', ')+'.</p>':'')+'</div>';
+  var d=dawFaixas(R,M),L=[{nome:'Mix L',n:'bus L',cat:' k-bus'},{nome:'Mix R',n:'bus R',cat:' k-bus'}].concat(d.L);
+  return '<details class="dawbox noprint"'+(UI.dawFechado?'':' open')+'><summary data-act="dawtog"><b>Na DAW</b> · '+L.length+' faixas no arquivo</summary>'+
+    '<div class="dawlanes">'+L.map(function(x,i){return '<div class="dl'+x.cat+'" title="'+(x.n==='bus L'||x.n==='bus R'?'Mixdown do Scorpio (bus '+x.n.slice(-1)+')':'Canal '+x.n+' do Scorpio')+'"><span class="dn">'+(i+1)+'</span><span class="dt">'+esc(x.nome)+'</span><span class="dc">'+(typeof x.n==='number'?'Ch '+x.n:'')+'</span><span class="clip"></span></div>';}).join('')+'</div></details>';
 }
 function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
 function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
@@ -1338,6 +1337,7 @@ function cliqueMix(a,el){
   if(a==='mcorreset'){UI.cores={};salvarUi();aplicarCores();render();return true;}
   if(a==='mlogclr'){MLOG=[];jset(KLOG,MLOG);render();return true;}
   if(a==='mlogtog'){UI.logAberto=!UI.logAberto;salvarUi();return false;}
+  if(a==='dawtog'){UI.dawFechado=!UI.dawFechado;salvarUi();return false;}
   if(a==='mavtog'){UI.avAberto=!UI.avAberto;salvarUi();return false;}
   if(a==='mavabrir'){UI.avAberto=true;salvarUi();render();var d=document.querySelector('details.avisos');if(d)d.scrollIntoView({behavior:'smooth',block:'center'});return true;}
   if(a==='mvarios'){MVARIOS=!MVARIOS;if(!MVARIOS&&MSELS.length<2)MSELS=[];render();return true;}

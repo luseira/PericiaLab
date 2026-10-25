@@ -5,6 +5,9 @@
 
 
 
+## v1.31 · 25/10/2026
+- Simulação da DAW: Mix L e Mix R (bus L/R do Scorpio) como as duas primeiras faixas; o retorno B vira Mix L-B e Mix R-B; sai o texto das pistas desarmadas e o aviso de mixdown; a caixa pode ser recolhida (fica lembrado neste aparelho).
+
 ## v1.30 · 25/10/2026
 - Corrigido: o mixer não abria (tela em branco) quando havia uma pista só com fonte, como Retorno B, nos canais 1–16.
 
