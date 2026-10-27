@@ -5,6 +5,16 @@
 
 
 
+## v1.40 · 27/10/2026
+- Sem barra de episódios: o app trabalha no episódio atual. Eliminar alguém (no lápis da pessoa) fecha o episódio e abre o próximo; o eliminado vai para o fim, em cinza com um X, e pode ser recuperado.
+- Carômetro no celular: cada grupo vira um carrossel de cartas. Tocar numa pessoa mostra o resumo e o lápis "Editar"; a escolha é em dois passos com cartas (transmissor → cápsula → OK), com foto quando houver. Quem ainda não tem nada já abre direto na escolha.
+- Fotos de transmissores e cápsulas (📷 na carta), guardadas na pasta de fotos; sem foto, aparece a de outro item do mesmo modelo ou um desenho.
+- Nome da cápsula só com o modelo (COS11, COS11D, TL47…); a cor fica na caixa e a marca vermelha vira um pontinho vermelho.
+- Configurações salvas: guardar a escalação inteira com um nome, recuperar depois e tirar todos os transmissores e cápsulas de uma vez. Antes de recuperar ou zerar, o estado atual fica em "Último estado".
+- Informações e avisos no fim do Carômetro, com os transmissores livres.
+- Input list nova: lista como padrão (pista, nome, source, mic, transmissor, receptor, freq., bloco), na ordem da cena "Todos juntos"; buses; outputs com nome, source, nível, transmissor e receptor; fichas impressas em paisagem; botão "Copiar para WhatsApp".
+- Apps Script 1.40: ações "lote" e "fotoEquip" e número de versão (precisa de Nova versão).
+
 ## v1.33 · 25/10/2026
 - Pistas só com fonte (ex.: Retorno B1) agora têm campo Name na tela do canal; Retorno B1 e B2 chamam-se Mix L-B e Mix R-B por padrão. O nome vale no app e na DAW (o export do Scorpio não grava nomes de canal).
 - Cena base: mixdown B nos canais 17 e 18; a colinha (23–32) não vem armada, então não entra na DAW.

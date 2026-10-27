@@ -22,6 +22,7 @@ const ABAS = {
 };
 const PASTA_FOTOS = 'Perícia Lab · Fotos';
 const ABA_CENAS = 'Cenas';
+const VERSAO_SCRIPT = '1.40';
 
 /* ───────── entrada ───────── */
 
@@ -52,8 +53,7 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     const q = q0;
-    const acoes = { escalar: escalar_, eliminar: eliminar_, ajustado: ajustado_, importar: importar_, foto: foto_, pessoa: pessoa_, cena: cena_ };
-    const fn = acoes[q.acao];
+    const fn = acoes_()[q.acao];
     if (!fn) throw new Error('Ação desconhecida: ' + q.acao);
     const r = fn(q) || {};
     SpreadsheetApp.flush();
@@ -65,6 +65,23 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function acoes_() {
+  return { escalar: escalar_, eliminar: eliminar_, ajustado: ajustado_, importar: importar_, foto: foto_, pessoa: pessoa_, cena: cena_, lote: lote_, fotoEquip: fotoEquip_ };
+}
+
+// várias alterações numa chamada só (recuperar configuração, zerar tudo)
+function lote_(q) {
+  const A = acoes_();
+  (q.ops || []).forEach(function (op) {
+    if (op.acao === 'lote') return;
+    const fn = A[op.acao];
+    if (!fn) throw new Error('Ação desconhecida: ' + op.acao);
+    op.por = op.por || q.por;
+    fn(op);
+  });
+  return {};
 }
 
 function testar() {
@@ -117,6 +134,7 @@ function lerTudo_() {
   Object.keys(ABAS).forEach(function (k) { o[k] = tabela_(ABAS[k]); });
   o.imp = o.imp.slice(-15);
   o.cenas = ss_().getSheetByName(ABA_CENAS) ? tabela_(ABA_CENAS) : [];
+  o.script = VERSAO_SCRIPT;
   return o;
 }
 function agora_() {
@@ -277,6 +295,25 @@ function foto_(q) {
   f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   const url = 'https://lh3.googleusercontent.com/d/' + f.getId();
   s.getRange(l, col_(s, 'Foto')).setValue(url);
+  return { url: url };
+}
+
+// foto de transmissor ou cápsula: q = {aba: 'tx'|'cap', id, base64, mime}
+function fotoEquip_(q) {
+  const aba = q.aba === 'cap' ? ABAS.cap : ABAS.tx, chave = q.aba === 'cap' ? 'Cápsula' : 'TX';
+  const s = aba_(aba);
+  const l = linhaPor_(s, chave, q.aba === 'cap' ? String(q.id) : valorTx_(q.id));
+  if (!l) throw new Error('Não encontrei ' + chave + ' ' + q.id);
+  let c = cabecalho_(s).indexOf('Foto') + 1;
+  if (!c) { c = s.getLastColumn() + 1; s.getRange(1, c).setValue('Foto').setFontWeight('bold'); }
+  const pasta = pastaFotos_();
+  const nome = (q.aba === 'cap' ? 'cap-' : 'tx-') + String(q.id).replace(/[^\w.-]+/g, '_') + '.jpg';
+  const velhos = pasta.getFilesByName(nome);
+  while (velhos.hasNext()) velhos.next().setTrashed(true);
+  const f = pasta.createFile(Utilities.newBlob(Utilities.base64Decode(q.base64), q.mime || 'image/jpeg', nome));
+  f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  const url = 'https://lh3.googleusercontent.com/d/' + f.getId();
+  s.getRange(l, c).setValue(url);
   return { url: url };
 }
 
