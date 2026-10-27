@@ -481,11 +481,29 @@ table.tab.il .tag.cap.sm{font-size:.82rem;height:1.3rem;min-width:0;padding:.12r
 table.tab.il tr.fx td{color:var(--ink2)}table.tab.il tr.sub td{font-size:.76rem;color:var(--ink2);border-top:0}
 small.ad{font-size:.7rem;color:var(--ink2)}
 .doc.il .dochead h1{font-size:1.5rem}
+
+/* v1.41 · conexões, inventário, RF, formulário */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:.6rem .8rem}
+.fgrid .campo{display:flex;flex-direction:column;gap:.2rem;font-size:.8rem;color:var(--ink2)}.fgrid .campo.longo{grid-column:1/-1}
+.fgrid input,.fgrid select{font-size:1rem}
+.fcheck{display:flex;align-items:center;gap:.4rem;font-size:.9rem;align-self:end;padding-bottom:.3rem}
+.btn.lp{padding:.15rem .5rem;min-height:0}
+table.tab.con td small,table.tab.il td.n small{display:block;font-weight:400;font-size:.72rem;color:var(--ink2);text-transform:none}
+table.tab.il td.w{white-space:normal;min-width:9rem;max-width:18rem}
+table.tab.inv td.th{width:2.4rem;padding:.15rem}table.tab.inv td.th img,table.tab.inv td.th svg{width:2.2rem;height:2.2rem;object-fit:cover;border-radius:4px;display:block;background:#eceef1}
+.rfbox{background:#14171c;border-radius:8px;padding:.4rem;margin:.4rem 0 .8rem}
+svg.rfg{width:100%;height:270px;display:block}
+svg.rfg .gd{stroke:#2c323b;stroke-width:1}svg.rfg .tk{fill:#8d939d;font-size:12px;text-anchor:middle}
+svg.rfg .sc{fill:none;stroke:#3fb27f;stroke-width:1.2;vector-effect:non-scaling-stroke}
+svg.rfg .tl{stroke:#f2c94c;stroke-width:2;vector-effect:non-scaling-stroke}svg.rfg .tm{stroke:#6fa8ff;stroke-width:2;stroke-dasharray:4 3;vector-effect:non-scaling-stroke}svg.rfg .bad{stroke:#ff5a4f}
+svg.rfg .tn{fill:#f2c94c;font-size:10px;font-weight:700;text-anchor:middle}
+td.alarme{color:var(--bad);font-weight:700}
+ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </style>
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.40 · 27/10 11:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.41 · 27/10 12:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -505,7 +523,7 @@ var API_FIXO = 'https://script.google.com/macros/s/AKfycbzqwlzmwmXkaSMXV1VFE67fS
 var DEMO = {"lidoEm":"22/10/2026 18:00:00","planilha":"","tx":[{"TX":1,"Nome":"A10 #1","Nome no Wireless Designer":"A10 #1","Modelo":"A10","Modulação":"Digital (A10)","Passo (kHz)":25,"Bloco":"C","Faixa (MHz)":"594 a 694","Receptor":"A10 1","Input do Scorpio":1,"Canal no gravador":"AES 1","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":611.6,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"Ramiro","Conector de entrada":"Lemo 3"},{"TX":2,"Nome":"SMQV #2","Nome no Wireless Designer":"SMQV #2","Modelo":"SMQV","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":26,"Faixa (MHz)":"665,6 a 691,1","Receptor":"DSR4 1","Input do Scorpio":2,"Canal no gravador":"LINE 2","Receptor na sala dos mentores":"411 26 2","Canal na sala dos mentores":"LINE 13","Freq. (MHz)":674.4,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"Mentor. No Wireless Designer está no canal 3 do DSR4: conferir","Conector de entrada":"TA5F"},{"TX":3,"Nome":"SMQV #3","Nome no Wireless Designer":"SMQV #3","Modelo":"SMQV","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":26,"Faixa (MHz)":"665,6 a 691,1","Receptor":"DSR4 2","Input do Scorpio":3,"Canal no gravador":"LINE 3","Receptor na sala dos mentores":"411 26 3","Canal na sala dos mentores":"LINE 14","Freq. (MHz)":676.4,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"Mentor. No Wireless Designer está no canal 4 do DSR4: conferir","Conector de entrada":"TA5F"},{"TX":4,"Nome":"DBSMD #4","Nome no Wireless Designer":"DBSMD #4","Modelo":"DBSMD","Modulação":"Digital (D2)","Passo (kHz)":25,"Bloco":"B1C1","Faixa (MHz)":"537,6 a 691,1","Receptor":"DSR4 3","Input do Scorpio":4,"Canal no gravador":"LINE 4","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":609.05,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"","Conector de entrada":"TA5F"},{"TX":5,"Nome":"DBSMD #5","Nome no Wireless Designer":"DBSMD #5","Modelo":"DBSMD","Modulação":"Digital (D2)","Passo (kHz)":25,"Bloco":"B1C1","Faixa (MHz)":"537,6 a 691,1","Receptor":"DSR4 4","Input do Scorpio":5,"Canal no gravador":"LINE 5","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":610.175,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"","Conector de entrada":"TA5F"},{"TX":6,"Nome":"DBSMD #6","Nome no Wireless Designer":"DBSMD #6","Modelo":"DBSMD","Modulação":"Digital (D2)","Passo (kHz)":25,"Bloco":"A1B1","Faixa (MHz)":"470,1 a 614,3","Receptor":"822 1","Input do Scorpio":6,"Canal no gravador":"AES 5","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":502.35,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"","Conector de entrada":"TA5F"},{"TX":7,"Nome":"UM400 #7","Nome no Wireless Designer":"UM400 #7","Modelo":"UM400","Modulação":"Digital Hybrid (DH)","Passo (kHz)":100,"Bloco":26,"Faixa (MHz)":"665,6 a 691,1","Receptor":"411 26 1","Input do Scorpio":7,"Canal no gravador":"LINE 7","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":677.875,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"","Conector de entrada":"TA5F"},{"TX":8,"Nome":"SSM #8","Nome no Wireless Designer":"SSM #8","Modelo":"SSM","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":"B1","Faixa (MHz)":"537,6 a 614,3","Receptor":"822 2","Input do Scorpio":6,"Canal no gravador":"AES 6","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":584.175,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"Faixa com mais interferência, usar por último","Conector de entrada":"Lemo 3"},{"TX":9,"Nome":"SMQV #9","Nome no Wireless Designer":"SMQV #9","Modelo":"SMQV","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":25,"Faixa (MHz)":"640 a 665,5","Receptor":"SRB 25 1","Input do Scorpio":8,"Canal no gravador":"LINE 8","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":641.5,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Gabi Cui","Devolve após EP":5,"Observações":"Dual, volta junto com o TX 10","Conector de entrada":"TA5F"},{"TX":10,"Nome":"SMQV #10","Nome no Wireless Designer":"SMQV #10","Modelo":"SMQV","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":25,"Faixa (MHz)":"640 a 665,5","Receptor":"SRB 25 2","Input do Scorpio":9,"Canal no gravador":"LINE 9","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":643.85,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Gabi Cui","Devolve após EP":5,"Observações":"Dual, volta junto com o TX 9","Conector de entrada":"TA5F"},{"TX":11,"Nome":"SMQV #11","Nome no Wireless Designer":"SMQV #11","Modelo":"SMQV","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":24,"Faixa (MHz)":"614,4 a 639,9","Receptor":"411 24","Input do Scorpio":11,"Canal no gravador":"LINE 11","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":638.3,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Clara Cervantes","Devolve após EP":3,"Observações":"","Conector de entrada":"TA5F"},{"TX":12,"Nome":"SMQV #12","Nome no Wireless Designer":"SMQV #12","Modelo":"SMQV","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":19,"Faixa (MHz)":"486,4 a 511,9","Receptor":"411 19","Input do Scorpio":10,"Canal no gravador":"LINE 10","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":501.0,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Clara Cervantes","Devolve após EP":2,"Observações":"","Conector de entrada":"TA5F"},{"TX":13,"Nome":"SMa #13","Nome no Wireless Designer":"SMa #13","Modelo":"SMa","Modulação":"Digital Hybrid (DH)","Passo (kHz)":25,"Bloco":26,"Faixa (MHz)":"665,6 a 691,1","Receptor":"411 26 (Clara)","Input do Scorpio":12,"Canal no gravador":"LINE 12","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":679.025,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Clara Cervantes","Devolve após EP":1,"Observações":"","Conector de entrada":"TA5F"},{"TX":14,"Nome":"UM200 #14","Nome no Wireless Designer":"UM200 #14","Modelo":"UM200","Modulação":"Analógico (série 200)","Passo (kHz)":100,"Bloco":25,"Faixa (MHz)":"640 a 665,5","Receptor":"","Input do Scorpio":"","Canal no gravador":"","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":640.6,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"a definir","Devolve após EP":"","Observações":"Spare, sem receptor fixo","Conector de entrada":"TA5F"},{"TX":15,"Nome":"A10 #15","Nome no Wireless Designer":"A10 #15","Modelo":"A10","Modulação":"Digital (A10)","Passo (kHz)":25,"Bloco":"C","Faixa (MHz)":"594 a 694","Receptor":"A10 2","Input do Scorpio":1,"Canal no gravador":"AES 2","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":612.625,"Código":"","Aparelho ajustado":false,"Report de origem":"22/10/2026 16:51","Dono":"Rovai","Devolve após EP":"","Observações":"Boom","Conector de entrada":"Lemo 3"},{"TX":"GN","Nome":"Gooseneck","Nome no Wireless Designer":"","Modelo":"Gooseneck","Modulação":"Cabo","Passo (kHz)":"","Bloco":"","Faixa (MHz)":"","Receptor":"Gooseneck (cabo)","Input do Scorpio":15,"Canal no gravador":"MIC PH48","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":"","Código":"","Aparelho ajustado":"","Report de origem":"","Dono":"Rovai","Devolve após EP":"","Observações":"Cabo, sem frequência","Conector de entrada":"XLR"},{"TX":"S1","Nome":"SONY #1","Nome no Wireless Designer":"SONY #1","Modelo":"UTX-B03","Modulação":"FM analógico","Passo (kHz)":125,"Bloco":"TV50-51","Faixa (MHz)":"686 a 698","Receptor":"","Input do Scorpio":"","Canal no gravador":"","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":693.625,"Código":"5113","Aparelho ajustado":false,"Report de origem":"23/10/2026 15:38","Dono":"a definir","Devolve após EP":"","Observações":"Monitoração","Uso":"monitoração","Fonte no Scorpio (saída)":"","Conector de entrada":"P2"},{"TX":"S2","Nome":"SONY #2","Nome no Wireless Designer":"SONY #2","Modelo":"UTX-B03","Modulação":"FM analógico","Passo (kHz)":125,"Bloco":"TV50-51","Faixa (MHz)":"686 a 698","Receptor":"","Input do Scorpio":"","Canal no gravador":"","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":694.425,"Código":"","Aparelho ajustado":false,"Report de origem":"23/10/2026 15:38","Dono":"a definir","Devolve após EP":"","Observações":"Monitoração","Uso":"monitoração","Fonte no Scorpio (saída)":"","Conector de entrada":"P2"},{"TX":"S3","Nome":"SONY #3","Nome no Wireless Designer":"SONY #3","Modelo":"UTX-B03","Modulação":"FM analógico","Passo (kHz)":125,"Bloco":"TV50-51","Faixa (MHz)":"686 a 698","Receptor":"","Input do Scorpio":"","Canal no gravador":"","Receptor na sala dos mentores":"","Canal na sala dos mentores":"","Freq. (MHz)":696.625,"Código":"5137","Aparelho ajustado":false,"Report de origem":"23/10/2026 15:38","Dono":"a definir","Devolve após EP":"","Observações":"Monitoração","Uso":"monitoração","Fonte no Scorpio (saída)":"","Conector de entrada":"P2"}],"rx":[{"Receptor":"A10 1","Modelo":"Audio Limited A10-RX","Canal do receptor":1,"Input do Scorpio":1,"Conector":"XLR F","Canal no gravador":"AES 1","Dono":"Rovai","Devolve após EP":"","Observações":"Um conector, dois canais AES"},{"Receptor":"A10 2","Modelo":"Audio Limited A10-RX","Canal do receptor":2,"Input do Scorpio":1,"Conector":"XLR F","Canal no gravador":"AES 2","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"DSR4 1","Modelo":"Lectrosonics DSR4","Canal do receptor":1,"Input do Scorpio":2,"Conector":"XLR F","Canal no gravador":"LINE 2","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"DSR4 2","Modelo":"Lectrosonics DSR4","Canal do receptor":2,"Input do Scorpio":3,"Conector":"XLR F","Canal no gravador":"LINE 3","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"DSR4 3","Modelo":"Lectrosonics DSR4","Canal do receptor":3,"Input do Scorpio":4,"Conector":"XLR F","Canal no gravador":"LINE 4","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"DSR4 4","Modelo":"Lectrosonics DSR4","Canal do receptor":4,"Input do Scorpio":5,"Conector":"XLR F","Canal no gravador":"LINE 5","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"822 1","Modelo":"Lectrosonics DCR822","Canal do receptor":1,"Input do Scorpio":6,"Conector":"XLR F","Canal no gravador":"AES 5","Dono":"Rovai","Devolve após EP":"","Observações":"Um conector, dois canais AES"},{"Receptor":"822 2","Modelo":"Lectrosonics DCR822","Canal do receptor":2,"Input do Scorpio":6,"Conector":"XLR F","Canal no gravador":"AES 6","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"411 26 1","Modelo":"Lectrosonics UCR411","Canal do receptor":1,"Input do Scorpio":7,"Conector":"TA3F","Canal no gravador":"LINE 7","Dono":"Rovai","Devolve após EP":"","Observações":""},{"Receptor":"SRB 25 1","Modelo":"Lectrosonics SRB (dual)","Canal do receptor":1,"Input do Scorpio":8,"Conector":"TA3F","Canal no gravador":"LINE 8","Dono":"Gabi Cui","Devolve após EP":5,"Observações":"Dual, volta inteiro"},{"Receptor":"SRB 25 2","Modelo":"Lectrosonics SRB (dual)","Canal do receptor":2,"Input do Scorpio":9,"Conector":"TA5F / XLR F","Canal no gravador":"LINE 9","Dono":"Gabi Cui","Devolve após EP":5,"Observações":"Dual, volta inteiro"},{"Receptor":"411 19","Modelo":"Lectrosonics UCR411","Canal do receptor":1,"Input do Scorpio":10,"Conector":"TA5F / XLR F","Canal no gravador":"LINE 10","Dono":"Clara Cervantes","Devolve após EP":2,"Observações":""},{"Receptor":"411 24","Modelo":"Lectrosonics UCR411","Canal do receptor":1,"Input do Scorpio":11,"Conector":"TA5F / XLR F","Canal no gravador":"LINE 11","Dono":"Clara Cervantes","Devolve após EP":3,"Observações":""},{"Receptor":"411 26 (Clara)","Modelo":"Lectrosonics UCR411","Canal do receptor":1,"Input do Scorpio":12,"Conector":"TA5F / XLR F","Canal no gravador":"LINE 12","Dono":"Clara Cervantes","Devolve após EP":1,"Observações":""},{"Receptor":"411 26 2","Modelo":"Lectrosonics UCR411","Canal do receptor":1,"Input do Scorpio":13,"Conector":"TA5F / XLR F","Canal no gravador":"LINE 13","Dono":"Rovai","Devolve após EP":"","Observações":"Sala dos mentores"},{"Receptor":"411 26 3","Modelo":"Lectrosonics UCR411","Canal do receptor":1,"Input do Scorpio":14,"Conector":"TA5F / XLR F","Canal no gravador":"LINE 14","Dono":"Rovai","Devolve após EP":"","Observações":"Sala dos mentores"},{"Receptor":"Gooseneck (cabo)","Modelo":"Cabo XLR","Canal do receptor":"","Input do Scorpio":15,"Conector":"TA5F / XLR F","Canal no gravador":"MIC PH48","Dono":"Rovai","Devolve após EP":"","Observações":"Phantom 48 V"}],"cap":[{"Cápsula":"DPA 6060","Tipo":"lapela","Modelo":"DPA 6060","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"marrom","Polaridade invertida":false,"Serial":"","Terminação":"MicroDot","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"DPA 4060","Tipo":"lapela","Modelo":"DPA 4060","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"bege","Polaridade invertida":false,"Serial":"","Terminação":"MicroDot","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"DPA 6061 B","Tipo":"lapela","Modelo":"DPA 6061","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"bege","Polaridade invertida":false,"Serial":"","Terminação":"MicroLock","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"DPA 6061 P","Tipo":"lapela","Modelo":"DPA 6061","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"MicroDot","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"COS11 P","Tipo":"lapela","Modelo":"Sanken COS-11D","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"TA5F","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"TL47 B","Tipo":"lapela","Modelo":"Shure Twinplex TL47","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"bege","Polaridade invertida":true,"Serial":"","Terminação":"TA5F","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"COS11 B","Tipo":"lapela","Modelo":"Sanken COS-11D","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"bege","Polaridade invertida":false,"Serial":"","Terminação":"TA5F","Compatível com digital":true,"Manutenção":true,"Qtd":"","Converte para":""},{"Cápsula":"COS11 R","Tipo":"lapela","Modelo":"Sanken COS-11 (sem D)","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"TA5F","Compatível com digital":false,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"COS11 N","Tipo":"lapela","Modelo":"Sanken COS-11 (sem D)","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"TA5F","Compatível com digital":false,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"TL47 2","Tipo":"lapela","Modelo":"Shure Twinplex TL47","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":true,"Serial":"","Terminação":"TA5F","Compatível com digital":true,"Manutenção":true,"Qtd":"","Converte para":""},{"Cápsula":"COS11D R","Tipo":"lapela","Modelo":"Sanken COS-11D","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"bege","Polaridade invertida":false,"Serial":"","Terminação":"Lemo 3","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"LAP 12","Tipo":"lapela","Modelo":"a definir","Dono":"Rovai","Devolve após EP":"","Observações":"Locação","Cor":"","Polaridade invertida":false,"Serial":"","Terminação":"","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"LAP 13","Tipo":"lapela","Modelo":"a definir","Dono":"Rovai","Devolve após EP":"","Observações":"Locação","Cor":"","Polaridade invertida":false,"Serial":"","Terminação":"","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"DPA 4017B","Tipo":"boom","Modelo":"DPA 4017B","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"MKH 50","Tipo":"boom","Modelo":"Sennheiser MKH 50","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"GOOSE 1","Tipo":"gooseneck","Modelo":"a definir","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"preto","Polaridade invertida":false,"Serial":"","Terminação":"","Compatível com digital":true,"Manutenção":false,"Qtd":"","Converte para":""},{"Cápsula":"AD MicroDot-TA5F","Tipo":"adaptador","Modelo":"DPA DAD3056","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"","Polaridade invertida":false,"Serial":"","Terminação":"MicroDot","Compatível com digital":true,"Manutenção":false,"Qtd":5,"Converte para":"TA5F"},{"Cápsula":"AD MicroDot-Lemo","Tipo":"adaptador","Modelo":"DPA MicroDot → Lemo 3","Dono":"Rovai","Devolve após EP":"","Observações":"","Cor":"","Polaridade invertida":false,"Serial":"","Terminação":"MicroDot","Compatível com digital":true,"Manutenção":false,"Qtd":2,"Converte para":"Lemo 3"}],"elenco":[{"ID":"RAMIRO","Nome":"Ramiro","Papel":"HOST","Colinha (pista)":"","Foto":"","Eliminado após EP":"","Observações":""},{"ID":"TELMA","Nome":"Telma","Papel":"MENTOR","Colinha (pista)":"","Foto":"","Eliminado após EP":"","Observações":""},{"ID":"SALADA","Nome":"Salada","Papel":"MENTOR","Colinha (pista)":"","Foto":"","Eliminado após EP":"","Observações":""},{"ID":"P01","Nome":"Caio Mendes","Papel":"PARTICIPANTE","Colinha (pista)":23,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P02","Nome":"Marina Salles","Papel":"PARTICIPANTE","Colinha (pista)":24,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P03","Nome":"Bruno Tavares","Papel":"PARTICIPANTE","Colinha (pista)":25,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P04","Nome":"Júlia Ferraz","Papel":"PARTICIPANTE","Colinha (pista)":26,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P05","Nome":"Davi Okamoto","Papel":"PARTICIPANTE","Colinha (pista)":27,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P06","Nome":"Renata Duarte","Papel":"PARTICIPANTE","Colinha (pista)":28,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P07","Nome":"Felipe Nogueira","Papel":"PARTICIPANTE","Colinha (pista)":29,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P08","Nome":"Luana Pacheco","Papel":"PARTICIPANTE","Colinha (pista)":30,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P09","Nome":"Otávio Brandão","Papel":"PARTICIPANTE","Colinha (pista)":31,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"P10","Nome":"Helena Cordeiro","Papel":"PARTICIPANTE","Colinha (pista)":32,"Foto":"","Eliminado após EP":"","Observações":"Nome fictício"},{"ID":"BOOM","Nome":"Boom","Papel":"FONTE","Colinha (pista)":"","Foto":"","Eliminado após EP":"","Observações":""},{"ID":"GOOSENECK","Nome":"Gooseneck","Papel":"FONTE","Colinha (pista)":"","Foto":"","Eliminado após EP":"","Observações":""}],"esc":[{"EP":1,"ID":"RAMIRO","Nome":"Ramiro","TX":1,"Cápsula":"DPA 6061 B","Time":"","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"TELMA","Nome":"Telma","TX":2,"Cápsula":"DPA 6060","Time":"","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"SALADA","Nome":"Salada","TX":3,"Cápsula":"DPA 4060","Time":"","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P01","Nome":"Caio Mendes","TX":4,"Cápsula":"DPA 6061 P","Time":"Vermelho","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P02","Nome":"Marina Salles","TX":5,"Cápsula":"COS11 P","Time":"Vermelho","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P03","Nome":"Bruno Tavares","TX":6,"Cápsula":"COS11 B","Time":"Vermelho","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P04","Nome":"Júlia Ferraz","TX":8,"Cápsula":"COS11D R","Time":"Vermelho","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P05","Nome":"Davi Okamoto","TX":7,"Cápsula":"TL47 B","Time":"Vermelho","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P06","Nome":"Renata Duarte","TX":9,"Cápsula":"COS11 N","Time":"Azul","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P07","Nome":"Felipe Nogueira","TX":10,"Cápsula":"COS11 R","Time":"Azul","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P08","Nome":"Luana Pacheco","TX":12,"Cápsula":"TL47 2","Time":"Azul","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P09","Nome":"Otávio Brandão","TX":11,"Cápsula":"LAP 12","Time":"Azul","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"P10","Nome":"Helena Cordeiro","TX":13,"Cápsula":"LAP 13","Time":"Azul","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"BOOM","Nome":"Boom","TX":15,"Cápsula":"DPA 4017B","Time":"","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"},{"EP":1,"ID":"GOOSENECK","Nome":"Gooseneck","TX":"GN","Cápsula":"GOOSE 1","Time":"","Observações":"","Atualizado em":"22/10/2026 18:00","Por":"carga inicial"}],"eps":[{"EP":1,"Vermelho":5,"Azul":5,"Participantes":10,"Data de gravação":"","Observações":""},{"EP":2,"Vermelho":5,"Azul":4,"Participantes":9,"Data de gravação":"","Observações":""},{"EP":3,"Vermelho":4,"Azul":4,"Participantes":8,"Data de gravação":"","Observações":""},{"EP":4,"Vermelho":4,"Azul":3,"Participantes":7,"Data de gravação":"","Observações":""},{"EP":5,"Vermelho":3,"Azul":3,"Participantes":6,"Data de gravação":"","Observações":""},{"EP":6,"Vermelho":3,"Azul":2,"Participantes":5,"Data de gravação":"","Observações":""},{"EP":7,"Vermelho":2,"Azul":2,"Participantes":4,"Data de gravação":"","Observações":""},{"EP":8,"Vermelho":2,"Azul":2,"Participantes":4,"Data de gravação":"","Observações":""}],"imp":[{"Report gerado em":"22/10/2026 16:51:11","Importado em":"22/10/2026 18:00","Por":"carga inicial","Transmissores atualizados":15,"Mudanças":"Carga inicial a partir do Report 2210 v1","Nomes sem correspondência":"SONY 1, SONY 2, SONY 3"}],"cenas":[]};
 
 var K={senha:'plc_senha',api:'plc_api',cache:'plc_cache',fila:'plc_fila',ui:'plc_ui',demo:'plc_demo',quem:'plc_quem',cenas:'plc_cenas'};
-var VIEWS=[['car','Carômetro'],['doc','Input list'],['mix','Mixer'],['dev','Devolução'],['tec','Técnico']];
+var VIEWS=[['car','Carômetro'],['doc','Input list'],['mix','Mixer'],['con','Conexões'],['inv','Inventário'],['rf','RF'],['tec','Técnico']];
 var ORDEM_PAPEL={HOST:0,MENTOR:1,PARTICIPANTE:2,CONVIDADO:3,FONTE:4};
 
 /* ───────── utilidades ───────── */
@@ -607,6 +625,8 @@ function normalizar(R){
   d.configs=(Array.isArray(R&&R.cenas)?R.cenas:[]).filter(function(o){return /^car:/.test(str(o['ID']));}).map(function(o){var x={};try{x=JSON.parse(str(o['Pistas'])||'{}');}catch(e){}return {id:str(o['ID']),nome:str(o['Nome']),em:str(o['Atualizado em']),por:str(o['Por']),car:x.car||{}};});
   if(Array.isArray(d.cenas))d.cenas=d.cenas.filter(function(c){return !/^car:/.test(c.id);});
   d.script=str(R&&R.script);
+  d.saidas=linhas(R,'saidas').filter(function(o){return str(o['Saída']);});
+  d.equip=linhas(R,'equip').filter(function(o){return str(o['Item']);});
   d.lidoEm=str(R&&R.lidoEm);d.planilha=str(R&&R.planilha);
   return d;
 }
@@ -638,6 +658,17 @@ function aplicar(R,op){
       t['Report de origem']=op.gerado;
     });});
     R.imp=R.imp||[];R.imp.push({'Report gerado em':op.gerado,'Importado em':agora(),'Por':op.por||'','Transmissores atualizados':op.itens.length,'Mudanças':mud.join('; ')||'Nenhuma frequência mudou','Nomes sem correspondência':(op.naoCasados||[]).join(', ')});
+  }else if(op.acao==='linha'){
+    var CH={tx:'TX',rx:'Receptor',cap:'Cápsula',saidas:'Saída',equip:'Item'}[op.aba],L0=R[op.aba]=R[op.aba]||[];
+    var ix=-1;for(i=0;i<L0.length;i++)if(op.valor!==''&&op.valor!=null&&str(L0[i][CH])===String(op.valor)){ix=i;break;}
+    if(op.apagar){if(ix>=0)L0.splice(ix,1);return;}
+    o=ix>=0?L0[ix]:null;if(!o){o={};o[CH]=op.campos[CH];L0.push(o);}
+    var antigo=str(o[CH]);
+    Object.keys(op.campos||{}).forEach(function(k){o[k]=op.campos[k];});
+    var novo=str(o[CH]);
+    if(op.aba==='rx'){(R.tx||[]).forEach(function(t){if(str(t['Receptor'])===antigo){t['Receptor']=novo;if(op.campos['Input do Scorpio']!==undefined)t['Input do Scorpio']=op.campos['Input do Scorpio'];if(op.campos['Canal no gravador']!==undefined)t['Canal no gravador']=op.campos['Canal no gravador'];}});}
+    if(antigo&&novo!==antigo&&op.aba==='cap')(R.esc||[]).forEach(function(r){if(str(r['Cápsula'])===antigo)r['Cápsula']=novo;});
+    if(antigo&&novo!==antigo&&op.aba==='tx')(R.esc||[]).forEach(function(r){if(str(r['TX'])===antigo)r['TX']=novo;});
   }else if(op.acao==='lote'){
     (op.ops||[]).forEach(function(o2){aplicar(R,Object.assign({por:op.por},o2));});
   }else if(op.acao==='fotoEquip'){
@@ -664,9 +695,9 @@ function efetivoCru(R,ep){
 }
 function recalcular(){
   var R=RAW?clone(RAW):{tx:[],rx:[],cap:[],elenco:[],esc:[],eps:[],imp:[]};
-  ['tx','rx','cap','elenco','esc','eps','imp'].forEach(function(k){if(!R[k])R[k]=[];});
+  ['tx','rx','cap','elenco','esc','eps','imp','saidas','equip'].forEach(function(k){if(!R[k])R[k]=[];});
   FILA.forEach(function(op){try{aplicar(R,op);}catch(e){}});
-  D=normalizar(R);
+  D=normalizar(R);D.raw=R;
 }
 
 /* ───────── lógica do episódio ───────── */
@@ -1066,7 +1097,7 @@ function viewDev(){
 function viewTec(){
   var convite=API?location.origin+location.pathname+'?api='+encodeURIComponent(API):'';
   var h='<h2>Técnico</h2>';
-  h+='<div class="painel"><h3>Importar report do Wireless Designer</h3><p class="hint">Escolha o arquivo HTML que o Wireless Designer gerou. A página lê só as tabelas de frequência, mostra o que mudou e só grava depois que você confirmar. O casamento é pelo nome no Wireless Designer, coluna da aba Transmissores.</p>'+
+  h+='<div class="painel"><h3>Importar report do Wireless Designer</h3><p class="hint">Também dá para importar pela aba RF.</p><p class="hint">Escolha o arquivo HTML que o Wireless Designer gerou. A página lê só as tabelas de frequência, mostra o que mudou e só grava depois que você confirmar. O casamento é pelo nome no Wireless Designer, coluna da aba Transmissores.</p>'+
     '<label class="btn pri">Escolher report…<input type="file" accept=".html,.htm,text/html" data-act="report" class="sr"></label>'+(PREVIEW?previewHtml():'')+
     (D.imp.length?'<h3>Últimas importações</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Report de</th><th>Importado em</th><th>Por</th><th>Mudanças</th><th>Sem correspondência</th></tr></thead><tbody>'+
       D.imp.slice(-6).reverse().map(function(i){return '<tr><td>'+esc(i.gerado)+'</td><td>'+esc(i.em)+'</td><td>'+esc(i.por)+'</td><td>'+esc(i.mud)+'</td><td>'+esc(i.nao)+'</td></tr>';}).join('')+'</tbody></table></div>':'')+'</div>';
@@ -1166,9 +1197,151 @@ function fechar(){EDIT=null;WIZ=null;renderModal();render();}
 function renderModal(){
   var m=$('#modal');
   var car=m.querySelector('.carrossel'),sx=car?car.scrollLeft:0,passo=WIZ&&WIZ.passo;
-  m.innerHTML=EDIT?editorHtml():'';
+  m.innerHTML=EDIT?editorHtml():FORM?formHtml():'';
   var c2=m.querySelector('.carrossel');if(c2&&passo===(WIZ&&WIZ.passo))c2.scrollLeft=sx;
-  document.body.style.overflow=EDIT?'hidden':'';
+  document.body.style.overflow=EDIT||FORM?'hidden':'';
+}
+
+
+/* ───────── formulário genérico: edita uma linha da planilha ───────── */
+var FORM=null; /* {aba, valor, titulo, campos:[[coluna, rótulo, tipo, opções]], dados:{}, apagar:bool, nota} */
+var CHAVES={tx:'TX',rx:'Receptor',cap:'Cápsula',saidas:'Saída',equip:'Item'};
+function rawDe(aba,valor){var ch=CHAVES[aba];return ((D.raw&&D.raw[aba])||[]).filter(function(o){return valor!==''&&str(o[ch])===String(valor);})[0]||{};}
+function podeEditar(){return MODO==='demo'||D.script>='1.41';}
+function abrirForm(aba,valor,titulo,campos,opts){
+  var o=rawDe(aba,valor),dados={};campos.forEach(function(c){dados[c[0]]=o[c[0]];});
+  if(valor===''&&opts&&opts.padrao)Object.keys(opts.padrao).forEach(function(k){dados[k]=opts.padrao[k];});
+  FORM=Object.assign({aba:aba,valor:valor,titulo:titulo,campos:campos,dados:dados},opts||{});renderModal();
+}
+function formHtml(){
+  var F=FORM,h='<div class="ov" data-act="formfora"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(F.titulo)+'">';
+  h+='<div class="sh-hd"><div><h2 style="font-size:1.4rem">'+esc(F.titulo)+'</h2>'+(F.nota?'<div class="hint" style="margin:0">'+esc(F.nota)+'</div>':'')+'</div><span class="sp"></span><button class="x" type="button" data-act="formfechar" aria-label="Fechar">×</button></div><div class="sh-bd"><div class="fgrid">';
+  F.campos.forEach(function(c,i){var v=F.dados[c[0]],id='ff'+i,tipo=c[2]||'text';
+    if(tipo==='check')h+='<label class="fcheck"><input type="checkbox" id="'+id+'"'+(v===true||simNao(v)?' checked':'')+'> '+esc(c[1])+'</label>';
+    else if(tipo==='select')h+='<label class="campo">'+esc(c[1])+'<select id="'+id+'">'+c[3].map(function(op){var val=Array.isArray(op)?op[0]:op,lb=Array.isArray(op)?op[1]:op;return '<option value="'+esc(val)+'"'+(String(v==null?'':v)===String(val)?' selected':'')+'>'+esc(lb||'—')+'</option>';}).join('')+(v!=null&&v!==''&&!c[3].some(function(op){return String(Array.isArray(op)?op[0]:op)===String(v);})?'<option value="'+esc(v)+'" selected>'+esc(v)+'</option>':'')+'</select></label>';
+    else h+='<label class="campo'+(tipo==='long'?' longo':'')+'">'+esc(c[1])+'<input type="'+(tipo==='num'?'text" inputmode="decimal':'text')+'" id="'+id+'" value="'+esc(v==null?'':v)+'"'+(c[0]===CHAVES[F.aba]&&F.valor!==''&&F.travaChave?' readonly':'')+'></label>';});
+  h+='</div><div class="linha" style="margin-top:1rem"><button class="btn pri" type="button" data-act="formsalvar">Salvar na planilha</button><button class="btn" type="button" data-act="formfechar">Cancelar</button><span class="sp"></span>'+
+    (F.apagar&&F.valor!==''?'<button class="btn dan" type="button" data-act="formapagar">Apagar</button>':'')+'</div>'+
+    (podeEditar()?'':'<p class="banner err" style="margin-top:.8rem">Para gravar daqui, atualize o Apps Script para a versão 1.41 (Nova versão).</p>')+'</div></div></div>';
+  return h;
+}
+function lerForm(){
+  var F=FORM,c={};F.campos.forEach(function(x,i){var el=$('#ff'+i);if(!el)return;var v;
+    if((x[2]||'text')==='check')v=el.checked;else{v=el.value.trim();if(x[2]==='num'&&v!==''&&!isNaN(num(v)))v=num(v);}
+    var antes=F.dados[x[0]];if(F.valor!==''&&String(antes==null?'':antes)===String(v)&&x[0]!==CHAVES[F.aba])return;c[x[0]]=v;});
+  return c;
+}
+function cliqueForm(a){
+  if(a==='formfechar'){FORM=null;renderModal();render();return true;}
+  if(a==='formsalvar'){if(!podeEditar()){toast('Atualize o Apps Script para 1.41 antes.',true);return true;}
+    var c=lerForm(),ch=CHAVES[FORM.aba];if(!String(c[ch]==null?FORM.valor:c[ch]).trim()){toast('Preencha '+ch+'.',true);return true;}
+    if(c[ch]===undefined)c[ch]=FORM.valor;
+    fazer({acao:'linha',aba:FORM.aba,valor:FORM.valor,campos:c});FORM=null;renderModal();toast('Salvo');return true;}
+  if(a==='formapagar'){if(confirm('Apagar "'+FORM.valor+'" da planilha?')){fazer({acao:'linha',aba:FORM.aba,valor:FORM.valor,apagar:true});FORM=null;renderModal();toast('Apagado');}return true;}
+  return false;
+}
+function lapis(act,aba,valor,extra){return '<button class="btn sm lp" type="button" data-act="'+act+'" data-aba="'+aba+'" data-v="'+esc(valor)+'"'+(extra||'')+' aria-label="Editar">✎</button>';}
+
+/* ───────── Conexões físicas ───────── */
+var CAMPOS_ENTRADA=[['Receptor','Equipamento (receptor ou fonte)'],['Modelo','Modelo'],['Canal do receptor','Canal do receptor','num'],['Input do Scorpio','Input do Scorpio (número)','num'],['Canal no gravador','Canal no gravador (ex.: AES 1, LINE 2, MIC 15)'],['Conector','Conector no Scorpio (ex.: XLR F, TA3F)'],['Cabo','Cabo (ex.: TA3F → XLR M)'],['Observações','Observações','long']];
+var CAMPOS_SAIDA=[['Saída','Saída do Scorpio (ex.: X1, L, HP, AES OUT)'],['Conector','Conector no Scorpio (ex.: TA3M, XLR M)'],['Cabo','Cabo (ex.: TA3F → XLR M)'],['Destino','Destino (equipamento)'],['Entrada no destino','Entrada no destino (ex.: input 1)'],['Nível','Nível',"select",[['',''],['Line','Line'],['Mic','Mic'],['AES','AES'],['Fone','Fone'],['Dante','Dante']]],['Observações','Observações','long']];
+function viewCon(){
+  var h='<div class="bar noprint"><h2 style="margin:0">Conexões físicas</h2><span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  if(!podeEditar())h+='<div class="banner noprint">Para editar daqui, atualize o Apps Script para a versão 1.41 (Nova versão). Por enquanto só leitura.</div>';
+  var rx=(D.raw.rx||[]).filter(function(o){return str(o['Receptor']);}).slice().sort(function(a,b){return (int(a['Input do Scorpio'])||99)-(int(b['Input do Scorpio'])||99)||nat(str(a['Canal no gravador']),str(b['Canal no gravador']));});
+  var s=situacao(UI.ep);
+  function quem(rxId){return D.tx.filter(function(t){return t.rx===rxId;}).map(function(t){var ps=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);});return t.nome+(ps.length?' · '+ps.join(', '):'');}).join('; ');}
+  h+='<section class="doc"><div class="dochead"><div><h1>Conexões físicas</h1><p>Scorpio · entradas e saídas</p></div><div class="r">Gerado em '+agora()+'</div></div>';
+  h+='<h3>Entradas</h3><div class="tabwrap"><table class="tab il con"><thead><tr><th>Input</th><th>Conector</th><th>Canal</th><th>Equipamento</th><th>Cabo</th><th>Transmissor · quem</th><th>Obs.</th><th class="noprint"></th></tr></thead><tbody>'+
+    rx.map(function(o){var id=str(o['Receptor']);return '<tr><td><span class="tag sm">'+esc(str(o['Input do Scorpio'])||'–')+'</span></td><td>'+esc(str(o['Conector']))+'</td><td><b>'+esc(str(o['Canal no gravador']))+'</b></td><td class="n">'+esc(id)+'<small>'+esc(str(o['Modelo']))+(str(o['Canal do receptor'])?' · canal '+esc(str(o['Canal do receptor'])):'')+'</small></td><td>'+esc(str(o['Cabo']))+'</td><td class="w">'+esc(quem(id))+'</td><td class="w">'+esc(str(o['Observações']))+'</td><td class="noprint">'+lapis('conent','rx',id)+'</td></tr>';}).join('')+
+    '</tbody></table></div><div class="linha noprint" style="margin:.5rem 0 1rem"><button class="btn sm" type="button" data-act="conent" data-aba="rx" data-v="">＋ Entrada</button></div>';
+  var c=cenaTodos(),R=resolver(c,UI.ep),M=mesaEf(c,R),por={};D.saidas.forEach(function(o){por[str(o['Saída']).toUpperCase()]=o;});
+  var nomes=SAIDAS.slice();D.saidas.forEach(function(o){var k=str(o['Saída']).toUpperCase();if(nomes.indexOf(k)<0)nomes.push(k);});
+  h+='<h3>Saídas</h3><div class="tabwrap"><table class="tab il con"><thead><tr><th>Saída</th><th>Nome · source na cena "'+esc(c.nome)+'"</th><th>Conector</th><th>Cabo</th><th>Destino</th><th>Nível</th><th>Obs.</th><th class="noprint"></th></tr></thead><tbody>'+
+    nomes.map(function(k){var o=por[k]||{},mo=M.out[k];var mon=D.tx.filter(function(t){return t.mon&&t.saida&&t.saida.toUpperCase()===k;});
+      var dest=[str(o['Destino']),str(o['Entrada no destino'])].filter(Boolean).join(' · ');if(!dest&&mon.length)dest=mon.map(function(t){return t.nome;}).join(', ');
+      return '<tr><td><span class="tag sm">'+esc(k)+'</span></td><td>'+(mo?'<b>'+esc(mo.nome||'')+'</b> <small>'+esc(saidaTxt(mo.src,M,R))+'</small>':'')+'</td><td>'+esc(str(o['Conector']))+'</td><td>'+esc(str(o['Cabo']))+'</td><td class="n">'+esc(dest)+'</td><td>'+esc(str(o['Nível'])||(mo?(NIVEIS.filter(function(nv){return nv[0]===(mo.nivel||'');})[0]||['',''])[1]:''))+'</td><td class="w">'+esc(str(o['Observações']))+'</td><td class="noprint">'+lapis('consai','saidas',por[k]?str(o['Saída']):'',' data-k="'+esc(k)+'"')+'</td></tr>';}).join('')+
+    '</tbody></table></div><div class="linha noprint" style="margin:.5rem 0 0"><button class="btn sm" type="button" data-act="consai" data-aba="saidas" data-v="" data-k="">＋ Saída (Dante, timecode, fone…)</button></div>';
+  h+='<p class="livres">As entradas vêm da aba Receptores (os transmissores puxam input e canal de lá). Nome, source e nível das saídas na cena ficam no Mixer; aqui fica o que está ligado fisicamente.</p></section>';
+  return h;
+}
+
+/* ───────── Inventário ───────── */
+var INVT=[['tx','Transmissores'],['rx','Receptores'],['cap','Cápsulas'],['equip','Outros'],['dev','Devolução']];
+function simTxt(v){return v===true||simNao(v)?'sim':'';}
+function colsInv(aba){
+  var eps=[['','—']].concat(D.eps.map(function(e){return [e.ep,'após EP '+e.ep];}));
+  if(aba==='tx')return [['TX','Número (TX)'],['Nome','Nome'],['Nome no Wireless Designer','Nome no Wireless Designer'],['Modelo','Modelo'],['Modulação','Modulação'],['Passo (kHz)','Passo (kHz)','num'],['Bloco','Bloco'],['Faixa (MHz)','Faixa (MHz)'],['Receptor','Receptor','select',[['','—']].concat(D.rx.map(function(r){return [r.id,r.id];}))],['Serial','Serial'],['Uso','Uso','select',[['','personagens'],['monitoração','monitoração']]],['Fonte no Scorpio (saída)','Saída do Scorpio que alimenta (monitoração)'],['Dono','Dono'],['Devolve após EP','Devolve','select',eps],['Observações','Observações','long']];
+  if(aba==='rx')return [['Receptor','Receptor'],['Modelo','Modelo'],['Canal do receptor','Canal do receptor','num'],['Serial','Serial'],['Dono','Dono'],['Devolve após EP','Devolve','select',eps],['Observações','Observações','long']];
+  if(aba==='cap')return [['Cápsula','Nome (ex.: COS11 P)'],['Tipo','Tipo','select',[['lapela','lapela'],['boom','boom'],['gooseneck','gooseneck'],['adaptador','adaptador']]],['Modelo','Modelo'],['Cor','Cor','select',[['',''],['bege','bege'],['preto','preto'],['marrom','marrom']]],['Terminação','Terminação (MicroDot, TA5F, Lemo 3…)'],['Serial','Serial'],['Digital?','Vai em transmissor digital','check'],['INV. ?','Polaridade invertida','check'],['Manutenção','Precisa de manutenção','check'],['Qtd','Quantidade (adaptadores)','num'],['Converte para','Converte para (adaptadores)'],['Dono','Dono'],['Devolve após EP','Devolve','select',eps],['Observações','Observações','long']];
+  return [['Item','Item'],['Categoria','Categoria'],['Modelo','Modelo'],['Serial','Serial'],['Qtd','Qtd','num'],['Dono','Dono'],['Devolve após EP','Devolve','select',eps],['Observações','Observações','long']];
+}
+function viewInv(){
+  var t=UI.invt||'tx',h='<div class="bar noprint"><span class="seg" role="group" aria-label="Inventário">'+INVT.map(function(x){return '<button type="button" data-act="invt" data-v="'+x[0]+'" aria-pressed="'+(t===x[0])+'">'+x[1]+'</button>';}).join('')+'</span><span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  if(t==='dev')return h+viewDev();
+  if(!podeEditar())h+='<div class="banner noprint">Para editar daqui, atualize o Apps Script para a versão 1.41 (Nova versão). Por enquanto só leitura.</div>';
+  var ch=CHAVES[t],L=((D.raw&&D.raw[t])||[]).filter(function(o){return str(o[ch]);});
+  var cols={tx:[['TX','TX'],['Nome','Nome'],['Modelo','Modelo'],['Bloco','Bloco'],['Receptor','Receptor'],['Serial','Serial'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']],
+    rx:[['Receptor','Receptor'],['Modelo','Modelo'],['Canal do receptor','Canal'],['Serial','Serial'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']],
+    cap:[['Cápsula','Cápsula'],['Tipo','Tipo'],['Modelo','Modelo'],['Cor','Cor'],['Terminação','Terminação'],['Serial','Serial'],['Manutenção','Manut.'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']],
+    equip:[['Item','Item'],['Categoria','Categoria'],['Modelo','Modelo'],['Serial','Serial'],['Qtd','Qtd'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']]}[t];
+  if(t==='tx')L.sort(function(a,b){return (int(a['TX'])||(/^S/.test(str(a['TX']))?95:90))-(int(b['TX'])||(/^S/.test(str(b['TX']))?95:90));});
+  h+='<section class="doc"><div class="dochead"><div><h1>Inventário · '+esc(INVT.filter(function(x){return x[0]===t;})[0][1])+'</h1><p>'+L.length+' item(ns)</p></div><div class="r">Gerado em '+agora()+'</div></div>';
+  h+='<div class="tabwrap"><table class="tab il inv"><thead><tr>'+(t==='tx'||t==='cap'?'<th></th>':'')+cols.map(function(c){return '<th>'+c[1]+'</th>';}).join('')+'<th class="noprint"></th></tr></thead><tbody>'+
+    L.map(function(o){var id=str(o[ch]),it=t==='tx'?D.txPor[id]:t==='cap'?D.capPor[id]:null;
+      return '<tr>'+(it?'<td class="th">'+fotoEquip(t,it)+'</td>':'')+cols.map(function(c,i){var v=o[c[0]];var txt=c[0]==='Manutenção'?simTxt(v):c[0]==='Devolve após EP'?(str(v)?'EP '+str(v):''):str(v);
+        if(i===0)return '<td class="n">'+(t==='cap'?capTag(id,'sm'):esc(txt))+'</td>';return '<td'+(c[0]==='Observações'?' class="w"':'')+'>'+esc(txt)+'</td>';}).join('')+'<td class="noprint">'+lapis('invedit',t,id)+'</td></tr>';}).join('')+'</tbody></table></div>';
+  h+='<div class="linha noprint" style="margin-top:.6rem"><button class="btn sm" type="button" data-act="invedit" data-aba="'+t+'" data-v="">＋ Novo</button></div></section>';
+  return h;
+}
+
+/* ───────── RF ───────── */
+var SCAN=null;try{SCAN=JSON.parse(localStorage.getItem('plc_scan')||'null');}catch(e){}
+function lerScan(texto,nome){
+  var pts=[];texto.split(/\r?\n/).forEach(function(l){var m=l.trim().split(/[;,\t ]+/).filter(Boolean);if(m.length<2)return;
+    var f=parseFloat(m[0].replace(',','.')),v=parseFloat(m[1].replace(',','.'));if(isNaN(f)||isNaN(v))return;pts.push([f,v]);});
+  if(!pts.length)return null;
+  var mx=Math.max.apply(null,pts.map(function(p){return p[0];}));
+  var k=mx>1e8?1e-6:mx>1e5?1e-3:1;pts.forEach(function(p){p[0]*=k;});
+  pts.sort(function(a,b){return a[0]-b[0];});
+  if(pts.length>4000){var st=Math.ceil(pts.length/4000),r=[];for(var i=0;i<pts.length;i+=st){var c=pts.slice(i,i+st);r.push([c[0][0],Math.max.apply(null,c.map(function(p){return p[1];}))]);}pts=r;}
+  return {nome:nome,em:agora(),pts:pts};
+}
+function txsRf(){return D.tx.filter(function(t){return !isNaN(t.freq)&&t.num!=='GN';}).sort(function(a,b){return a.freq-b.freq;});}
+function graficoRf(){
+  var T=txsRf(),P=SCAN&&SCAN.pts||[];if(!T.length&&!P.length)return '';
+  var fs=T.map(function(t){return t.freq;}).concat(P.map(function(p){return p[0];}));
+  var lo=Math.floor(Math.min.apply(null,fs)-2),hi=Math.ceil(Math.max.apply(null,fs)+2);
+  var W=1000,H=270,top=12,bot=H-52,x=function(f){return (f-lo)/(hi-lo)*W;};
+  var vmin=-110,vmax=-20;if(P.length){vmin=Math.min(-110,Math.min.apply(null,P.map(function(p){return p[1];})));vmax=Math.max(-20,Math.max.apply(null,P.map(function(p){return p[1];})));}
+  var y=function(v){return bot-(v-vmin)/(vmax-vmin)*(bot-top);};
+  var g='<svg class="rfg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Espectro e transmissores">';
+  for(var f=Math.ceil(lo/10)*10;f<=hi;f+=10)g+='<line x1="'+x(f)+'" x2="'+x(f)+'" y1="'+top+'" y2="'+bot+'" class="gd"/><text x="'+x(f)+'" y="'+(bot+12)+'" class="tk">'+f+'</text>';
+  if(P.length)g+='<polyline class="sc" points="'+P.map(function(p){return x(p[0]).toFixed(1)+','+y(p[1]).toFixed(1);}).join(' ')+'"/>';
+  T.forEach(function(t,i){var xx=x(t.freq);g+='<line x1="'+xx+'" x2="'+xx+'" y1="'+top+'" y2="'+bot+'" class="'+(t.mon?'tm':'tl')+(t.grade&&!t.grade.ok?' bad':'')+'"/><text x="'+xx+'" y="'+(H-22+(i%3)*9)+'" class="tn">'+(i+1)+'</text>';});
+  return g+'</svg>';
+}
+function imd(T){
+  var out=[];
+  for(var a=0;a<T.length;a++)for(var b=0;b<T.length;b++){if(a===b)continue;var p=2*T[a].freq-T[b].freq;
+    T.forEach(function(c){if(c===T[a]||c===T[b])return;if(Math.abs(c.freq-p)<0.1)out.push({c:c,a:T[a],b:T[b],d:Math.abs(c.freq-p)});});}
+  return out;
+}
+function viewRf(){
+  var T=txsRf(),h='<div class="bar noprint"><h2 style="margin:0">RF</h2><span class="sp"></span>'+
+    '<label class="btn">Importar scan (.csv)<input type="file" accept=".csv,.txt,text/csv" data-act="scan" class="sr"></label>'+
+    '<label class="btn">Importar report (.html)<input type="file" accept=".html,.htm,text/html" data-act="report" class="sr"></label>'+
+    '<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  if(PREVIEW)h+='<div class="painel noprint">'+previewHtml()+'</div>';
+  h+='<section class="doc"><div class="dochead"><div><h1>Coordenação de RF</h1><p>'+T.length+' transmissores'+(SCAN?' · scan "'+esc(SCAN.nome)+'" ('+esc(SCAN.em)+')':'')+'</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
+  h+='<div class="rfbox">'+graficoRf()+'</div>'+(SCAN?'':'<p class="hint noprint">Importe o scan exportado do Wireless Designer (.csv) para ver o espectro por baixo dos transmissores. O scan fica só neste aparelho.</p>');
+  var s=situacao(UI.ep);
+  h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>#</th><th>Freq. MHz</th><th>Transmissor</th><th>Bloco</th><th>Código</th><th>Receptor</th><th>Com quem</th><th>Distância do vizinho</th><th></th></tr></thead><tbody>'+
+    T.map(function(t,i){var viz=Math.min(i>0?t.freq-T[i-1].freq:99,i<T.length-1?T[i+1].freq-t.freq:99);var quem=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);}).join(', ');
+      return '<tr><td><span class="tag sm">'+(i+1)+'</span></td><td><b>'+mhz(t.freq)+'</b></td><td class="n">'+esc(t.nome)+(t.mon?' <small>monitoração</small>':'')+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(t.cod)+'</td><td>'+esc(t.rx||'')+'</td><td>'+esc(quem)+'</td><td'+(viz<0.3?' class="alarme"':'')+'>'+(viz<99?Math.round(viz*1000)+' kHz':'')+'</td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':t.ajustado?'<span class="chip ok">ajustado</span>':'<span class="chip warn">conferir</span>')+'</td></tr>';}).join('')+'</tbody></table></div>';
+  var I=imd(T.filter(function(t){return !t.mon;}));
+  h+='<h3>Intermodulação de 3ª ordem (2·f1 − f2)</h3>'+(I.length?'<p class="hint">Produtos a menos de 100 kHz de outro transmissor. É uma conferência simples; a coordenação vale a do Wireless Designer.</p><ul class="imd">'+I.slice(0,30).map(function(x){return '<li><b>'+esc(x.c.nome)+'</b> ('+mhz(x.c.freq)+') ← 2·'+esc(x.a.nome)+' − '+esc(x.b.nome)+' = '+mhz(2*x.a.freq-x.b.freq)+' ('+Math.round(x.d*1000)+' kHz)</li>';}).join('')+'</ul>':'<p class="hint">Nenhum produto de 3ª ordem a menos de 100 kHz de um transmissor de personagem.</p>');
+  return h+'</section>';
 }
 
 /* ───────── report ───────── */
@@ -2153,7 +2326,7 @@ function render(){
   UI.ep=epAtual();if(!UI.devEp)UI.devEp=UI.ep;
   var pre=senhaBanner()+(MODO==='demo'&&UI.view!=='tec'?'<div class="banner">Modo demonstração com dados de exemplo. Para ligar na planilha, abra a aba Técnico.</div>':'');
   if(MODO==='api'&&NET==='off'&&!PRECISA_SENHA)pre='<div class="banner err">Sem conexão. Mostrando os dados de '+esc(D.lidoEm||'—')+(FILA.length?'; '+FILA.length+' alteração(ões) serão enviadas quando a conexão voltar':'')+'.</div>';
-  $('#app').innerHTML=pre+({car:viewCar,doc:viewDoc,mix:viewMix,dev:viewDev,tec:viewTec}[UI.view]||viewCar)();
+  $('#app').innerHTML=pre+({car:viewCar,doc:viewDoc,mix:viewMix,con:viewCon,inv:viewInv,rf:viewRf,dev:viewInv,tec:viewTec}[UI.view]||viewCar)();
   if(EDIT)renderModal();
   if(UI.view==='car'&&BUSCA)aplicarBusca();
   if(UI.view==='mix'&&(MBUSCA))aplicarBuscaMix();
@@ -2174,7 +2347,13 @@ document.addEventListener('click',function(ev){
   var a=el.dataset.act,v=el.dataset.v;
   if(el.tagName==='INPUT'||el.tagName==='SELECT')return;
   if(cliqueMix(a,el))return;
+  if(cliqueForm(a))return;
+  if(a==='formfora'){if(ev.target===el){FORM=null;renderModal();render();}return;}
   if(a==='fecharfora'){if(ev.target===el)fechar();return;}
+  if(a==='conent'){abrirForm('rx',v,v?'Entrada · '+v:'Nova entrada',CAMPOS_ENTRADA,{apagar:false,nota:'Grava na aba Receptores.'});return;}
+  if(a==='consai'){var kk=el.dataset.k||'';abrirForm('saidas',v,kk?'Saída '+kk:'Nova saída',CAMPOS_SAIDA,{apagar:true,padrao:kk?{'Saída':kk}:null,nota:'Grava na aba Saídas físicas.'});return;}
+  if(a==='invedit'){var ab=el.dataset.aba;abrirForm(ab,v,(v?v:'Novo')+' · '+INVT.filter(function(x){return x[0]===ab;})[0][1],colsInv(ab),{apagar:ab==='equip',nota:{tx:'Aba Transmissores',rx:'Aba Receptores',cap:'Aba Cápsulas',equip:'Aba Equipamento'}[ab]+(v&&ab!=='equip'?'. Ao trocar o nome, as referências nas outras abas são trocadas junto.':'')});return;}
+  if(a==='invt'){UI.invt=v;salvarUi();render();return;}
   if(a==='view'){UI.view=v;salvarUi();render();window.scrollTo(0,0);}
   else if(a==='devep'){UI.devEp=+el.dataset.ep;salvarUi();render();}
   else if(a==='avtoggle'){AVOPEN=AVOPEN===el.dataset.v&&el.dataset.v==='bad'?'':el.dataset.v;render();}
@@ -2221,6 +2400,7 @@ document.addEventListener('change',function(ev){
   if(mudancaMix(a,el))return;
   if(a==='ordem'){UI.ordem=el.value;salvarUi();render();}
   else if(a==='elim'){fazer({acao:'eliminar',id:EDIT,ep:el.checked?UI.ep:''});renderModal();}
+  else if(a==='scan'&&el.files[0]){var fsc=el.files[0];var rd=new FileReader();rd.onload=function(){var sc=lerScan(String(rd.result),fsc.name);if(!sc){toast('Não reconheci frequências e níveis nesse arquivo.',true);return;}SCAN=sc;try{localStorage.setItem('plc_scan',JSON.stringify(sc));}catch(e){}toast('Scan importado: '+sc.pts.length+' pontos');render();};rd.readAsText(fsc);}
   else if(a==='fotoeq'&&el.files[0]){var ab=el.dataset.aba,idq=el.dataset.id;reduzirFoto(el.files[0],function(url){fazer({acao:'fotoEquip',aba:ab,id:idq,base64:url.split(',')[1],mime:'image/jpeg',preview:url});renderModal();toast('Foto salva');});}
   else if(a==='foto'&&el.files[0]){var id=EDIT;reduzirFoto(el.files[0],function(url){fazer({acao:'foto',id:id,base64:url.split(',')[1],mime:'image/jpeg',preview:url});renderModal();toast('Foto salva');});}
   else if(a==='report'&&el.files[0]){

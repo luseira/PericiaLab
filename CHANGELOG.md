@@ -5,6 +5,13 @@
 
 
 
+## v1.41 · 27/10/2026
+- Aba Conexões: entradas do Scorpio (input, conector, canal, equipamento, cabo, quem está com o transmissor) e saídas (L, R, X1–X10 e outras: conector, cabo, destino, nível), editáveis pelo lápis, gravando na planilha. As entradas são a aba Receptores (de onde os transmissores puxam input e canal); as saídas ficam na aba nova "Saídas físicas".
+- Aba Inventário: Transmissores, Receptores, Cápsulas, Outros (aba nova "Equipamento") e Devolução, com edição pelo site. Trocar o nome de um receptor ou de uma cápsula troca as referências nas outras abas; células com fórmula não são sobrescritas.
+- Aba RF: transmissores por frequência com bloco, código, receptor, quem usa e distância do vizinho; gráfico com o scan .csv do Wireless Designer (guardado só no aparelho) e os transmissores numerados; conferência simples de intermodulação de 3ª ordem; importação do report também por aqui.
+- A Devolução foi para dentro do Inventário.
+- Apps Script 1.41: ação "linha" (criar, editar e apagar linhas pelo site) e leitura das abas novas (precisa de Nova versão).
+
 ## v1.40 · 27/10/2026
 - Sem barra de episódios: o app trabalha no episódio atual. Eliminar alguém (no lápis da pessoa) fecha o episódio e abre o próximo; o eliminado vai para o fim, em cinza com um X, e pode ser recuperado.
 - Carômetro no celular: cada grupo vira um carrossel de cartas. Tocar numa pessoa mostra o resumo e o lápis "Editar"; a escolha é em dois passos com cartas (transmissor → cápsula → OK), com foto quando houver. Quem ainda não tem nada já abre direto na escolha.

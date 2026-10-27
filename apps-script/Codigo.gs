@@ -22,7 +22,14 @@ const ABAS = {
 };
 const PASTA_FOTOS = 'Perícia Lab · Fotos';
 const ABA_CENAS = 'Cenas';
-const VERSAO_SCRIPT = '1.40';
+const VERSAO_SCRIPT = '1.41';
+// abas extras, criadas pelo site quando necessário (aba, colunas iniciais, coluna-chave)
+const ABAS_EXTRA = {
+  saidas: { nome: 'Saídas físicas', cols: ['Saída', 'Conector', 'Cabo', 'Destino', 'Entrada no destino', 'Nível', 'Observações', 'Posição'], chave: 'Saída' },
+  equip: { nome: 'Equipamento', cols: ['Item', 'Categoria', 'Modelo', 'Serial', 'Dono', 'Qtd', 'Devolve após EP', 'Observações'], chave: 'Item' }
+};
+// quais abas o site pode editar e por qual coluna acha a linha
+const EDITAVEIS = { tx: 'TX', rx: 'Receptor', cap: 'Cápsula', saidas: 'Saída', equip: 'Item' };
 
 /* ───────── entrada ───────── */
 
@@ -68,7 +75,7 @@ function doPost(e) {
 }
 
 function acoes_() {
-  return { escalar: escalar_, eliminar: eliminar_, ajustado: ajustado_, importar: importar_, foto: foto_, pessoa: pessoa_, cena: cena_, lote: lote_, fotoEquip: fotoEquip_ };
+  return { escalar: escalar_, eliminar: eliminar_, ajustado: ajustado_, importar: importar_, foto: foto_, pessoa: pessoa_, cena: cena_, lote: lote_, fotoEquip: fotoEquip_, linha: linha_ };
 }
 
 // várias alterações numa chamada só (recuperar configuração, zerar tudo)
@@ -134,6 +141,7 @@ function lerTudo_() {
   Object.keys(ABAS).forEach(function (k) { o[k] = tabela_(ABAS[k]); });
   o.imp = o.imp.slice(-15);
   o.cenas = ss_().getSheetByName(ABA_CENAS) ? tabela_(ABA_CENAS) : [];
+  Object.keys(ABAS_EXTRA).forEach(function (k) { o[k] = ss_().getSheetByName(ABAS_EXTRA[k].nome) ? tabela_(ABAS_EXTRA[k].nome) : []; });
   o.script = VERSAO_SCRIPT;
   return o;
 }
@@ -315,6 +323,69 @@ function fotoEquip_(q) {
   const url = 'https://lh3.googleusercontent.com/d/' + f.getId();
   s.getRange(l, c).setValue(url);
   return { url: url };
+}
+
+/* ───────── edição de linhas pelo site (inventário, conexões) ─────────
+   q = {aba, valor (chave atual; vazio = linha nova), campos: {Coluna: valor}, apagar}
+   - cria a aba extra e as colunas que faltarem;
+   - não escreve por cima de fórmulas (devolve a lista do que pulou);
+   - ao renomear um receptor ou uma cápsula, troca as referências nas outras abas. */
+function linha_(q) {
+  const chave = EDITAVEIS[q.aba];
+  if (!chave) throw new Error('Aba não editável pelo site: ' + q.aba);
+  const nomeAba = ABAS[q.aba] || ABAS_EXTRA[q.aba].nome;
+  let s = ss_().getSheetByName(nomeAba);
+  if (!s) {
+    const ex = ABAS_EXTRA[q.aba];
+    if (!ex) throw new Error('Aba não encontrada: ' + nomeAba);
+    s = ss_().insertSheet(ex.nome);
+    s.getRange(1, 1, 1, ex.cols.length).setValues([ex.cols]).setFontWeight('bold');
+    s.setFrozenRows(1);
+  }
+  const valor = q.aba === 'tx' ? valorTx_(q.valor) : String(q.valor === undefined ? '' : q.valor);
+  let l = valor !== '' ? linhaPor_(s, chave, valor) : 0;
+  if (q.apagar) { if (l) s.deleteRow(l); return {}; }
+  const campos = q.campos || {};
+  const novoValor = campos[chave] !== undefined ? String(campos[chave]).trim() : valor;
+  if (!novoValor) throw new Error('Falta ' + chave + '.');
+  if (novoValor !== valor && linhaPor_(s, chave, q.aba === 'tx' ? valorTx_(novoValor) : novoValor)) throw new Error('Já existe ' + chave + ' ' + novoValor + '.');
+  if (!l) {
+    // primeira linha com a chave vazia (a aba pode ter linhas vazias com caixas de seleção)
+    const ck = col_(s, chave), n = s.getLastRow();
+    l = n + 1;
+    if (n >= 2) { const v = s.getRange(2, ck, n - 1, 1).getValues(); for (let i = 0; i < v.length; i++) if (v[i][0] === '' || v[i][0] === null) { l = i + 2; break; } }
+    s.getRange(l, ck).setValue(q.aba === 'tx' ? valorTx_(novoValor) : novoValor);
+    // copia as fórmulas da linha de cima (ex.: Input e Canal puxados de Receptores)
+    if (l > 2) {
+      const nc = s.getLastColumn(), fc = s.getRange(l - 1, 1, 1, nc).getFormulasR1C1()[0], alvo = s.getRange(l, 1, 1, nc).getFormulas()[0];
+      fc.forEach(function (f, i) { if (f && !alvo[i] && i + 1 !== ck) s.getRange(l, i + 1).setFormulaR1C1(f); });
+    }
+  }
+  let cab = cabecalho_(s);
+  const pulados = [];
+  Object.keys(campos).forEach(function (k) {
+    let c = cab.indexOf(k) + 1;
+    if (!c) { c = s.getLastColumn() + 1; s.getRange(1, c).setValue(k).setFontWeight('bold'); cab = cabecalho_(s); }
+    const cel = s.getRange(l, c);
+    if (cel.getFormula()) { pulados.push(k); return; }
+    let v = campos[k];
+    if (k === chave && q.aba === 'tx') v = valorTx_(v);
+    cel.setValue(v === null || v === undefined ? '' : v);
+  });
+  if (valor && novoValor !== valor) {
+    if (q.aba === 'rx') trocar_(ABAS.tx, 'Receptor', valor, novoValor);
+    if (q.aba === 'cap') trocar_(ABAS.esc, 'Cápsula', valor, novoValor);
+    if (q.aba === 'tx') trocar_(ABAS.esc, 'TX', valor, valorTx_(novoValor));
+  }
+  return { pulados: pulados };
+}
+function trocar_(nomeAba, coluna, de, para) {
+  const s = aba_(nomeAba), c = col_(s, coluna), n = s.getLastRow();
+  if (n < 2) return;
+  const r = s.getRange(2, c, n - 1, 1), v = r.getValues(), f = r.getFormulas();
+  let mudou = false;
+  for (let i = 0; i < v.length; i++) if (!f[i][0] && String(v[i][0]) === String(de)) { v[i][0] = para; mudou = true; }
+  if (mudou) r.setValues(v.map(function (x, i) { return f[i][0] ? [f[i][0]] : x; }));
 }
 
 /* ───────── cenas do mixer ───────── */
