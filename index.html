@@ -457,7 +457,8 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 .carta .cb{all:unset;box-sizing:border-box;display:flex;flex-direction:column;width:100%;cursor:pointer}
 .carta .cb:focus-visible{outline:3px solid var(--accent)}
 .cf{aspect-ratio:1;background:#eceef1;display:grid;place-items:center;overflow:hidden;position:relative}
-.cf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.cf svg{width:52%;height:auto}
+.cf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cf img[src^="img/"]{object-fit:contain;padding:7%;box-sizing:border-box}.cf svg{width:52%;height:auto}
 .carta .cn{font:700 1.15rem/1.1 var(--fc);padding:.35rem .5rem .1rem;text-transform:uppercase}
 .carta .ci{font-size:.74rem;color:var(--ink2);padding:0 .5rem;min-height:1em}
 .carta .cs{font-size:.74rem;padding:.1rem .5rem .5rem;color:var(--ok);font-weight:600}.carta .cs.x{color:var(--ink3);font-weight:500}
@@ -503,7 +504,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.41 · 27/10 12:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.42 · 27/10 22:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1116,11 +1117,14 @@ var WIZ=null; /* {id, passo:'tx'|'cap', tx, cap} */
 function fotoEquip(tipo,o){
   var f=o.foto;
   if(!f){var L=tipo==='tx'?D.tx:D.cap;var irmao=L.filter(function(y){return y.foto&&y.modelo===o.modelo&&(tipo==='tx'||y.cor===o.cor);})[0];if(irmao)f=irmao.foto;}
+  if(!f&&tipo==='tx')f=imgModeloTx(o.modelo);
   if(f)return '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">';
   if(tipo==='tx')return '<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="12" y="10" width="36" height="62" rx="6" fill="#2b3038"/><rect x="18" y="18" width="24" height="12" rx="2" fill="#57616e"/><rect x="36" y="2" width="4" height="10" rx="1.5" fill="#2b3038"/><circle cx="30" cy="52" r="6" fill="#3b424d"/></svg>';
   var cc={bege:'#d8c3a2',preto:'#15181d',marrom:'#6a4630'}[o.cor]||'#555';
   return '<svg viewBox="0 0 60 80" aria-hidden="true"><path d="M30 34 C 30 52, 18 58, 22 76" stroke="'+cc+'" stroke-width="3" fill="none"/><rect x="24" y="14" width="12" height="22" rx="6" fill="'+cc+'" stroke="rgba(0,0,0,.35)"/></svg>';
 }
+/* fotos de referência por modelo (pasta img/tx do site); a foto de cada aparelho, se houver, tem prioridade */
+function imgModeloTx(m){m=String(m||'');return /DBSMD|SMDB/i.test(m)?'img/tx/dbsmd.webp':/^SMQV|^SMV\b/i.test(m)?'img/tx/smqv.webp':/^SSM/i.test(m)?'img/tx/ssm.webp':/^UM(400|200)/i.test(m)?'img/tx/um.webp':'';}
 function podeFoto(){return MODO==='demo'||!!D.script;}
 function camBtn(tipo,id){return podeFoto()?'<label class="cam" title="Foto"><span aria-hidden="true">📷</span><input type="file" accept="image/*" data-act="fotoeq" data-aba="'+tipo+'" data-id="'+esc(id)+'" class="sr"></label>':'';}
 function cartaTx(t2,s,p,sel){

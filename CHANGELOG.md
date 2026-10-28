@@ -5,6 +5,9 @@
 
 
 
+## v1.42 · 27/10/2026
+- Fotos de referência dos transmissores (DBSMD, SMQV, SSM, UM400/UM200), recortadas sobre fundo transparente, nas cartas de escolha, no resumo e no inventário. Uma foto enviada pelo 📷 para um aparelho específico continua tendo prioridade.
+
 ## v1.41 · 27/10/2026
 - Aba Conexões: entradas do Scorpio (input, conector, canal, equipamento, cabo, quem está com o transmissor) e saídas (L, R, X1–X10 e outras: conector, cabo, destino, nível), editáveis pelo lápis, gravando na planilha. As entradas são a aba Receptores (de onde os transmissores puxam input e canal); as saídas ficam na aba nova "Saídas físicas".
 - Aba Inventário: Transmissores, Receptores, Cápsulas, Outros (aba nova "Equipamento") e Devolução, com edição pelo site. Trocar o nome de um receptor ou de uma cápsula troca as referências nas outras abas; células com fórmula não são sobrescritas.
