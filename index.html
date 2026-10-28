@@ -523,11 +523,18 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 .adun b{font:700 1rem var(--fc)}.adun small{font-size:.68rem;color:var(--ink2)}
 .adun.sel{border-color:var(--ink);background:var(--ink);color:#fff}.adun.sel small{color:#c6cbd2}
 .adun:disabled{opacity:.45;cursor:not-allowed}
+
+/* v1.47 · barra de rolagem sempre visível nos carrosséis */
+.carrossel::-webkit-scrollbar,.grid.carr::-webkit-scrollbar{height:10px;-webkit-appearance:none}
+.carrossel::-webkit-scrollbar-track,.grid.carr::-webkit-scrollbar-track{background:#e3e6ea;border-radius:6px}
+.carrossel::-webkit-scrollbar-thumb,.grid.carr::-webkit-scrollbar-thumb{background:#8d949e;border-radius:6px;border:2px solid #e3e6ea}
+.carrossel::-webkit-scrollbar-thumb:hover,.grid.carr::-webkit-scrollbar-thumb:hover{background:#5f6670}
+@supports not selector(::-webkit-scrollbar){.carrossel,.grid.carr{scrollbar-width:auto;scrollbar-color:#8d949e #e3e6ea}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.46 · 28/10 16:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.47 · 28/10 16:35</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -582,6 +589,8 @@ var D=null, EDIT=null, PREVIEW=null, NET='', enviando=false, BUSCA='', MBUSCA=''
 
 function salvarUi(){jset(K.ui,UI);}
 if(UI.fmtv!==2){UI.fmt='lista';UI.fmtv=2;}
+/* o site sempre abre no Carômetro */
+UI.view='car';
 
 /* ───────── dados ───────── */
 /* times: guardados como Vermelho/Azul (aceita A/B antigos); internamente A=Vermelho, B=Azul */

@@ -5,6 +5,10 @@
 
 
 
+## v1.47 · 28/10/2026
+- Barra de rolagem horizontal sempre visível nas cartas (antes o Mac escondia quando o mouse saía).
+- O site sempre abre no Carômetro.
+
 ## v1.46 · 28/10/2026
 - As cartas de transmissor e cápsula ficam na ordem em que abriram (escolhido primeiro, ocupados no fim); tocar numa carta não reordena nem rola a lista.
 - Adaptador por unidade: quando a cápsula pede adaptador, aparece a fileira "Adaptador MicroDot → TA5F/Lemo 3" com #1…#N (livre ou com quem está). A unidade fica gravada na Escalação (coluna Adaptador, criada pelo Apps Script 1.42), aparece no card ("+AD TA5F #2") e na Input list; quem usa adaptador sem unidade ganha o aviso "adaptador?".
