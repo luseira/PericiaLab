@@ -5,6 +5,10 @@
 
 
 
+## v1.45 · 28/10/2026
+- Fotos das cápsulas e dos adaptadores (DPA 4060, 6060, 6061 B e P; COS11 P, R, N e B; TL47 B e 2; MicroDot → TA5F e → Lemo 3), recortadas sem fundo.
+- Rostos centralizados nos cards do Carômetro (enquadramento calculado por detecção de rosto em cada foto; Rafael desce no quadro, Bárbaro ganha zoom). Foto trocada depois volta ao enquadramento central.
+
 ## v1.44 · 28/10/2026
 - Volta o bloqueio de cápsula incompatível: conector que não entra no transmissor (sem adaptador livre) e COS-11 sem D em transmissor digital ficam apagados, com o motivo na carta.
 

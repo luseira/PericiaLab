@@ -518,7 +518,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.44 · 28/10 09:40</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.45 · 28/10 15:50</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -815,8 +815,13 @@ function fazer(op){
 function avatar(p,cls){
   return '<span class="av'+(cls?' '+cls:'')+'" style="background:'+cor(p.nome)+'">'+esc(iniciais(p.nome))+(p.foto?'<img src="'+esc(p.foto)+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</span>';
 }
-function fotoGrande(p){
-  return '<div class="ft" style="background:'+cor(p.nome)+'">'+esc(iniciais(p.nome))+(p.foto?'<img src="'+esc(p.foto)+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</div>';
+/* enquadramento do rosto nos cards (4:3), calculado por detecção de rosto em cada foto: [zoom, x0, y0] da janela visível.
+   Vale só para a foto daquele momento (o final do endereço confere); foto nova volta ao enquadramento central. */
+var ENQ={RAMIRO:['NjP_W8Em',1,0,.127],TELMA:['QfjQLcVu',1,0,.135],SALADA:['2_Qtp5X9',1,0,.104],P01:['BAlYWypw',1,0,.22],P02:['5SCnK9j0',1,0,.25],P03:['iPqEwJhD',1,0,.178],P04:['-zh57TzM',1,0,.234],P05:['m6ZXJCSf',1,0,.223],P06:['KaZLt2Ix',1,0,.09],P07:['dNvsF_N8',1,0,.156],P08:['TNbZBixE',1,0,.19],P09:['wvJ85Ub6',1.463,.158,.078],P10:['jaAXZ7mp',1,0,.106]};
+function estiloEnq(p){var e=ENQ[p.id];if(!e||!p.foto||String(p.foto).slice(-8)!==e[0])return '';var z=e[1];
+  return ' style="inset:auto;width:'+(z*100).toFixed(1)+'%;height:auto;aspect-ratio:1;object-fit:cover;left:'+(-e[2]*z*100).toFixed(1)+'%;top:'+(-e[3]*z/0.75*100).toFixed(1)+'%"';}
+function fotoGrande(p,card){
+  return '<div class="ft" style="background:'+cor(p.nome)+'">'+esc(iniciais(p.nome))+(p.foto?'<img src="'+esc(p.foto)+'" alt="" loading="lazy" onerror="this.remove()"'+(card?estiloEnq(p):'')+'>':'')+'</div>';
 }
 function epBar(cur){
   return '<div class="eps" role="group" aria-label="Episódio">'+D.eps.map(function(e){
@@ -890,7 +895,7 @@ function cardHtml(x,col){
   var rf=t&&t.num!=='GN'?'<span class="rf">'+blocoTag(t)+(isNaN(t.freq)?'':'<span class="fq"><b>'+mhz(t.freq)+'</b> MHz</span>')+(t.cod?'<span class="cod" title="código">'+esc(t.cod)+'</span>':'')+'</span>':'';
   var rx=t?rxTxt(t):'';
   return '<button class="card'+(x.ativo?'':' fora')+(bad&&x.ativo?' bad':'')+(tc?' '+tc:'')+'" type="button" data-act="abrir" data-id="'+esc(p.id)+'" data-busca="'+esc(buscaTxt(x,ch))+'">'+
-    fotoGrande(p)+(function(){var r=/^(HOST|MENTOR)$/.test(p.papel)?papelTxt(p):'';var tx=r;return tx?'<span class="papel">'+esc(tx)+'</span>':'';})()+(tc?'<span class="timefaixa">'+esc(timeNome(e.time))+'</span>':'')+
+    fotoGrande(p,1)+(function(){var r=/^(HOST|MENTOR)$/.test(p.papel)?papelTxt(p):'';var tx=r;return tx?'<span class="papel">'+esc(tx)+'</span>':'';})()+(tc?'<span class="timefaixa">'+esc(timeNome(e.time))+'</span>':'')+
     '<span class="bd"><span class="nm" title="'+esc(p.nome)+'">'+esc(primeiroNome(p))+'</span>'+
     (x.ativo?'<span class="eq">'+(e&&e.tx?'<span class="tag" title="TX '+esc(e.tx)+'">'+esc(txNome(t,e.tx))+'</span>':'<span class="tag vazio">TX –</span>')+
       (e&&e.cap?capTag(e.cap)+invIcon(e.cap)+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?'<span class="chip pend" title="adaptador MicroDot → '+esc(k.ad)+'">+AD '+esc(k.ad)+'</span>':'';})():'')+'</span>'+
@@ -1132,12 +1137,14 @@ function fotoEquip(tipo,o){
   var f=o.foto;
   if(!f){var L=tipo==='tx'?D.tx:D.cap;var irmao=L.filter(function(y){return y.foto&&y.modelo===o.modelo&&(tipo==='tx'||y.cor===o.cor);})[0];if(irmao)f=irmao.foto;}
   if(!f&&tipo==='tx')f=imgModeloTx(o.modelo);
+  if(!f&&tipo==='cap'&&CAP_FOTOS.indexOf(o.id)>=0)f='img/cap/'+o.id.toLowerCase().replace(/\s+/g,'-')+'.webp';
   if(f)return '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">';
   if(tipo==='tx')return '<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="12" y="10" width="36" height="62" rx="6" fill="#2b3038"/><rect x="18" y="18" width="24" height="12" rx="2" fill="#57616e"/><rect x="36" y="2" width="4" height="10" rx="1.5" fill="#2b3038"/><circle cx="30" cy="52" r="6" fill="#3b424d"/></svg>';
   var cc={bege:'#d8c3a2',preto:'#15181d',marrom:'#6a4630'}[o.cor]||'#555';
   return '<svg viewBox="0 0 60 80" aria-hidden="true"><path d="M30 34 C 30 52, 18 58, 22 76" stroke="'+cc+'" stroke-width="3" fill="none"/><rect x="24" y="14" width="12" height="22" rx="6" fill="'+cc+'" stroke="rgba(0,0,0,.35)"/></svg>';
 }
 /* fotos de referência por modelo (pasta img/tx do site); a foto de cada aparelho, se houver, tem prioridade */
+var CAP_FOTOS=['AD MicroDot-Lemo','AD MicroDot-TA5F','DPA 4060','DPA 6061 B','DPA 6060','DPA 6061 P','COS11 P','COS11 R','COS11 N','COS11 B','TL47 2','TL47 B'];
 function imgModeloTx(m){m=String(m||'');return /DBSMD|SMDB/i.test(m)?'img/tx/dbsmd.webp':/^SMQV|^SMV\b/i.test(m)?'img/tx/smqv.webp':/^SSM/i.test(m)?'img/tx/ssm.webp':/^UM(400|200)/i.test(m)?'img/tx/um.webp':/^A10/i.test(m)?'img/tx/a10.webp':'';}
 var COR_BLOCO={19:'#16181c',20:'#16181c',21:'#6e4424',22:'#d0302a',23:'#ee7a1c',24:'#f2c81a',25:'#2c9a49',26:'#2766cf',27:'#b058d6',28:'#8a8f98',29:'#f4f4f4',470:'#16181c'};
 function blocoNum(t){if(!t||isNaN(t.freq)||!LECTRO.test(t.modelo||''))return 0;return Math.floor((Math.round(t.freq*1000)+1e-6)/25600);}
