@@ -518,7 +518,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.43 · 27/10 23:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.44 · 28/10 09:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1155,7 +1155,7 @@ function cartaTx(t2,s,p,sel){
 function cartaCap(c,s,p,t,sel,usoAd){
   var ep=UI.ep,quem=(s.uso.cap[c.id]||[]).filter(function(id){return id!==p.id;}),dev=c.dev&&ep>c.dev;
   var k=compatCap(c,t),livres=k.ad&&D.capPor[k.adId]?D.capPor[k.adId].qtd-(usoAd[k.adId]||0):0,semAd=k.ok&&k.ad&&livres<=0;
-  var bloq=(dev||quem.length)&&!sel,avisa=t&&(!k.ok||semAd);
+  var avisa=t&&(!k.ok||semAd),bloq=(dev||quem.length||avisa)&&!sel;
   var porque=dev?'devolvida':quem.length?'com '+primeiroNome(D.pPor[quem[0]]):!t?'livre':!k.ok?'⚠ '+k.motivo:semAd?'⚠ sem adaptador livre':k.ad?'+ adaptador '+k.ad:(c.manut?'⚠ manutenção':'livre');
   return '<div class="carta cap-'+(corDe(c.id)||'semcor')+(sel?' sel':'')+(bloq?' bloq':'')+'"><button type="button" class="cb" data-act="wizcap" data-v="'+esc(c.id)+'"'+(bloq?' disabled':'')+' title="'+esc(c.id)+'">'+
     '<span class="cf">'+fotoEquip('cap',c)+'</span><span class="cn">'+esc(capNome(c.id))+(redMark(c.id)?'<i class="rm"></i>':'')+'</span>'+
@@ -2405,8 +2405,8 @@ document.addEventListener('click',function(ev){
   else if(a==='desfazerelim'){fazer({acao:'eliminar',id:EDIT,ep:''});toast('Recuperado');fechar();}
   else if(a==='eliminar'){var pe=D.pPor[EDIT];if(pe&&confirm('Eliminar '+primeiroNome(pe)+'? O transmissor e a cápsula ficam livres. Dá para recuperar depois.')){fazer({acao:'eliminar',id:EDIT,ep:UI.ep});toast(primeiroNome(pe)+' eliminado');fechar();}}
   else if(a==='wizabrir'){var x0=situacao(UI.ep).pessoas.filter(function(y){return y.p.id===EDIT;})[0]||{};var e0=x0.e||{};WIZ={id:EDIT,passo:'tx',tx:e0.tx||'',cap:e0.cap||''};renderModal();}
-  else if(a==='wiztx'){if(ARRASTOU)return;WIZ.tx=WIZ.tx===v?'':v;renderModal();}
-  else if(a==='wizcap'){if(ARRASTOU)return;WIZ.cap=WIZ.cap===v?'':v;renderModal();}
+  else if(a==='wiztx'){if(ARRASTOU)return;WIZ.tx=v;renderModal();}
+  else if(a==='wizcap'){if(ARRASTOU)return;WIZ.cap=v;renderModal();}
   else if(a==='wizsem'){if(v==='tx'){WIZ.tx='';WIZ.passo='cap';}else WIZ.cap='';renderModal();}
   else if(a==='wizir'){WIZ.passo=v;renderModal();}
   else if(a==='wizok'){fazer({acao:'escalar',ep:UI.ep,id:EDIT,tx:WIZ.tx,cap:WIZ.cap});WIZ.passo='tx';renderModal();toast('Escalação salva');}

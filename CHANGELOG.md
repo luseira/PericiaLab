@@ -5,6 +5,9 @@
 
 
 
+## v1.44 · 28/10/2026
+- Volta o bloqueio de cápsula incompatível: conector que não entra no transmissor (sem adaptador livre) e COS-11 sem D em transmissor digital ficam apagados, com o motivo na carta.
+
 ## v1.43 · 27/10/2026
 - Fotos dos transmissores refeitas: recorte sem sombra, com os conectores (só a antena foi cortada); foto do A10.
 - Tocar numa pessoa abre direto as cartas dos transmissores (sem o "Editar"). Tocar num transmissor só marca a escolha; as abas "Transmissor" e "Cápsula" no topo trocam de passo, e o OK grava. Fechar com mudança não salva pergunta se quer salvar.
