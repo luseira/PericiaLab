@@ -22,7 +22,7 @@ const ABAS = {
 };
 const PASTA_FOTOS = 'Perícia Lab · Fotos';
 const ABA_CENAS = 'Cenas';
-const VERSAO_SCRIPT = '1.41';
+const VERSAO_SCRIPT = '1.42';
 // abas extras, criadas pelo site quando necessário (aba, colunas iniciais, coluna-chave)
 const ABAS_EXTRA = {
   saidas: { nome: 'Saídas físicas', cols: ['Saída', 'Conector', 'Cabo', 'Destino', 'Entrada no destino', 'Nível', 'Observações', 'Posição'], chave: 'Saída' },
@@ -169,7 +169,7 @@ function efetivo_(esc, ep) {
     const e = Number(r['EP']);
     if (!(e <= ep)) return;
     const id = String(r['ID']), cur = m[id];
-    if (!cur || e > cur.ep || (e === cur.ep && i > cur.i)) m[id] = { ep: e, i: i, tx: String(r['TX']), cap: String(r['Cápsula']), time: String(r['Time'] || '') };
+    if (!cur || e > cur.ep || (e === cur.ep && i > cur.i)) m[id] = { ep: e, i: i, tx: String(r['TX']), cap: String(r['Cápsula']), time: String(r['Time'] || ''), ad: String(r['Adaptador'] || '') };
   });
   return m;
 }
@@ -203,19 +203,24 @@ function escalar_(q) {
   }
   const anterior = ef[id] || { tx: '', cap: '', time: '' };
   const atual = linha ? esc.filter(function (r) { return r._linha === linha; })[0] : null;
-  const base = atual ? { tx: atual['TX'], cap: atual['Cápsula'], time: atual['Time'], obs: atual['Observações'] }
-                     : { tx: anterior.tx, cap: anterior.cap, time: anterior.time || '', obs: '' };
+  const base = atual ? { tx: atual['TX'], cap: atual['Cápsula'], time: atual['Time'], obs: atual['Observações'], ad: atual['Adaptador'] || '' }
+                     : { tx: anterior.tx, cap: anterior.cap, time: anterior.time || '', obs: '', ad: anterior.ad || '' };
   const novo = {
     tx: q.tx !== undefined ? q.tx : base.tx,
     cap: q.cap !== undefined ? q.cap : base.cap,
     time: q.time !== undefined ? q.time : base.time,
-    obs: q.obs !== undefined ? q.obs : base.obs
+    obs: q.obs !== undefined ? q.obs : base.obs,
+    ad: q.ad !== undefined ? q.ad : (q.cap !== undefined && q.cap !== base.cap ? '' : base.ad)
   };
   if (!linha) linha = s.getLastRow() + 1;
   s.getRange(linha, 1, 1, 9).setValues([[
     ep, id, nomes[id]['Nome'] || id, valorTx_(novo.tx), novo.cap || '', novo.time || '', novo.obs || '', '', q.por || 'app'
   ]]);
   s.getRange(linha, 8).setValue(agora_());
+  // unidade do adaptador (coluna criada na primeira vez)
+  let ca = cabecalho_(s).indexOf('Adaptador') + 1;
+  if (!ca) { ca = s.getLastColumn() + 1; s.getRange(1, ca).setValue('Adaptador').setFontWeight('bold'); }
+  s.getRange(linha, ca).setValue(novo.ad || '');
   return {};
 }
 
