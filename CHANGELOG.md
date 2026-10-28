@@ -5,6 +5,13 @@
 
 
 
+## v1.43 · 27/10/2026
+- Fotos dos transmissores refeitas: recorte sem sombra, com os conectores (só a antena foi cortada); foto do A10.
+- Tocar numa pessoa abre direto as cartas dos transmissores (sem o "Editar"). Tocar num transmissor só marca a escolha; as abas "Transmissor" e "Cápsula" no topo trocam de passo, e o OK grava. Fechar com mudança não salva pergunta se quer salvar.
+- Cápsulas não ficam mais bloqueadas pelo conector do transmissor: a carta só avisa (em vermelho) quando precisa de adaptador ou não combina.
+- Bloco em destaque no card, nas cartas e na tabela, com a cor de bloco da Lectrosonics (21 marrom, 22 vermelho, 23 laranja, 24 amarelo, 25 verde, 26 azul, 19/20/470 preto); nos wideband (A1B1, B1C1…) a cor é a do bloco da frequência.
+- No computador, setas e arrastar com o mouse para rolar as cartas.
+
 ## v1.42 · 27/10/2026
 - Fotos de referência dos transmissores (DBSMD, SMQV, SSM, UM400/UM200), recortadas sobre fundo transparente, nas cartas de escolha, no resumo e no inventário. Uma foto enviada pelo 📷 para um aparelho específico continua tendo prioridade.
 
