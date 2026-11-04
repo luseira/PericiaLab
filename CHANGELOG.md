@@ -6,6 +6,9 @@
 
 
 
+
+## v1.49 · 03/11
+- Mixer: embaixo do nome, transmissor numa linha e input do gravador (LINE 2, AES 1…) na linha de baixo, em destaque.
 ## v1.48 · 03/11
 - Setas ‹ › no topo da ficha da pessoa (e teclas ← →) para passar de personagem sem fechar. Seguem a ordem dos cards na tela, respeitando busca e filtro de time.
 - Tocar no transmissor, na cápsula ou no adaptador já salva. Não há mais OK.
