@@ -5,6 +5,13 @@
 
 
 
+
+## v1.48 · 03/11
+- Setas ‹ › no topo da ficha da pessoa (e teclas ← →) para passar de personagem sem fechar. Seguem a ordem dos cards na tela, respeitando busca e filtro de time.
+- Tocar no transmissor, na cápsula ou no adaptador já salva. Não há mais OK.
+- O passo escolhido (Transmissor ou Cápsula) continua ao passar de pessoa: dá para fazer todos os transmissores e depois todas as cápsulas.
+- Time no topo da ficha.
+- Observação digitada é salva ao trocar de pessoa ou fechar.
 ## v1.47 · 28/10/2026
 - Barra de rolagem horizontal sempre visível nas cartas (antes o Mac escondia quando o mouse saía).
 - O site sempre abre no Carômetro.

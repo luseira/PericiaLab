@@ -109,6 +109,10 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .sh-hd .av{width:3.6rem;height:3.6rem;border-radius:10px;font-size:1.6rem}
 .sh-hd h2{margin:0;font-size:1.8rem;text-transform:uppercase}
 .sh-hd .sp{flex:1}
+.sh-hd .pnav{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:2.6rem;height:2.6rem;font-size:1.5rem;line-height:1;flex:none}
+.sh-hd .pnav:disabled{opacity:.3}
+.sh-hd .pcont{font-size:.85rem;color:var(--mut,#777);white-space:nowrap}
+.timetop{display:flex;gap:.6rem;align-items:center;margin:0 0 .6rem}.timetop b{font-size:.85rem}
 .sh-hd .x{background:var(--pendbg);border:0;border-radius:999px;width:2.4rem;height:2.4rem;font-size:1.3rem;line-height:1}
 .sh-bd{padding:.8rem 1rem 1.4rem}
 .sh-bd h3:first-child{margin-top:.2rem}
@@ -534,7 +538,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.47 · 28/10 16:35</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.48 · 03/11 22:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1202,7 +1206,7 @@ function wizHtml(x,s){
     if(!W.ordTx){txs.sort(function(a,b){var ua=(s.uso.tx[a.num]||[]).filter(function(i){return i!==p.id;}).length,ub=(s.uso.tx[b.num]||[]).filter(function(i){return i!==p.id;}).length;return (a.num===W.tx?-1:b.num===W.tx?1:0)||ua-ub||(int(a.num)||90)-(int(b.num)||90);});W.ordTx=txs.map(function(t2){return t2.num;});}
     else txs.sort(function(a,b){return W.ordTx.indexOf(a.num)-W.ordTx.indexOf(b.num);});
     h+='<div class="carwrap"><button type="button" class="carseta e" data-act="carseta" data-d="-1" aria-label="Anterior">‹</button><div class="carrossel">'+txs.map(function(t2){return cartaTx(t2,s,p,W.tx===t2.num);}).join('')+'</div><button type="button" class="carseta d" data-act="carseta" data-d="1" aria-label="Próximo">›</button></div>';
-    h+='<div class="wizbar"><button class="btn" type="button" data-act="wizsem" data-v="tx">Sem transmissor</button><span class="sp"></span><button class="btn" type="button" data-act="wizir" data-v="cap">Cápsula →</button>'+(mudouWiz(x)?'<button class="btn pri" type="button" data-act="wizok">OK</button>':'')+'</div>';
+    h+='<div class="wizbar"><button class="btn" type="button" data-act="wizsem" data-v="tx">Sem transmissor</button><span class="sp"></span><button class="btn" type="button" data-act="wizir" data-v="cap">Cápsula →</button></div>';
   }else{
     var t=W.tx?D.txPor[W.tx]:null,usoAd=adaptUso(UI.ep,p.id);
     var caps=D.cap.filter(function(c){return c.tipo===tipo;});
@@ -1215,7 +1219,7 @@ function wizHtml(x,s){
       if(!W.ad||us.indexOf(W.ad)<0){W.ad=us.filter(function(u){return !qa[u];})[0]||'';}
       h+='<div class="adrow"><span class="adtit">Adaptador MicroDot → '+esc(kc.ad)+'</span><span class="adfoto">'+fotoEquip('cap',D.capPor[kc.adId])+'</span>'+us.map(function(u){var com=qa[u];return '<button type="button" class="adun'+(W.ad===u?' sel':'')+'" data-act="wizad" data-v="'+esc(u)+'"'+(com&&W.ad!==u?' disabled':'')+'><b>#'+esc(u.split(' #')[1])+'</b><small>'+(com?esc(primeiroNome(D.pPor[com[0]])):'livre')+'</small></button>';}).join('')+'</div>';
     }else W.ad='';
-    h+='<div class="wizbar"><button class="btn" type="button" data-act="wizir" data-v="tx">← Transmissor</button><button class="btn" type="button" data-act="wizsem" data-v="cap">Sem cápsula</button><span class="sp"></span><button class="btn pri" type="button" data-act="wizok"'+(mudouWiz(x)?'':' disabled')+'>OK</button></div>';
+    h+='<div class="wizbar"><button class="btn" type="button" data-act="wizir" data-v="tx">← Transmissor</button><button class="btn" type="button" data-act="wizsem" data-v="cap">Sem cápsula</button><span class="sp"></span><span class="hint" style="margin:0">Salva ao tocar</span></div>';
   }
   return h;
 }
@@ -1232,7 +1236,8 @@ function editorHtml(){
   if(!x)return '';
   var p=x.p,e=x.e||{},t=x.t,h='';
   h+='<div class="ov" data-act="fecharfora"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(p.nome)+'">';
-  h+='<div class="sh-hd">'+avatar(p)+'<div><h2>'+esc(primeiroNome(p))+'</h2><div class="hint" style="margin:0">'+esc(p.nome!==primeiroNome(p)?p.nome+' · ':'')+esc(papelTxt(p))+(colinhaMap(ep).map[p.id]?' · colinha '+colinhaMap(ep).map[p.id]:'')+'</div></div><span class="sp"></span><button class="x" type="button" data-act="fechar" aria-label="Fechar">×</button></div>';
+  var NV=ordemNav(),ix=NV.indexOf(p.id);
+  h+='<div class="sh-hd"><button type="button" class="pnav" data-act="pnav" data-d="-1" aria-label="Pessoa anterior (←)" title="Anterior (←)"'+(ix<=0?' disabled':'')+'>‹</button>'+avatar(p)+'<div><h2>'+esc(primeiroNome(p))+'</h2><div class="hint" style="margin:0">'+esc(p.nome!==primeiroNome(p)?p.nome+' · ':'')+esc(papelTxt(p))+(colinhaMap(ep).map[p.id]?' · colinha '+colinhaMap(ep).map[p.id]:'')+'</div></div><span class="sp"></span>'+(ix>=0?'<span class="pcont">'+(ix+1)+' de '+NV.length+'</span>':'')+'<button type="button" class="pnav" data-act="pnav" data-d="1" aria-label="Próxima pessoa (→)" title="Próxima (→)"'+(ix<0||ix>=NV.length-1?' disabled':'')+'>›</button><button class="x" type="button" data-act="fechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sh-bd">';
   if(!x.ativo){
     h+='<div class="alerta pend">Eliminado no EP '+p.elim+'. O transmissor e a cápsula ficaram livres.<span class="sp"></span><button class="btn sm pri" type="button" data-act="desfazerelim">Recuperar</button></div></div></div></div>';
@@ -1240,12 +1245,12 @@ function editorHtml(){
   }
   if(x.av.length)h+='<div class="alertas">'+x.av.map(function(a){
       return '<div class="alerta '+a.k+'">'+esc(a.t[0].toUpperCase()+a.t.slice(1))+(a.ajuste?' (TX '+esc(t.num)+' em '+mhz(t.freq)+' MHz)<span class="sp"></span><button class="btn sm" type="button" data-act="ajustado" data-tx="'+esc(t.num)+'">Já ajustei</button>':'')+'</div>';}).join('')+'</div>';
-  if(!WIZ||WIZ.id!==p.id)WIZ={id:p.id,passo:'tx',tx:e.tx||'',cap:e.cap||'',ad:e.ad||''};
+  if(!WIZ||WIZ.id!==p.id)WIZ={id:p.id,passo:WIZ_PASSO,tx:e.tx||'',cap:e.cap||'',ad:e.ad||''};
+  if(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')
+    h+='<div class="timetop"><b>Time</b><span class="seg" role="group" aria-label="Time">'+['A','B',''].map(function(v){return '<button type="button" class="'+timeCls(v)+'" data-act="time" data-v="'+(v?TIMES[v].grava:'')+'" aria-pressed="'+((e.time||'')===v)+'">'+(timeNome(v)||'—')+'</button>';}).join('')+'</span></div>';
   h+=wizHtml(x,s);
   {
     if(p.papel==='MENTOR'&&t&&t.rxM)h+='<p class="hint">Sala dos mentores: '+esc(t.rxM)+' · '+esc(t.canalM)+'</p>';
-    if(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')
-      h+='<h3>Time</h3><span class="seg" role="group" aria-label="Time">'+['A','B',''].map(function(v){return '<button type="button" class="'+timeCls(v)+'" data-act="time" data-v="'+(v?TIMES[v].grava:'')+'" aria-pressed="'+((e.time||'')===v)+'">'+(timeNome(v)||'—')+'</button>';}).join('')+'</span>';
     h+='<h3>Observação</h3><div class="linha"><input type="text" id="obs" value="'+esc(e.obs||'')+'" placeholder="figurino, posição da cápsula, troca de pilha…" style="flex:1;min-width:12rem"><button class="btn" type="button" data-act="obs">Salvar</button></div>';
     h+='<div class="linha" style="margin-top:1rem"><label class="btn">'+(p.foto?'Trocar foto':'Foto da pessoa')+'<input type="file" accept="image/*" data-act="foto" class="sr"></label><span class="sp"></span>'+
       ((p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?'<button class="btn dan" type="button" data-act="eliminar">Eliminar</button>':'')+'</div>';
@@ -1253,19 +1258,34 @@ function editorHtml(){
   h+='</div></div></div>';
   return h;
 }
-function abrir(id){EDIT=id;var s=situacao(UI.ep),x=s.pessoas.filter(function(y){return y.p.id===id;})[0],e=(x&&x.e)||{};
-  WIZ=x&&x.ativo?{id:id,passo:'tx',tx:e.tx||'',cap:e.cap||'',ad:e.ad||''}:null;renderModal();}
-function fechar(){
-  if(EDIT&&WIZ){var x=situacao(UI.ep).pessoas.filter(function(y){return y.p.id===EDIT;})[0];
-    if(x&&mudouWiz(x)&&confirm('Salvar a troca de transmissor/cápsula antes de fechar?'))fazer({acao:'escalar',ep:UI.ep,id:EDIT,tx:WIZ.tx,cap:WIZ.cap,ad:WIZ.ad||''});}
-  EDIT=null;WIZ=null;renderModal();render();}
+var WIZ_PASSO='tx'; /* o passo (transmissor/cápsula) continua o mesmo ao passar de pessoa */
+function abrir(id){salvaObs();EDIT=id;var s=situacao(UI.ep),x=s.pessoas.filter(function(y){return y.p.id===id;})[0],e=(x&&x.e)||{};
+  WIZ=x&&x.ativo?{id:id,passo:WIZ_PASSO,tx:e.tx||'',cap:e.cap||'',ad:e.ad||''}:null;renderModal();}
+/* ordem das setas: a mesma dos cards na tela (respeita busca e filtro de time), só quem está no jogo */
+function ordemNav(){
+  var L=[].slice.call(document.querySelectorAll('#app .card[data-act="abrir"]')).filter(function(b){return !b.classList.contains('fora')&&b.offsetParent!==null;}).map(function(b){return b.dataset.id;});
+  if(!L.length)L=situacao(UI.ep).pessoas.filter(function(x){return x.ativo;}).map(function(x){return x.p.id;});
+  return L;}
+function navPessoa(d){var L=ordemNav(),i=L.indexOf(EDIT),j=i+d;if(i<0||j<0||j>=L.length)return;abrir(L[j]);}
+/* observação digitada e não salva: salva ao sair da pessoa */
+function salvaObs(){var o=EDIT&&$('#obs');if(!o)return;var x=situacao(UI.ep).pessoas.filter(function(y){return y.p.id===EDIT;})[0],v=o.value.trim();
+  if(x&&v!==((x.e||{}).obs||''))fazer({acao:'escalar',ep:UI.ep,id:EDIT,obs:v});}
+/* adaptador: escolhe a primeira unidade livre quando a cápsula precisa */
+function ajustaAd(W,pid){var t=W.tx?D.txPor[W.tx]:null,kc=W.cap&&t?compatCap(D.capPor[W.cap],t):null;
+  if(kc&&kc.ok&&kc.ad){var us=unidadesAd(kc.adId),qa=adQuem(UI.ep,pid);if(!W.ad||us.indexOf(W.ad)<0)W.ad=us.filter(function(u){return !qa[u];})[0]||'';}else W.ad='';}
+/* salva na hora: cada toque em transmissor, cápsula ou adaptador já grava */
+function salvaWiz(){var x=situacao(UI.ep).pessoas.filter(function(y){return y.p.id===EDIT;})[0];if(!x||!WIZ)return;
+  ajustaAd(WIZ,EDIT);if(!mudouWiz(x)){renderModal();return;}
+  fazer({acao:'escalar',ep:UI.ep,id:EDIT,tx:WIZ.tx,cap:WIZ.cap,ad:WIZ.ad||''});renderModal();
+  toast(primeiroNome(x.p)+': '+(WIZ.tx?txNome(D.txPor[WIZ.tx],WIZ.tx):'sem TX')+' · '+(WIZ.cap?capNome(WIZ.cap):'sem cápsula'));}
+function fechar(){salvaObs();EDIT=null;WIZ=null;renderModal();render();}
 var RM_ID=null;
 function renderModal(){
   var m=$('#modal');
   var car=m.querySelector('.carrossel'),sx=car?car.scrollLeft:0,passo=WIZ&&WIZ.passo,sh=m.querySelector('.sheet'),sy=sh?sh.scrollTop:0,mesmo=!!EDIT&&RM_ID===EDIT;
   m.innerHTML=EDIT?editorHtml():FORM?formHtml():'';RM_ID=EDIT;
   var c2=m.querySelector('.carrossel'),sh2=m.querySelector('.sheet');
-  function volta(){if(c2&&passo===(WIZ&&WIZ.passo)){c2.style.scrollSnapType='none';c2.scrollLeft=sx;c2.style.scrollSnapType='';}if(sh2&&mesmo)sh2.scrollTop=sy;}
+  function volta(){if(c2&&mesmo&&passo===(WIZ&&WIZ.passo)){c2.style.scrollSnapType='none';c2.scrollLeft=sx;c2.style.scrollSnapType='';}if(sh2&&mesmo)sh2.scrollTop=sy;}
   volta();requestAnimationFrame(volta);
   ligarArraste(m);
   document.body.style.overflow=EDIT||FORM?'hidden':'';
@@ -2446,11 +2466,12 @@ document.addEventListener('click',function(ev){
   else if(a==='desfazerelim'){fazer({acao:'eliminar',id:EDIT,ep:''});toast('Recuperado');fechar();}
   else if(a==='eliminar'){var pe=D.pPor[EDIT];if(pe&&confirm('Eliminar '+primeiroNome(pe)+'? O transmissor e a cápsula ficam livres. Dá para recuperar depois.')){fazer({acao:'eliminar',id:EDIT,ep:UI.ep});toast(primeiroNome(pe)+' eliminado');fechar();}}
   else if(a==='wizabrir'){var x0=situacao(UI.ep).pessoas.filter(function(y){return y.p.id===EDIT;})[0]||{};var e0=x0.e||{};WIZ={id:EDIT,passo:'tx',tx:e0.tx||'',cap:e0.cap||''};renderModal();}
-  else if(a==='wiztx'){if(ARRASTOU)return;WIZ.tx=v;renderModal();}
-  else if(a==='wizcap'){if(ARRASTOU)return;if(WIZ.cap!==v)WIZ.ad='';WIZ.cap=v;renderModal();}
-  else if(a==='wizad'){WIZ.ad=v;renderModal();}
-  else if(a==='wizsem'){if(v==='tx'){WIZ.tx='';WIZ.passo='cap';}else WIZ.cap='';renderModal();}
-  else if(a==='wizir'){WIZ.passo=v;renderModal();}
+  else if(a==='wiztx'){if(ARRASTOU)return;WIZ.tx=v;salvaWiz();}
+  else if(a==='wizcap'){if(ARRASTOU)return;if(WIZ.cap!==v)WIZ.ad='';WIZ.cap=v;salvaWiz();}
+  else if(a==='wizad'){WIZ.ad=v;salvaWiz();}
+  else if(a==='wizsem'){if(v==='tx')WIZ.tx='';else{WIZ.cap='';WIZ.ad='';}salvaWiz();}
+  else if(a==='wizir'){WIZ.passo=WIZ_PASSO=v;renderModal();}
+  else if(a==='pnav'){navPessoa(+el.dataset.d);}
   else if(a==='wizok'){fazer({acao:'escalar',ep:UI.ep,id:EDIT,tx:WIZ.tx,cap:WIZ.cap,ad:WIZ.ad||''});WIZ.passo='tx';renderModal();toast('Escalação salva');}
   else if(a==='carseta'){var cw=el.parentNode.querySelector('.carrossel,.grid.carr');if(cw)cw.scrollBy({left:(+el.dataset.d)*cw.clientWidth*0.8,behavior:'smooth'});}
   else if(a==='cfgtog'){UI.cfgAberto=!UI.cfgAberto;salvarUi();render();}
@@ -2499,6 +2520,7 @@ document.addEventListener('input',function(ev){var a=ev.target.dataset&&ev.targe
   else if(a==='mbusca'){MBUSCA=ev.target.value;aplicarBuscaMix();}});
 document.addEventListener('keydown',function(ev){
   if(ev.key==='Escape'&&EDIT){fechar();return;}
+  if(EDIT&&(ev.key==='ArrowLeft'||ev.key==='ArrowRight')&&!/^(INPUT|SELECT|TEXTAREA)$/.test((ev.target&&ev.target.tagName)||'')){ev.preventDefault();navPessoa(ev.key==='ArrowLeft'?-1:1);return;}
   if(UI.view==='mix'&&(ev.key==='Delete'||ev.key==='Backspace')&&!/^(INPUT|SELECT|TEXTAREA)$/.test((ev.target&&ev.target.tagName)||'')&&(MSEL||MSELS.length)){ev.preventDefault();esvaziarSel();return;}
   var tg=ev.target&&ev.target.tagName;if(UI.view!=='mix'||/^(INPUT|SELECT|TEXTAREA)$/.test(tg||''))return;
   if((ev.ctrlKey||ev.metaKey)&&(ev.key==='z'||ev.key==='Z')){ev.preventDefault();if(ev.shiftKey)refazerMix();else desfazerMix();}
