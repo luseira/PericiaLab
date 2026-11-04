@@ -539,7 +539,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.49 · 03/11 22:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.50 · 03/11 22:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1237,7 +1237,7 @@ function editorHtml(){
   if(!x)return '';
   var p=x.p,e=x.e||{},t=x.t,h='';
   h+='<div class="ov" data-act="fecharfora"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(p.nome)+'">';
-  var NV=ordemNav(),ix=NV.indexOf(p.id);
+  var NV=NAVL||ordemNav(),ix=NV.indexOf(p.id);
   h+='<div class="sh-hd"><button type="button" class="pnav" data-act="pnav" data-d="-1" aria-label="Pessoa anterior (←)" title="Anterior (←)"'+(ix<=0?' disabled':'')+'>‹</button>'+avatar(p)+'<div><h2>'+esc(primeiroNome(p))+'</h2><div class="hint" style="margin:0">'+esc(p.nome!==primeiroNome(p)?p.nome+' · ':'')+esc(papelTxt(p))+(colinhaMap(ep).map[p.id]?' · colinha '+colinhaMap(ep).map[p.id]:'')+'</div></div><span class="sp"></span>'+(ix>=0?'<span class="pcont">'+(ix+1)+' de '+NV.length+'</span>':'')+'<button type="button" class="pnav" data-act="pnav" data-d="1" aria-label="Próxima pessoa (→)" title="Próxima (→)"'+(ix<0||ix>=NV.length-1?' disabled':'')+'>›</button><button class="x" type="button" data-act="fechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sh-bd">';
   if(!x.ativo){
@@ -1260,14 +1260,15 @@ function editorHtml(){
   return h;
 }
 var WIZ_PASSO='tx'; /* o passo (transmissor/cápsula) continua o mesmo ao passar de pessoa */
-function abrir(id){salvaObs();EDIT=id;var s=situacao(UI.ep),x=s.pessoas.filter(function(y){return y.p.id===id;})[0],e=(x&&x.e)||{};
+var NAVL=null; /* lista das setas, congelada ao abrir: tirar alguém do filtro (ex.: time) não trava a navegação */
+function abrir(id,nav){salvaObs();if(!nav){NAVL=ordemNav();if(NAVL.indexOf(id)<0)NAVL=null;}EDIT=id;var s=situacao(UI.ep),x=s.pessoas.filter(function(y){return y.p.id===id;})[0],e=(x&&x.e)||{};
   WIZ=x&&x.ativo?{id:id,passo:WIZ_PASSO,tx:e.tx||'',cap:e.cap||'',ad:e.ad||''}:null;renderModal();}
 /* ordem das setas: a mesma dos cards na tela (respeita busca e filtro de time), só quem está no jogo */
 function ordemNav(){
   var L=[].slice.call(document.querySelectorAll('#app .card[data-act="abrir"]')).filter(function(b){return !b.classList.contains('fora')&&b.offsetParent!==null;}).map(function(b){return b.dataset.id;});
   if(!L.length)L=situacao(UI.ep).pessoas.filter(function(x){return x.ativo;}).map(function(x){return x.p.id;});
   return L;}
-function navPessoa(d){var L=ordemNav(),i=L.indexOf(EDIT),j=i+d;if(i<0||j<0||j>=L.length)return;abrir(L[j]);}
+function navPessoa(d){var L=NAVL||ordemNav(),i=L.indexOf(EDIT),j=i+d;if(i<0||j<0||j>=L.length)return;abrir(L[j],1);}
 /* observação digitada e não salva: salva ao sair da pessoa */
 function salvaObs(){var o=EDIT&&$('#obs');if(!o)return;var x=situacao(UI.ep).pessoas.filter(function(y){return y.p.id===EDIT;})[0],v=o.value.trim();
   if(x&&v!==((x.e||{}).obs||''))fazer({acao:'escalar',ep:UI.ep,id:EDIT,obs:v});}
@@ -1279,7 +1280,7 @@ function salvaWiz(){var x=situacao(UI.ep).pessoas.filter(function(y){return y.p.
   ajustaAd(WIZ,EDIT);if(!mudouWiz(x)){renderModal();return;}
   fazer({acao:'escalar',ep:UI.ep,id:EDIT,tx:WIZ.tx,cap:WIZ.cap,ad:WIZ.ad||''});renderModal();
   toast(primeiroNome(x.p)+': '+(WIZ.tx?txNome(D.txPor[WIZ.tx],WIZ.tx):'sem TX')+' · '+(WIZ.cap?capNome(WIZ.cap):'sem cápsula'));}
-function fechar(){salvaObs();EDIT=null;WIZ=null;renderModal();render();}
+function fechar(){salvaObs();NAVL=null;EDIT=null;WIZ=null;renderModal();render();}
 var RM_ID=null;
 function renderModal(){
   var m=$('#modal');

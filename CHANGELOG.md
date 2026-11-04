@@ -7,6 +7,9 @@
 
 
 
+
+## v1.50 · 03/11
+- Setas entre pessoas: a lista fica fixa enquanto a caixa está aberta. Antes, com filtro de time ligado, tirar o time de alguém tirava a pessoa da lista e as setas travavam.
 ## v1.49 · 03/11
 - Mixer: embaixo do nome, transmissor numa linha e input do gravador (LINE 2, AES 1…) na linha de baixo, em destaque.
 ## v1.48 · 03/11
