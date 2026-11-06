@@ -22,7 +22,7 @@ const ABAS = {
 };
 const PASTA_FOTOS = 'Perícia Lab · Fotos';
 const ABA_CENAS = 'Cenas';
-const VERSAO_SCRIPT = '1.42';
+const VERSAO_SCRIPT = '1.43';
 // abas extras, criadas pelo site quando necessário (aba, colunas iniciais, coluna-chave)
 const ABAS_EXTRA = {
   saidas: { nome: 'Saídas físicas', cols: ['Saída', 'Conector', 'Cabo', 'Destino', 'Entrada no destino', 'Nível', 'Observações', 'Posição'], chave: 'Saída' },
@@ -353,7 +353,8 @@ function linha_(q) {
   const campos = q.campos || {};
   const novoValor = campos[chave] !== undefined ? String(campos[chave]).trim() : valor;
   if (!novoValor) throw new Error('Falta ' + chave + '.');
-  if (novoValor !== valor && linhaPor_(s, chave, q.aba === 'tx' ? valorTx_(novoValor) : novoValor)) throw new Error('Já existe ' + chave + ' ' + novoValor + '.');
+  const mudou = String(novoValor) !== String(valor);
+  if (mudou && linhaPor_(s, chave, q.aba === 'tx' ? valorTx_(novoValor) : novoValor)) throw new Error('Já existe ' + chave + ' ' + novoValor + '.');
   if (!l) {
     // primeira linha com a chave vazia (a aba pode ter linhas vazias com caixas de seleção)
     const ck = col_(s, chave), n = s.getLastRow();
@@ -377,7 +378,7 @@ function linha_(q) {
     if (k === chave && q.aba === 'tx') v = valorTx_(v);
     cel.setValue(v === null || v === undefined ? '' : v);
   });
-  if (valor && novoValor !== valor) {
+  if (valor !== '' && mudou) {
     if (q.aba === 'rx') trocar_(ABAS.tx, 'Receptor', valor, novoValor);
     if (q.aba === 'cap') trocar_(ABAS.esc, 'Cápsula', valor, novoValor);
     if (q.aba === 'tx') trocar_(ABAS.esc, 'TX', valor, valorTx_(novoValor));

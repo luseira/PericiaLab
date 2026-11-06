@@ -14,6 +14,9 @@
 
 
 
+
+## v1.57 · 06/11
+- Inventário: editar um transmissor sem trocar o número dava "Já existe TX 9". Corrigido no site (e no Codigo.gs 1.43, para quando for reimplantado).
 ## v1.56 · 06/11
 - Colinha agora ocupa as pistas 17–32 com todo mundo: transmissores em ordem (host, mentores e participantes), quem está sem TX, boom, gooseneck e Mix B.
 - A colinha pode ser editada à mão no mixer e fica como você deixar (a ordem automática é só o ponto de partida). Botão "↺ Refazer colinha" volta para a ordem automática.

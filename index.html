@@ -554,7 +554,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.56 · 06/11 00:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.57 · 06/11 00:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1363,6 +1363,8 @@ function cliqueForm(a){
   if(a==='formsalvar'){if(!podeEditar()){toast('Atualize o Apps Script para 1.41 antes.',true);return true;}
     var c=lerForm(),ch=CHAVES[FORM.aba];if(!String(c[ch]==null?FORM.valor:c[ch]).trim()){toast('Preencha '+ch+'.',true);return true;}
     if(c[ch]===undefined)c[ch]=FORM.valor;
+    /* chave igual à atual: não manda (o script antigo comparava "9" com 9 e achava que era outro TX) */
+    if(FORM.valor!==''&&FORM.valor!=null&&String(c[ch]).trim()===String(FORM.valor).trim())delete c[ch];
     fazer({acao:'linha',aba:FORM.aba,valor:FORM.valor,campos:c});FORM=null;renderModal();toast('Salvo');return true;}
   if(a==='formapagar'){if(confirm('Apagar "'+FORM.valor+'" da planilha?')){fazer({acao:'linha',aba:FORM.aba,valor:FORM.valor,apagar:true});FORM=null;renderModal();toast('Apagado');}return true;}
   return false;
