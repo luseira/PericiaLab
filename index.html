@@ -352,6 +352,8 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .sd-in.nome input{width:11rem;text-align:right;text-transform:uppercase;font-weight:600}
 .sd-in input:disabled{opacity:.35}.sd-in i{font-style:normal;color:#8d8d93;font-size:.8rem;min-width:1.4rem}
 .sd-sel{background:#2a2a2d;color:#fff;border:1px solid #3c3c40;border-radius:4px;min-height:2.2rem;max-width:15rem}
+.sd-mais{margin:.5rem .7rem;border-top:1px solid var(--sdln,#2e2e31);padding-top:.3rem}.sd-mais>summary{cursor:pointer;color:#b9bcc4;font-size:.85rem;padding:.35rem 0;list-style:none}.sd-mais>summary::before{content:'▸ ';}.sd-mais[open]>summary::before{content:'▾ ';}
+.sd-mais .sd-cols{margin:0}
 .sw{position:relative;width:3.1rem;height:1.8rem;border-radius:1rem;border:0;background:#3a3a3d;flex:none;transition:background .15s}
 .sw::after{content:'';position:absolute;top:.15rem;left:.15rem;width:1.5rem;height:1.5rem;border-radius:50%;background:#f2f2f4;transition:left .15s}
 .sw.on{background:#e2ae4e}.sw.on::after{left:1.45rem}
@@ -556,7 +558,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.62 · 06/11 00:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.63 · 06/11 01:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2212,7 +2214,7 @@ function nomeArquivoPista(s,M){return s.p?nomePista(s.p).slice(0,16):s.fx?semAce
 function comparar(R,M,A){
   var L=[];function add(onde,campo,cena,grav){if(String(cena)!==String(grav))L.push([onde,campo,cena,grav]);}
   function rt(v){return ROTA_TXT[v||''];}
-  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');if(!s.tok)return; /* pista vazia: fica como no arquivo */
+  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');xComparar(add,on,'ch',n,c,XCH.concat(n<=16?XEQ:[]));if(!s.tok)return; /* pista vazia: fica como no arquivo */
     add(on,'Nome',nomeArquivoPista(s,M),A.nomes[n]);
     add(on,'Fonte',s.cn?(fonteSlot(s)?fonteTxt(fonteSlot(s)):s.cn+' (código a confirmar)'):'sem fonte',fonteTxt(A.fonte[n]));
     add(on,'ON',c.on?'sim':'não',a.on?'sim':'não');add(on,'ARM',c.arm?'sim':'não',a.arm?'sim':'não');if(a.iso==='post')add(on,'ISO','pré (sempre)','pós');
@@ -2222,6 +2224,8 @@ function comparar(R,M,A){
     if(c.ph!=null)add(on,'Fase',c.ph?'Ø':'normal',a.ph?'Ø':'normal');
     if(c.dly!=null)add(on,'Delay',c.dly+' ms',a.dly+' ms');
   });
+  BUSES.forEach(function(b){xComparar(add,'Bus '+b,'bus',b,M.bus[b],XBUS);});
+  SAIDAS.forEach(function(o){xComparar(add,'Saída '+o,'out',o,M.out[o],XOUT);});
   BUSES.forEach(function(b){add('Bus '+b,'Nome',M.bus[b].nome||'(mantém)',M.bus[b].nome?A.bus[b].nome:'(mantém)');if(b!=='L'&&b!=='R')add('Bus '+b,'Retorno',M.bus[b].src||'—',A.bus[b].src||'—');});
   SAIDAS.forEach(function(o){var c=M.out[o],a=A.out[o];add('Saída '+o,'Nome',c.nome,a.nome);add('Saída '+o,'Fonte',saidaTxt(c.src,M,R),saidaTxt(a.src,M,R));
     if(c.nivel)add('Saída '+o,'Nível',c.nivel,a.nivel);if(c.gain!=null)add('Saída '+o,'Ganho',c.gain+' dB',a.gain+' dB');if(c.dly!=null)add('Saída '+o,'Delay',c.dly+' ms',a.dly+' ms');});
@@ -2249,6 +2253,7 @@ function exportar(c,R,M,nome){
   var m=sjParse(SC.txt),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
   var srcAntes={};SAIDAS.forEach(function(o){srcAntes[o]=srcDoArquivo(sjGet(m,['AnalogOutputs',o,'source']),+sjGet(m,['AnalogOutputs',o,'chan']));});
   R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
+    xExport(m,'ch',n,ch,XCH.concat(n<=16?XEQ:[]));
     /* pista vazia na cena: o canal fica exatamente como está no arquivo base (nome, fonte, ARM, mute, routing) */
     if(!s.tok)return;
     sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s,M));
@@ -2264,6 +2269,7 @@ function exportar(c,R,M,nome){
     if(n<=16&&ch.ph!=null)sjSet(m,[k,'isPolarityInverted'],!!ch.ph);
     if(n<=16&&ch.dly!=null)sjSet(m,[k,'msInputDelay'],+ch.dly);
   });
+  BUSES.forEach(function(b){xExport(m,'bus',b,M.bus[b],XBUS.filter(function(f){return !/^s[LR12]$/.test(f[0])||(b!=='L'&&b!=='R'&&b!=='1'&&b!=='2');}));});
   BUSES.forEach(function(b){var x=M.bus[b];if(x.nome)sjSet(m,['OutputBusControl','obus'+b,'userName'],x.nome);if(b!=='L'&&b!=='R')sjSet(m,['SlateMicAndReturns','bus'+b],x.src||'');});
   SAIDAS.forEach(function(o){var x=M.out[o],p=['AnalogOutputs',o],f=srcParaArquivo(x.src);
     sjSet(m,p.concat('userName'),x.nome||'');if(f){sjSet(m,p.concat('source'),f[0]);sjSet(m,p.concat('chan'),f[1]);}
@@ -2271,11 +2277,13 @@ function exportar(c,R,M,nome){
   /* saídas em par (link) com fontes diferentes no plano: desfaz o link */
   for(var i=1;i<=9;i+=2){var a1='X'+i,a2='X'+(i+1),la=sjGet(m,['AnalogOutputs',a1,'linkedToOutput']),lb=sjGet(m,['AnalogOutputs',a2,'linkedToOutput']);
     var igual=(M.out[a1].src||'')===(srcAntes[a1]||'')&&(M.out[a2].src||'')===(srcAntes[a2]||'');
+    if(M.out[a1].x_link!=null||M.out[a2].x_link!=null)continue; /* link decidido à mão: aplicado abaixo */
     if((la&&la!=='nAnalogOutputs'||lb&&lb!=='nAnalogOutputs')&&!igual&&M.out[a1].src!==M.out[a2].src){sjSet(m,['AnalogOutputs',a1,'linkedToOutput'],'nAnalogOutputs');sjSet(m,['AnalogOutputs',a2,'linkedToOutput'],'nAnalogOutputs');}}
   /* entradas AES: AES 1/2 entram pelo XLR 1 e AES 5/6 pelo XLR 6 (teste de 05/11). Liga a chave só se a cena usa; nunca desliga sozinho */
   var fontes=R.S.map(function(s){return s.cn?fonteSlot(s):'';});
   if(fontes.some(function(f){return f==='AES3-1'||f==='AES3-2';}))sjSet(m,['GlobalChannelSettings','xlr1Aes'],true);
   if(fontes.some(function(f){return f==='AES3-5'||f==='AES3-6';}))sjSet(m,['GlobalChannelSettings','xlr6Aes'],true);
+  SAIDAS.forEach(function(o){xExport(m,'out',o,M.out[o],XOUT);});
   sjSet(m,['system','name'],nome);
   return sjDump(m)+'\n';
 }
@@ -2329,6 +2337,9 @@ function cliqueMesa(a,el){
   if(a==='moutsel'){UI.mout=el.dataset.v;salvarUi();render();return true;}
   if(a==='mbussrcb'){var bb=el.dataset.b,cv=el.dataset.v,cM=mesaEf(cenaAtual(),resolver(cenaAtual(),UI.ep));mudarMesa(function(m){m.bus[bb]=Object.assign({},m.bus[bb]||{},{src:cM.bus[bb].src===cv?'':cv});});return true;}
   if(a==='moutsrc'){var oo=el.dataset.o,ov=el.dataset.v;mudarMesa(function(m){m.out[oo]=Object.assign({},m.out[oo]||{},{src:ov});});return true;}
+  if(a==='mxs'){var al=el.dataset.alvo,id=el.dataset.id,kx=el.dataset.k,cX=cenaAtual(),MX=mesaEf(cX,resolver(cX,UI.ep)),ob=al==='ch'?MX.ch[+id]:al==='bus'?MX.bus[id]:MX.out[id],cv=ob?ob['x_'+kx]:null;
+    setX(al,al==='ch'?+id:id,kx,cv==null?true:cv===true?false:null);return true;}
+  if(a==='sdmais'){UI.sdMais=!UI.sdMais;salvarUi();return false;}
   if(a==='msw'){var cS=cenaAtual(),chS=mesaEf(cS,resolver(cS,UI.ep)).ch[MSEL],kk=el.dataset.k;
     if(kk==='ph')setCh(MSEL,{ph:chS.ph==null?true:chS.ph===true?false:null});
     else if(kk==='hpf')setCh(MSEL,{hpf:chS.hpf==null?(chS.hpfhz||80):chS.hpf>0?0:null});
@@ -2362,6 +2373,10 @@ function mudancaMesa(a,el){
   if(a==='mfxnome'){setCh(MSEL,{nome:semAcento(el.value.trim()).toUpperCase()});return true;}
   if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){logMix(['Nome de pista: '+nomePista(sp.p)+' → '+semAcento(el.value.trim()).toUpperCase()]);fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   if(a==='mhpfhz'){var hzv=el.value===''?null:parseFloat(el.value),cH=cenaAtual(),chH=mesaEf(cH,resolver(cH,UI.ep)).ch[MSEL],pt={hpfhz:hzv};if(chH.hpf>0&&hzv>0)pt.hpf=hzv;setCh(MSEL,pt);return true;}
+  if(a==='mxn'||a==='mxe'){var al2=el.dataset.alvo,id2=el.dataset.id,kx2=el.dataset.k,v2=el.value;
+    if(a==='mxn'){v2=v2===''?null:parseFloat(v2);if(v2!==null&&isNaN(v2))return true;var fx=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===kx2;})[0];if(v2!==null&&fx&&fx[4]!=null){v2=Math.max(fx[4],Math.min(fx[5],v2));}}
+    else v2=v2===''?null:v2;
+    setX(al2,al2==='ch'?+id2:id2,kx2,v2);return true;}
   if(a==='mbusnome'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{nome:el.value.trim().toUpperCase()});});return true;}
   if(a==='mbussrc'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{src:el.value});});return true;}
   if(a==='moutv'){var o=el.dataset.o;mudarMesa(function(m){var x={};x[k]=k==='nome'?el.value.trim().toUpperCase():el.value;m.out[o]=Object.assign({},m.out[o]||{},x);});return true;}
@@ -2383,6 +2398,49 @@ function sdNav(solo){
   var at=UI.mixp&&UI.mixp!=='pistas'?UI.mixp:UI.mixv;
   return '<nav class="sd-nav noprint'+(solo?' solo':'')+'" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'"'+(x[0]===at?' class="sel" aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
 }
+/* ───── ajustes extras do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1) ─────
+   Cada campo: [chave, rótulo, campo no settings, tipo, mín, máx, unidade, opções]. Tipos: n (número), n10 (décimos no arquivo),
+   b (liga/desliga), bi (liga = campo falso), e (lista), m3 (Off/Pre/Post, composto). Valor vazio = não mexer no gravador. */
+var XCH=[['fad','Fader','faderdB10ths','n10',-127.5,16,'dB'],['pan','Pan (L −100 · C 0 · R +100)','lrPanPercentage','n',-100,100,'%'],['mix','Automix','duganEnabled','b'],
+  ['cmode','Compressor','*comp','m3'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
+var XEQ=[['emode','EQ','*eq','m3'],
+  ['lfon','LF ativo','lowEqBypassed','bi'],['lfhz','LF freq.','lowEqCutoffHz','n',20,20000,'Hz'],['lfg','LF ganho','lowEqGaindB10ths','n10',-24,24,'dB'],['lfq','LF Q','lowEqQ','n',0.5,10,''],['lft','LF tipo','lowEqType','e',0,0,'',[['lowshelf','Shelf'],['peaking','Peak']]],
+  ['mfon','MF ativo','midEqBypassed','bi'],['mfhz','MF freq.','midEqCutoffHz','n',20,20000,'Hz'],['mfg','MF ganho','midEqGaindB10ths','n10',-24,24,'dB'],['mfq','MF Q','midEqQ','n',0.5,10,''],
+  ['hfon','HF ativo','hiEqBypassed','bi'],['hfhz','HF freq.','hiEqCutoffHz','n',20,20000,'Hz'],['hfg','HF ganho','hiEqGaindB10ths','n10',-24,24,'dB'],['hfq','HF Q','hiEqQ','n',0.5,10,''],['hft','HF tipo','hiEqType','e',0,0,'',[['highshelf','Shelf'],['peaking','Peak']]]];
+var XBUS=[['gain','Gain','dB10ths','n10',-60,16,'dB'],['mute','Mute All','mute','b'],['cmute','Mute Coms','comsMute','b'],['lim','Limiter','limiterEnabled','b'],
+  ['sL','Mix L entra no bus','hasBusL','b'],['sR','Mix R entra no bus','hasBusR','b'],['s1','Bus 1 entra no bus','hasBus1','b'],['s2','Bus 2 entra no bus','hasBus2','b'],
+  ['comp','Compressor','compressorEnabled','b'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
+var XOUT=[['mute','Mute','muted','b'],['link','Link com o par','*link','b']];
+function xBase(alvo,id){return alvo==='ch'?['InputChannel'+id]:alvo==='bus'?['OutputBusControl','obus'+id]:['AnalogOutputs',id];}
+function parOut(k){var m=/^X(\d+)$/.exec(k);if(!m)return null;var n=+m[1];return n%2?['X'+n,'X'+(n+1)]:['X'+(n-1),'X'+n];}
+/* valor que está no arquivo do gravador (null se não há arquivo) */
+function xArq(alvo,id,f){var sc=scCarregar();if(!sc)return null;var b=xBase(alvo,id),m=sc.m;
+  if(f[2]==='*comp'){var en=sjGet(m,b.concat('compressorEnabled'));return !en?'off':sjGet(m,b.concat('compressorPreFader'))?'pre':'post';}
+  if(f[2]==='*eq'){var e2=sjGet(m,b.concat('eqEnabled'));return !e2?'off':sjGet(m,b.concat('eqPreFader'))?'pre':'post';}
+  if(f[2]==='*link'){var pr=parOut(id);if(!pr)return null;var l=sjGet(m,['AnalogOutputs',id,'linkedToOutput']);return !!l&&l!=='nAnalogOutputs';}
+  var v=sjGet(m,b.concat(f[2]));if(v===undefined)return null;
+  if(f[3]==='n10')return v/10;if(f[3]==='bi')return !v;if(f[3]==='b')return !!v;return v;}
+function xTxt(f,v){if(v===null||v===undefined)return '';if(f[3]==='b'||f[3]==='bi')return v?'ligado':'desligado';if(f[3]==='m3')return {off:'Off',pre:'Pre',post:'Post'}[v]||v;
+  if(f[3]==='e'){var o=(f[7]||[]).filter(function(x){return x[0]===v;})[0];return o?o[1]:v;}if(f[3]==='n10'&&v<=-127)return '−∞';return v+(f[6]?' '+f[6]:'');}
+function xCampo(alvo,id,f,obj){var cur=obj?obj['x_'+f[0]]:undefined,arq=xArq(alvo,id,f),set=cur!==null&&cur!==undefined;
+  var at='data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+f[0]+'"',dica=!set&&arq!==null?'<i class="sd-dim">gravador: '+esc(xTxt(f,arq))+'</i>':(set&&arq!==null&&String(arq)!==String(cur)?'<i class="sd-dim">era '+esc(xTxt(f,arq))+'</i>':'');
+  var c;
+  if(f[3]==='b'||f[3]==='bi')c=sdSw(set?!!cur:null,'data-act="mxs" '+at);
+  else if(f[3]==='m3'||f[3]==='e'){var op=f[3]==='m3'?[['off','Off'],['pre','Pre'],['post','Post']]:f[7];
+    c='<select class="sd-sel" data-act="mxe" '+at+'><option value="">— não mexer</option>'+op.map(function(o){return '<option value="'+o[0]+'"'+(set&&cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';}
+  else c='<span class="sd-in"><input type="number" step="any" min="'+f[4]+'" max="'+f[5]+'" data-act="mxn" '+at+' value="'+(set?cur:'')+'" placeholder="'+(arq!==null?esc(xTxt(f,arq).replace(/ [^ ]+$/,'')):'—')+'"><i>'+esc(f[6]||'')+'</i></span>';
+  return sdRow(esc(f[1])+':',c+dica);}
+function xSo(lbl,v){return '<div class="sd-row"><span class="sd-l">'+esc(lbl)+':</span><span class="sd-v"><i class="sd-dim">'+esc(v)+' · só leitura, falta testar</i></span></div>';}
+function setX(alvo,id,k,v){mudarMesa(function(m){var c=alvo==='ch'?m.ch:alvo==='bus'?m.bus:m.out;var o=c[id]=c[id]||{};if(v===null||v===undefined)delete o['x_'+k];else o['x_'+k]=v;});}
+/* grava no settings os ajustes extras definidos (só os que não estão em "não mexer") */
+function xExport(m,alvo,id,obj,specs){var b=xBase(alvo,id);specs.forEach(function(f){var v=obj&&obj['x_'+f[0]];if(v===null||v===undefined)return;
+  if(f[2]==='*comp'){sjSet(m,b.concat('compressorEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('compressorPreFader'),v==='pre');return;}
+  if(f[2]==='*eq'){sjSet(m,b.concat('eqEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('eqPreFader'),v==='pre');return;}
+  if(f[2]==='*link'){var pr=parOut(id);if(!pr)return;pr.forEach(function(o){sjSet(m,['AnalogOutputs',o,'linkedToOutput'],v?pr[0]:'nAnalogOutputs');});return;}
+  var val=f[3]==='n10'?Math.round(v*10):f[3]==='bi'?!v:f[3]==='b'?!!v:f[3]==='n'?+v:v;
+  if(sjGet(m,b.concat(f[2]))===undefined)return; /* campo que o arquivo não tem: não cria */
+  sjSet(m,b.concat(f[2]),val);});}
+function xComparar(add,on,alvo,id,obj,specs){specs.forEach(function(f){var v=obj&&obj['x_'+f[0]];if(v===null||v===undefined)return;var a=xArq(alvo,id,f);add(on,f[1],xTxt(f,v),xTxt(f,a));});}
 function sdSw(on,attrs,dis){var st=on===null||on===undefined?'nulo':on?'on':'';return '<button type="button" role="switch" aria-checked="'+(on===true)+'" class="sw '+st+'" '+attrs+(dis?' disabled':'')+' title="'+(st==='nulo'?'não mexer no gravador':on?'ligado':'desligado')+'"></button>';}
 function sdRow(l,v,cls){return '<div class="sd-row'+(cls?' '+cls:'')+'"><span class="sd-l">'+l+'</span><span class="sd-v">'+v+'</span></div>';}
 function sdNum(act,k,v,un,dis,extra){return '<span class="sd-in"><input type="number" step="any" data-act="'+act+'" data-k="'+k+'" value="'+(v==null?'':v)+'" placeholder="—"'+(dis?' disabled':'')+(extra||'')+'><i>'+un+'</i></span>';}
@@ -2397,7 +2455,7 @@ function painelSlot(R,M){
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   [['F','Time da frente'],['T','Time de trás']].forEach(function(g){var L=R[g[0]];
     o+='<optgroup label="'+g[1]+' (o '+(g[0]==='F'?'maior':'menor')+') · '+timeNome(g[0]==='F'?R.frente:(R.frente==='A'?'B':'A'))+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
-  o+='<optgroup label="Colinha (ordem de transmissor)">'+[1,2,3,4,5,6,7,8,9,10].map(function(k){return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(R.C[k-1]?' ('+esc(R.C[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';
+  o+='<optgroup label="Colinha (ordem de transmissor)">'+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16].map(function(k){var tk=R.C[k-1]||'',mm=/^P:(.+)$/.exec(tk),nm=mm&&D.pPor[mm[1]]?D.pPor[mm[1]].nome:tk.replace(/^S:/,'');return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(nm?' ('+esc(nm)+')':'')+'</option>';}).join('')+'</optgroup>';
   o+='<optgroup label="Pessoa ou fonte fixa">'+D.elenco.map(function(p){return '<option value="P:'+esc(p.id)+'"'+(s.tok==='P:'+p.id?' selected':'')+'>'+esc(p.nome)+'</option>';}).join('')+'</optgroup>';
   var p=s.p,e=s.e||{},t=s.t,fonte=s.cn?fonteSlot(s):'';
   var h='<div class="sdr mpan2">';
@@ -2415,7 +2473,8 @@ function painelSlot(R,M){
   var auto=/^[ABCFT]:/.test(s.tok)?rotuloTok(s.tok):'';
   h+=sdRow('Quem:','<button type="button" class="sd-btn'+(PICK==='nome'?' sel':'')+'" data-act="mpick" data-v="nome">'+esc(p?primeiroNome(p):'— escolher —')+'</button>'+(auto?'<i class="sd-dim" title="Esta pista segue automaticamente a ordem do time/colinha">auto: '+esc(auto)+'</i>':''));
   if(PICK==='nome')h+=pickNome(R,s);
-  h+=sdRow('Trim:',sdNum('mchn','trim',ch.trim,'dB'));
+  var AQ=(function(){var sc=scCarregar();if(!sc)return null;if(!sc._A)sc._A=lerArquivo(sc.m);return sc._A.ch[n];})(),gv=function(v,f){return AQ&&(v===null||v===undefined)?'<i class="sd-dim">gravador: '+esc(f(AQ))+'</i>':'';};
+  h+=sdRow('Trim:',sdNum('mchn','trim',ch.trim,'dB')+gv(ch.trim,function(a){return a.trim<=-127?'−∞':a.trim+' dB';}));
   h+=sdRow('ON:',sdSw(!!ch.on,'data-act="mled" data-n="'+n+'" data-k="on"'));
   h+=sdRow('Arm:',sdSw(!!ch.arm,'data-act="mled" data-n="'+n+'" data-k="arm"'));
   h+='<div class="sd-row sd-acts"><button class="sd-btn'+(COPIA?' sel':'')+'" type="button" data-act="mcopia">⧉ Copiar este canal…</button><button class="sd-btn" type="button" data-act="mlimpa" title="Tira a pessoa desta pista (tecla Delete)">Limpar canal</button><button class="sd-btn" type="button" data-act="mclipc" title="Ctrl+C">Copiar</button>'+(CLIP?'<button class="sd-btn" type="button" data-act="mclipv" title="Ctrl+V">Colar '+CLIP.it.length+' pista(s) a partir daqui</button>':'')+'</div>';
@@ -2425,9 +2484,15 @@ function painelSlot(R,M){
   var hz=ch.hpf?ch.hpf:(ch.hpfhz||80);
   h+=sdRow('HPF:',sdNum('mhpfhz','hpfhz',ch.hpf===null||ch.hpf===undefined?(ch.hpfhz||''):hz,'Hz')+sdSw(ch.hpf==null?null:ch.hpf>0,'data-act="msw" data-k="hpf"'));
   h+=sdRow('Iso:','<span class="sd-btn pre" title="As pistas gravam sempre pré-fader">Pre</span><i class="sd-dim">sempre</i>');
-  h+=sdRow('Delay:',sdNum('mchn','dly',ch.dly,'ms',n>16));
+  h+=sdRow('Delay:',sdNum('mchn','dly',ch.dly,'ms',n>16)+(n<=16?gv(ch.dly,function(a){return a.dly+' ms';}):''));
+  var MAIS=function(){var sc=scCarregar(),ln=sc?sjGet(sc.m,['InputChannel'+n,'linkType']):null;
+    return '<details class="sd-mais"'+(UI.sdMais?' open':'')+'><summary data-act="sdmais">Mais ajustes do gravador · fader, pan, automix, compressor'+(n<=16?', EQ':'')+'</summary><div class="sd-cols"><div class="sd-col">'+
+      XCH.map(function(f){return xCampo('ch',n,f,ch);}).join('')+(ln!=null?xSo('Link',ln):'')+'</div><div class="sd-col">'+
+      (n<=16?XEQ.map(function(f){return xCampo('ch',n,f,ch);}).join(''):'<p class="sd-nota">EQ só nos canais 1–16 (manual, cap. 4).</p>')+'</div></div>'+
+      '<p class="sd-nota">Vazio / "não mexer" = fica como está no gravador'+(sc?' (o valor do arquivo aparece em cinza)':'; carregue o settings em Scorpio para ver os valores atuais')+'.</p></details>';};
   h+=sdRow('Phase:',sdSw(ch.ph,'data-act="msw" data-k="ph"',n>16)+(n>16?'<i class="sd-dim">só 1–16</i>':(s.p&&s.e&&s.e.cap&&capInv(s.e.cap)?'<i class="sd-dim">cápsula '+esc(capNome(s.e.cap))+' é invertida (Ø)</i>':'')));
   h+='</div></div>';
+  h+=MAIS();
   /* envios */
   h+='<div class="sd-src one"><span class="sd-l">Envios</span><div class="sd-grid b12">'+BUSES.map(function(b){var v=ch.r[b]||'';
       return '<button type="button" class="sd-k '+rotaCls(v)+'" data-act="mrota" data-n="'+n+'" data-b="'+b+'" title="'+esc(busNome(b,M))+': '+ROTA_TXT[v]+'">'+(b==='L'||b==='R'?b:'B'+b)+'<small>'+esc(M.bus[b].nome||'')+'</small></button>';}).join('')+'</div></div>';
@@ -2467,7 +2532,11 @@ function viewBus(R,M){
   var b=UI.mbus&&M.bus[UI.mbus]?UI.mbus:'L',x=M.bus[b],lr=b==='L'||b==='R';
   var h='<div class="sdr"><div class="sd-hd"><span class="sd-ch">'+(lr?'Bus '+b:'Bus '+b)+'</span><div class="sd-who"><b>'+esc(x.nome||busNome(b))+'</b><span>'+R.S.filter(function(s){return M.ch[s.n].r[b];}).length+' canais mandando</span></div></div>';
   h+='<div class="sd-cols"><div class="sd-col">'+sdRow('Name:','<span class="sd-in nome"><input type="text" maxlength="12" data-act="mbusnome" data-b="'+b+'" value="'+esc(x.nome)+'" placeholder="'+esc(busNome(b))+'"></span>')+
-    '<p class="sd-nota">Ganho, limiter e mute do bus ficam como estão no gravador.</p></div><div class="sd-col"><div class="sd-src"><span class="sd-l">ISO</span><div class="sd-grid">';
+    XBUS.filter(function(f){return ['gain','mute','cmute','lim'].indexOf(f[0])>=0;}).map(function(f){return xCampo('bus',b,f,x);}).join('')+
+    (b!=='L'&&b!=='R'&&b!=='1'&&b!=='2'?'<div class="sd-row"><span class="sd-l">Fontes de bus:</span><span class="sd-v"><i class="sd-dim">o que entra neste bus além dos canais</i></span></div>'+XBUS.filter(function(f){return /^s[LR12]$/.test(f[0]);}).map(function(f){return xCampo('bus',b,f,x);}).join(''):'')+
+    (function(){var sc=scCarregar();if(!sc)return '';var lk=sjGet(sc.m,['OutputBusControl','obus'+b,'linkedToBus']),ar=sjGet(sc.m,['OutputBusControl','obus'+b,'arm']);return xSo('Link (*-*)',lk==='nOutBuses'||!lk?'desligado':'com '+String(lk).replace('obus','bus '))+(ar!=null?xSo('Arm (trilha do bus)',ar?'armado':'desarmado'):'');})()+
+    '<details class="sd-mais"'+(UI.sdMais?' open':'')+'><summary data-act="sdmais">Compressor do bus</summary>'+XBUS.filter(function(f){return /^(comp|cthr|crat|catt|crel)$/.test(f[0]);}).map(function(f){return xCampo('bus',b,f,x);}).join('')+'</details>'+
+    '<p class="sd-nota">Vazio / "não mexer" = fica como está no gravador.</p></div><div class="sd-col"><div class="sd-src"><span class="sd-l">ISO</span><div class="sd-grid">';
   for(var n=1;n<=32;n++){var v=M.ch[n].r[b]||'';h+=sdK(String(n),rotaCls(v),'data-act="mrota" data-n="'+n+'" data-b="'+b+'" title="Ch '+n+': '+ROTA_TXT[v]+'"');}
   h+='</div>';
   if(!lr){h+='<span class="sd-l">Com</span><div class="sd-grid w2">'+sdK('Rtn 1',x.src==='_1'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_1"',1)+sdK('Rtn 2',x.src==='_2'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_2"',0)+'</div>'+
@@ -2488,6 +2557,8 @@ function viewOut(R,M){
     sdRow('Name:','<span class="sd-in nome"><input type="text" maxlength="12" data-act="moutv" data-o="'+k+'" data-k="nome" value="'+esc(o.nome)+'"></span>')+
     sdRow('Gain:',sdNum('moutn','gain',o.gain,'dB',false,' data-o="'+k+'"'))+
     sdRow('Delay:',sdNum('moutn','dly',o.dly,'ms',false,' data-o="'+k+'"'))+
+    XOUT.filter(function(f){return f[0]!=='link'||parOut(k);}).map(function(f){return xCampo('out',k,f,o);}).join('')+
+    (function(){var sc=scCarregar();if(!sc)return '';var am=sjGet(sc.m,['AnalogOutputs',k,'autoMute']),ao=sjGet(sc.m,['AnalogOutputs',k,'autoMutOptions']);return xSo('Record/Stop/Play Mute',am?'ligado ('+ao+')':'desligado');})()+
     sdRow('Nível:','<select class="sd-sel" data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+nv[1]+'</option>';}).join('')+'</select>')+
     '<p class="sd-nota">"—" = fica como está no gravador.</p></div><div class="sd-col"><div class="sd-src"><span class="sd-l">ISO</span><div class="sd-grid">';
   for(var n=1;n<=32;n++){var s=R.S[n-1];h+=sdK(String(n),a[0]==='iso'&&+a[1]===n?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="iso:'+n+':'+(a[0]==='iso'?a[2]:'pre')+'" title="ISO '+n+(s&&s.p?' · '+esc(nomePista(s.p)):'')+'"');}

@@ -20,6 +20,13 @@
 
 
 
+
+## v1.63 · 06/11
+- Mixer com os ajustes do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1), cada um com o valor atual do arquivo em cinza e "não mexer" por padrão:
+  - Canal: fader, pan, automix, compressor (Off/Pre/Post, threshold, ratio, attack, release) e EQ de 3 bandas (1–16).
+  - Bus: gain, Mute All, Mute Coms, limiter, Mix L / Mix R / Bus 1 / Bus 2 entrando no bus (buses 3–10) e compressor.
+  - Saída: mute e link com o par (X1/X2 … X9/X10).
+- Só leitura por enquanto (falta teste no gravador): link de canais, link de buses, arm de bus, Record/Stop/Play Mute das saídas.
 ## v1.62 · 06/11
 - Export do Scorpio: pista com retorno (Mix B = RTN B1) agora sai com a fonte "Return B1" e o nome "MIX B". Antes saía "Ch 16"/"Ch 32" mantendo a entrada antiga do arquivo base.
 ## v1.61 · 06/11
