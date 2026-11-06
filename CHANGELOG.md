@@ -24,6 +24,10 @@
 
 
 
+
+## v1.67 · 06/11
+- Mixer: teclas Scorpio e Menu no começo da barra, em destaque.
+- Menu do gravador › Slate/Coms/Returns (manual 6.14): gain do slate mic, Slate / Com Send 1 / Com Send 2 Routing (Track, Output, Bus, HP), Duck Bus/HP e gains dos retornos (Com Rtn 1/2, Rtn A/B/C). Fonte do mic só leitura até o teste.
 ## v1.66 · 06/11
 - Teste PL 0611 2: link de buses liberado (pares L-R, 1-2, 3-4, 5-6, 7-8, 9-10), Play Mute confirmado, saída L/R em AES (Level → AES).
 - Outputs: tocar no número do ISO alterna desligado → pre (verde) → post (laranja), como no gravador.

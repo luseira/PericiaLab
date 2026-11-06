@@ -368,6 +368,9 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .sd-sk.num input,.sd-sk.num select{width:4.2rem;background:#1c1c1e;color:#fff;border:1px solid #555;border-radius:4px;padding:.1rem .25rem;font-size:.85rem;text-align:center}
 .sd-sk.num input[type=text]{width:7rem}.sd-sk.num select{width:auto;text-align:left}
 .sd-mutes{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;font-size:.85rem;color:#d2d2d6}.sd-mutes .cx{display:inline-block;width:.9rem;height:.9rem;border:1px solid #aaa;border-radius:2px;margin-right:.3rem;vertical-align:middle}.sd-mutes .cx.on{background:#e2ae4e}
+.sd-menu{display:flex;gap:5px;padding:6px;background:#141416;flex-wrap:wrap}
+.sd-mi{background:#2c2c2f;color:#ececee;border:0;border-radius:6px;padding:.45rem .8rem;font-size:.88rem;display:flex;flex-direction:column;align-items:flex-start}.sd-mi.sel{background:#2f5fd6}.sd-mi:disabled{opacity:.45}.sd-mi small{font-size:.68rem;color:#aaa}
+.sdscr .sd-bar.sub{background:#2a2a2d;font-size:.95rem}
 .sd-chx{border-top:1px solid #2e2e31;margin-top:.4rem}
 .sd-sk.ro{opacity:.75}
 .sd-eq{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px;background:#18181a}
@@ -428,6 +431,7 @@ table.sd-mx{border-collapse:separate;border-spacing:4px}
 .sd-nav button{background:none;border:0;color:#8e8e93;display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.68rem;padding:.3rem .5rem;min-width:3.3rem;border-radius:8px}
 .sd-nav svg{width:1.25rem;height:1.25rem;fill:currentColor}
 .sd-nav button.sel{color:#fff;background:#2c2c2f}
+.sd-nav button.gr{color:#e2ae4e}.sd-nav button.gr.sel{color:#1c1c1e;background:#e2ae4e}.sd-nav button.fim{margin-right:.5rem;position:relative}.sd-nav button.fim::after{content:'';position:absolute;right:-.35rem;top:20%;bottom:20%;border-right:1px solid #3a3a3e}
 @media print{.sdr{background:#fff;color:#000}.sd-nav{display:none}}
 /* mesa */
 .leds{display:flex;gap:3px;width:var(--sw);margin-bottom:7px;justify-content:center;padding:0 6px}
@@ -580,7 +584,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.66 · 06/11 10:40</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.67 · 06/11 11:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1813,8 +1817,8 @@ function viewMix(){
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+'</p>';
   if(pg!=='pistas'){
-    var cab='<div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>';
-    var fn={rota:viewRota,bus:viewBus,out:viewOut}[pg],corpo=fn?fn(R,M):viewScorpio(c,R,M),pt=corpo.split('<!--NAV-->');
+    var cab='<div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio',menu:'Menu do gravador'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>';
+    var fn={rota:viewRota,bus:viewBus,out:viewOut,menu:viewMenu}[pg],corpo=fn?fn(R,M):viewScorpio(c,R,M),pt=corpo.split('<!--NAV-->');
     /* painel escuro grudado na barra de navegação, como na tela das pistas; listas embaixo, no papel branco */
     if(pt.length>1)return h+'<div class="soimpr-hide">'+pt[0].replace('<div class="sdr','<div class="sdr comnav')+sdNav()+'</div><section class="doc mixdoc'+(pg==='rota'?' tabela':'')+'">'+cab+pt.slice(1).join('')+'</section>'+logHtml();
     h+='<section class="doc'+(pg==='rota'?' tabela':'')+'">'+cab+corpo+'</section>';
@@ -1980,7 +1984,7 @@ var SAIDAS=['L','R','X1','X2','X3','X4','X5','X6','X7','X8','X9','X10'];
 var CL_ROTAS=[['1','X1'],['L','L'],['R','R'],['2','X2']];
 var ROTA_TXT={'':'—',post:'pós',pre:'pré',send:'send'};
 var ROTA_CICLO=['','post','pre','send'];
-var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio']];
+var MPAGS=[['pistas','Pistas'],['rota','Routing'],['bus','Buses'],['out','Saídas'],['scorpio','Scorpio'],['menu','Menu']];
 var CLIP=null,COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
 /* escolher quem está na pista: pelo nome (a fonte vem do Carômetro) */
 function pickNome(R,s){
@@ -2092,6 +2096,7 @@ function mesaEf(c,R){
   });
   Object.keys(m.bus||{}).forEach(function(b){if(M.bus[b])Object.assign(M.bus[b],m.bus[b]);});
   Object.keys(m.out||{}).forEach(function(k){if(M.out[k])Object.assign(M.out[k],m.out[k]);});
+  M.sl=Object.assign({},m.sl||{});
   return M;
 }
 function mudarMesa(fn){var c=clone(cenaAtual());c.mesa=c.mesa||{};c.mesa.ch=c.mesa.ch||{};c.mesa.bus=c.mesa.bus||{};c.mesa.out=c.mesa.out||{};fn(c.mesa,c);salvarCenaMix(c);}
@@ -2248,6 +2253,7 @@ function comparar(R,M,A){
   });
   BUSES.forEach(function(b){xComparar(add,'Bus '+b,'bus',b,M.bus[b],XBUS);});
   SAIDAS.forEach(function(o){xComparar(add,'Saída '+o,'out',o,M.out[o],XOUT);});
+  Object.keys(M.sl||{}).forEach(function(k){add('Slate/Coms',k,String(M.sl[k]),String(slArq(k)));});
   BUSES.forEach(function(b){add('Bus '+b,'Nome',M.bus[b].nome||'(mantém)',M.bus[b].nome?A.bus[b].nome:'(mantém)');if(b!=='L'&&b!=='R')add('Bus '+b,'Retorno',M.bus[b].src||'—',A.bus[b].src||'—');});
   SAIDAS.forEach(function(o){var c=M.out[o],a=A.out[o];add('Saída '+o,'Nome',c.nome,a.nome);add('Saída '+o,'Fonte',saidaTxt(c.src,M,R),saidaTxt(a.src,M,R));
     if(c.nivel)add('Saída '+o,'Nível',c.nivel,a.nivel);if(c.gain!=null)add('Saída '+o,'Ganho',c.gain+' dB',a.gain+' dB');if(c.dly!=null)add('Saída '+o,'Delay',c.dly+' ms',a.dly+' ms');});
@@ -2307,6 +2313,9 @@ function exportar(c,R,M,nome){
   if(fontes.some(function(f){return f==='AES3-1'||f==='AES3-2';}))sjSet(m,['GlobalChannelSettings','xlr1Aes'],true);
   if(fontes.some(function(f){return f==='AES3-5'||f==='AES3-6';}))sjSet(m,['GlobalChannelSettings','xlr6Aes'],true);
   SAIDAS.forEach(function(o){xExport(m,'out',o,M.out[o],XOUT);});
+  Object.keys(M.sl||{}).forEach(function(k){var v=M.sl[k];if(v===null||v===undefined)return;
+    if(/^rtn[ABC]$/.test(k)){['LVolume','RVolume'].forEach(function(z){if(sjGet(m,['SlateMicAndReturns',k+z])!==undefined)sjSet(m,['SlateMicAndReturns',k+z],+v);});return;}
+    if(sjGet(m,[slSec(k),k])===undefined)return;sjSet(m,[slSec(k),k],typeof sjGet(m,[slSec(k),k])==='number'?+v:String(v));});
   sjSet(m,['system','name'],nome);
   return sjDump(m)+'\n';
 }
@@ -2369,6 +2378,12 @@ function cliqueMesa(a,el){
     var f4=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k4;})[0],e4=xEf(al4,al4==='ch'?+id4:id4,f4,ob4),op4=(f4[3]==='m3'?[['off'],['pre'],['post']]:f4[7]).map(function(o){return o[0];});
     var nx=op4[(op4.indexOf(e4.v)+1)%op4.length];setX(al4,al4==='ch'?+id4:id4,k4,e4.arq!==null&&nx===e4.arq?null:nx);return true;}
   if(a==='mchmais'){UI.chMais=UI.chMais===el.dataset.v?'':el.dataset.v;salvarUi();render();return true;}
+  if(a==='mmenu'){UI.mmenu=el.dataset.v;salvarUi();render();return true;}
+  if(a==='mslr'){UI.slr=el.dataset.v;salvarUi();render();return true;}
+  if(a==='mslk'){var cS2=cenaAtual(),MS2=mesaEf(cS2,resolver(cS2,UI.ep)),fS=el.dataset.f,tS=el.dataset.t,eS=slEf(MS2,fS),tk=slToks(eS.v),ord=fS.indexOf('Tracks')>0?null:(fS.indexOf('Outputs')>0?SL_OUT:SL_BUS);
+    if(tk.indexOf(tS)>=0)tk=tk.filter(function(z){return z!==tS;});else tk.push(tS);
+    tk.sort(function(x,y){return ord?ord.indexOf(x)-ord.indexOf(y):(+x)-(+y);});var nv2=tk.join('+'),aq2=slArq(fS);
+    mudarMesa(function(m){m.sl=m.sl||{};if(aq2!==null&&nv2===String(aq2))delete m.sl[fS];else m.sl[fS]=nv2;});return true;}
   if(a==='mbusmais'){UI.busMais=!UI.busMais;salvarUi();render();return true;}
   if(a==='sdmais'){UI.sdMais=!UI.sdMais;salvarUi();return false;}
   if(a==='msw'){var cS=cenaAtual(),chS=mesaEf(cS,resolver(cS,UI.ep)).ch[MSEL],kk=el.dataset.k;
@@ -2380,9 +2395,9 @@ function cliqueMesa(a,el){
   if(a==='mcopiapara'){var np=+el.dataset.n,ip=COPIA.para.indexOf(np);if(ip>=0)COPIA.para.splice(ip,1);else COPIA.para.push(np);render();return true;}
   if(a==='mcopiaok'){if(!COPIA.para.length)return true;aplicarCopia();COPIA=null;render();return true;}
   if(a==='mcopiafim'){COPIA=null;render();return true;}
-  if(a==='mbusall'){if(!confirm('Copiar os buses e as saídas desta cena para todas as outras?'))return true;
+  if(a==='mbusall'){if(!confirm('Copiar os buses, as saídas e o Slate/Coms/Returns desta cena para todas as outras?'))return true;
     var cur=cenaAtual(),mb=(cur.mesa&&cur.mesa.bus)||{},mo=(cur.mesa&&cur.mesa.out)||{};
-    cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);salvarCena(y);});toast('Buses e saídas copiados para as outras cenas');return true;}
+    cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);y.mesa.sl=clone((cur.mesa&&cur.mesa.sl)||{});salvarCena(y);});toast('Buses, saídas e Slate/Coms copiados para as outras cenas');return true;}
   if(a==='mscdel'){SC=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
   if(a==='mtrazer'){if(!SC)return true;if(!confirm('Substituir ON, ARM, routing, ajustes, buses e saídas desta cena pelo que está no arquivo?'))return true;
     var c3=cenaAtual(),R3=resolver(c3,UI.ep);trazerDoArquivo(R3,lerArquivo(SC.m));toast('Cena atualizada com o gravador');return true;}
@@ -2404,6 +2419,8 @@ function mudancaMesa(a,el){
   if(a==='mfxnome'){setCh(MSEL,{nome:semAcento(el.value.trim()).toUpperCase()});return true;}
   if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){logMix(['Nome de pista: '+nomePista(sp.p)+' → '+semAcento(el.value.trim()).toUpperCase()]);fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   if(a==='mhpfhz'){var hzv=el.value===''?null:parseFloat(el.value),cH=cenaAtual(),chH=mesaEf(cH,resolver(cH,UI.ep)).ch[MSEL],pt={hpfhz:hzv};if(chH.hpf>0&&hzv>0)pt.hpf=hzv;setCh(MSEL,pt);return true;}
+  if(a==='msln'){var fN=el.dataset.f,mul=+el.dataset.mul,vN=el.value===''?null:Math.round(parseFloat(el.value))*mul,aqN2=slArq(fN);if(vN!==null&&isNaN(vN))return true;
+    mudarMesa(function(m){m.sl=m.sl||{};if(vN===null||(aqN2!==null&&+aqN2===vN))delete m.sl[fN];else m.sl[fN]=vN;});return true;}
   if(a==='mxn'||a==='mxe'){var al2=el.dataset.alvo,id2=el.dataset.id,kx2=el.dataset.k,v2=el.value;
     var fx=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===kx2;})[0];
     if(a==='mxn'){v2=v2===''?null:parseFloat(v2);if(v2!==null&&isNaN(v2))return true;if(v2!==null&&fx&&fx[4]!=null){v2=Math.max(fx[4],Math.min(fx[5],v2));}}
@@ -2419,8 +2436,8 @@ function mudancaMesa(a,el){
 }
 
 /* ───────── telas no estilo do SD-Remote ───────── */
-var SDNAV=[['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g'],['scorpio','Scorpio','d']];
-var SDICO={f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="3" height="12" rx="1"/><rect x="8" y="4" width="3" height="17" rx="1"/><rect x="13" y="7" width="3" height="14" rx="1"/><rect x="18" y="11" width="3" height="10" rx="1"/></svg>',
+var SDNAV=[['scorpio','Scorpio','d'],['menu','Menu','m'],['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g']];
+var SDICO={m:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="3" height="12" rx="1"/><rect x="8" y="4" width="3" height="17" rx="1"/><rect x="13" y="7" width="3" height="14" rx="1"/><rect x="18" y="11" width="3" height="10" rx="1"/></svg>',
   g:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h18M3 16h18" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>',
   d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
 var RET_COD=[['Al','A1'],['Ar','A2'],['Bl','B1'],['Br','B2'],['Cl','C1'],['Cr','C2']];
@@ -2429,7 +2446,7 @@ function retTxt(c){if(!c)return '';if(c==='_1')return 'RTN 1';if(c==='_2')return
 var BUS_FONTES=[['','—'],['_1','Com Rtn 1 *'],['_2','Com Rtn 2 *']].concat(RET_COD.map(function(r){return [r[0],'Return '+r[1]+(r[0]==='Bl'?'':' *')];}));
 function sdNav(solo){
   var at=UI.mixp&&UI.mixp!=='pistas'?UI.mixp:UI.mixv;
-  return '<nav class="sd-nav noprint'+(solo?' solo':'')+'" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'"'+(x[0]===at?' class="sel" aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
+  return '<nav class="sd-nav noprint'+(solo?' solo':'')+'" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'" class="'+(x[0]===at?'sel ':'')+(x[0]==='scorpio'||x[0]==='menu'?'gr'+(x[0]==='menu'?' fim':''):'')+'"'+(x[0]===at?' aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
 }
 /* ───── ajustes extras do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1) ─────
    Cada campo: [chave, rótulo, campo no settings, tipo, mín, máx, unidade, opções]. Tipos: n (número), n10 (décimos no arquivo),
@@ -2620,6 +2637,48 @@ function viewBus(R,M){
   h+='<!--NAV-->'+tabelaBuses(R,M,b);
   h+='<p class="hint">Rtn B ← 633 X3/X4 (Clara) · Com Rtn 1 ← rádio.</p>';
   h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
+  return h;
+}
+/* ───── Menu do gravador › Slate/Coms/Returns (manual 6.14) ─────
+   Fica em ToneSlateSend (roteamentos "HpL+HpR+L+R", ducks em décimos de dB) e SlateMicAndReturns (gains em dB).
+   Cada campo vazio = fica como está no gravador. */
+var SL_BUS=['HpL','HpR','L','R','1','2','3','4','5','6','7','8','9','10'],SL_OUT=['L','R','X1','X2','X3','X4','X5','X6','X7','X8','A1','A2'];
+var SL_ROT={slate:{nome:'Slate',tr:'slateRouteTracks',out:'slateRouteOutputs',bus:'slateRouteBuses',db:'busdB10thsSlate',dh:'hpdB10thsSlate'},
+  s1:{nome:'Com Send 1',out:'send1RouteOutputs',bus:'send1RouteBuses',db:'busdB10thsSend1',dh:'hpdB10thsSend1'},
+  s2:{nome:'Com Send 2',out:'send2RouteOutputs',bus:'send2RouteBuses',db:'busdB10thsSend2',dh:'hpdB10thsSend2'}};
+var SL_GAN=[['rtn1Volume','Com Rtn 1'],['rtn2Volume','Com Rtn 2'],['rtnA','Rtn A'],['rtnB','Rtn B'],['rtnC','Rtn C']];
+function slSec(k){return /^(rtn|slateMic|extSlateMic)/.test(k)?'SlateMicAndReturns':'ToneSlateSend';}
+function slArq(k){var sc=scCarregar();if(!sc)return null;if(/^rtn[ABC]$/.test(k))k=k+'LVolume';var v=sjGet(sc.m,[slSec(k),k]);return v===undefined?null:v;}
+function slEf(M,k){var v=M.sl[k];return v!==undefined&&v!==null?{v:v,set:true}:{v:slArq(k),set:false};}
+function slToks(v){return v?String(v).split('+').filter(Boolean):[];}
+function slKey(M,campo,tok,lbl,ast){var e=slEf(M,campo),on=slToks(e.v).indexOf(tok)>=0;
+  return '<button type="button" class="sd-k'+(on?' sel':'')+(e.set?' mod':'')+'" data-act="mslk" data-f="'+campo+'" data-t="'+tok+'" title="'+esc(lbl)+(on?': ligado':': desligado')+'">'+esc(lbl)+(ast?'<sup>*</sup>':'')+'</button>';}
+function slNum(M,campo,lbl,un,mul,mn,mx){var e=slEf(M,campo),v=e.v==null?'':(e.v<=-1270?'':Math.round(e.v/mul*10)/10);
+  return '<label class="sd-sk num'+(e.set?' mod':'')+'">'+esc(lbl)+'<span><input type="number" step="1" min="'+mn+'" max="'+mx+'" data-act="msln" data-f="'+campo+'" data-mul="'+mul+'" value="'+v+'" placeholder="'+(e.v!=null&&e.v<=-1270?'−∞':'—')+'">'+un+'</span></label>';}
+function viewMenu(R,M){
+  var pg=UI.mmenu||'slate';
+  var h='<div class="sdr sdscr"><div class="sd-bar"><b>Menu</b><span>Gravador</span></div><div class="sd-menu">'+
+    [['slate','Slate/Coms/Returns',1],['lim','Limiters',0],['dante','Dante Outputs',0],['hp','Headphones',0],['tc','Timecode',0]].map(function(x){return '<button type="button" class="sd-mi'+(pg===x[0]?' sel':'')+'" data-act="mmenu" data-v="'+x[0]+'"'+(x[2]?'':' disabled title="em breve"')+'>'+esc(x[1])+(x[2]?'':'<small>em breve</small>')+'</button>';}).join('')+'</div>';
+  if(pg==='slate')h+=viewSlate(M);
+  h+='</div><!--NAV-->';
+  h+='<p class="hint">Valores em cinza/sem contorno vêm do settings carregado em Scorpio. Contorno amarelo = mudado no site. * = código ainda não conferido no aparelho.</p>';
+  h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar buses, saídas e Slate/Coms em todas as cenas</button></div>';
+  return h;
+}
+function viewSlate(M){
+  var r=UI.slr&&SL_ROT[UI.slr]?UI.slr:'slate',D2=SL_ROT[r],sc=scCarregar();
+  var src=sc?sjGet(sc.m,['SlateMicAndReturns','slateMicSrc']):null,ext=/ext/i.test(src||'');
+  var h='<div class="sd-bar sub"><b>Slate/Coms/Returns</b><span>'+(sc?'':'carregue o settings em Scorpio para ver os valores do gravador')+'</span></div>';
+  h+='<div class="sd-soft"><span class="sd-sk ro">Mic<small>'+esc(src==null?'—':src==='External'?'Ext Mic':src)+' *</small></span>'+
+    (ext||src==null?slNum(M,'extSlateMicVolume','Gain (Ext)','dB',1,0,60):'')+(!ext||src==null?slNum(M,'slateMicVolume','Gain (Int)','dB',1,-10,20):'')+'</div>';
+  h+='<div class="sd-tabs">'+Object.keys(SL_ROT).map(function(k){return '<button type="button" class="sd-tab'+(k===r?' sel':'')+'" data-act="mslr" data-v="'+k+'">'+SL_ROT[k].nome+' Routing</button>';}).join('')+'</div>';
+  h+='<div class="sd-src">';
+  if(D2.tr){h+='<span class="sd-l">Track</span><div class="sd-grid g8">';for(var n=1;n<=32;n++)h+=slKey(M,D2.tr,String(n),String(n),n===1);h+='</div>';}
+  h+='<span class="sd-l">Output</span><div class="sd-grid g8">'+SL_OUT.map(function(t){return slKey(M,D2.out,t,t,/^A/.test(t));}).join('')+'</div>';
+  h+='<span class="sd-l">Bus</span><div class="sd-grid g8">'+SL_BUS.slice(2).map(function(t){return slKey(M,D2.bus,t,t,0);}).join('')+'</div>';
+  h+='<span class="sd-l">HP</span><div class="sd-grid g8">'+slKey(M,D2.bus,'HpL','HP-L',0)+slKey(M,D2.bus,'HpR','HP-R',0)+'</div>';
+  h+='</div><div class="sd-soft">'+slNum(M,D2.db,'Duck Bus Prgm By','dB',10,-40,0)+slNum(M,D2.dh,'Duck HP Prgm By','dB',10,-40,0)+'</div>';
+  h+='<div class="sd-bar sub"><b>Returns</b><span>gain de 0 a 30 dB</span></div><div class="sd-soft">'+SL_GAN.map(function(g){return slNum(M,g[0],g[1],'dB',1,0,30);}).join('')+'</div>';
   return h;
 }
 /* outputs: uma saída por vez, fonte única à direita */
