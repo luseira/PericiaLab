@@ -18,6 +18,11 @@
 
 
 
+
+## v1.61 · 06/11
+- Export para o Scorpio: liga a entrada AES do XLR 1 (AES 1/2, A10) ou do XLR 6 (AES 5/6) quando a cena usa, como o gravador faz. Avisa se AES 3/4 (não testado) ou se o mesmo XLR é usado como analógico e AES.
+- Botão "Baixar todas as cenas": um settings por cena.
+- Pista vazia na cena não mexe no canal do arquivo base (antes virava "Ch N" sem fonte). Saídas em par (ex.: X9/X10 no HP) só são separadas se a cena mudar a fonte delas.
 ## v1.60 · 06/11
 - Buses e saídas partem do settings do gravador (PL 1104 1): buses 4 e 5 = A e B, fontes Com Rtn 1 nos buses 1–3, Rtn B no bus 5, saídas com os nomes e fontes do arquivo. Edições feitas no site continuam valendo.
 - Fonte dos buses aparece como no gravador: RTN 1, RTN 2, RTN B1…

@@ -556,7 +556,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.60 · 06/11 01:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.61 · 06/11 01:35</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2237,11 +2237,18 @@ function deduzidosUsados(M,R){
   /* confirmados nos testes de 05/11: entradas AES3-n, saída ← Bus n (n+6), HP-L/R, Com Rtn 1; fontes de bus Al, Bl, _1, _2 */
   SAIDAS.forEach(function(o){var s=M.out[o].src||'';if(/^ret:(?!B1$)/.test(s)||s==='com:2')d.push(o+' ← '+s.replace(':',' '));});
   BUSES.forEach(function(b){var s=M.bus[b].src;if(s&&['Al','Bl','_1','_2'].indexOf(s)<0)d.push('Bus '+b+' ← '+s);});
+  if(R){var fs=R.S.map(function(x){return x.cn?fonteSlot(x):'';});
+    R.S.forEach(function(x,i){if(/^AES3-[34]$/.test(fs[i]))d.push('Ch '+x.n+' ← '+fs[i]+' (entrada AES 3/4 ainda não testada)');});
+    if(fs.indexOf('Adc1')>=0&&fs.some(function(f){return /^AES3-[12]$/.test(f);}))d.push('XLR 1 usado como analógico (LINE 1) e como AES 1/2 ao mesmo tempo');
+    if(fs.indexOf('Adc6')>=0&&fs.some(function(f){return /^AES3-[56]$/.test(f);}))d.push('XLR 6 usado como analógico (LINE 6) e como AES 5/6 ao mesmo tempo');}
   return d;
 }
 function exportar(c,R,M,nome){
   var m=sjParse(SC.txt),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
+  var srcAntes={};SAIDAS.forEach(function(o){srcAntes[o]=srcDoArquivo(sjGet(m,['AnalogOutputs',o,'source']),+sjGet(m,['AnalogOutputs',o,'chan']));});
   R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
+    /* pista vazia na cena: o canal fica exatamente como está no arquivo base (nome, fonte, ARM, mute, routing) */
+    if(!s.tok)return;
     sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s));
     sjSet(m,[k,'inputSrcName'],s.cn?(fonteSlot(s)||sjGet(m,[k,'inputSrcName'])):'Nosource');
     sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);sjSet(m,[k,'isoPostFader'],false); /* pistas sempre ISO pré */
@@ -2261,7 +2268,12 @@ function exportar(c,R,M,nome){
     if(x.nivel)sjSet(m,p.concat('lineMic'),x.nivel);if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));});
   /* saídas em par (link) com fontes diferentes no plano: desfaz o link */
   for(var i=1;i<=9;i+=2){var a1='X'+i,a2='X'+(i+1),la=sjGet(m,['AnalogOutputs',a1,'linkedToOutput']),lb=sjGet(m,['AnalogOutputs',a2,'linkedToOutput']);
-    if((la&&la!=='nAnalogOutputs'||lb&&lb!=='nAnalogOutputs')&&M.out[a1].src!==M.out[a2].src){sjSet(m,['AnalogOutputs',a1,'linkedToOutput'],'nAnalogOutputs');sjSet(m,['AnalogOutputs',a2,'linkedToOutput'],'nAnalogOutputs');}}
+    var igual=(M.out[a1].src||'')===(srcAntes[a1]||'')&&(M.out[a2].src||'')===(srcAntes[a2]||'');
+    if((la&&la!=='nAnalogOutputs'||lb&&lb!=='nAnalogOutputs')&&!igual&&M.out[a1].src!==M.out[a2].src){sjSet(m,['AnalogOutputs',a1,'linkedToOutput'],'nAnalogOutputs');sjSet(m,['AnalogOutputs',a2,'linkedToOutput'],'nAnalogOutputs');}}
+  /* entradas AES: AES 1/2 entram pelo XLR 1 e AES 5/6 pelo XLR 6 (teste de 05/11). Liga a chave só se a cena usa; nunca desliga sozinho */
+  var fontes=R.S.map(function(s){return s.cn?fonteSlot(s):'';});
+  if(fontes.some(function(f){return f==='AES3-1'||f==='AES3-2';}))sjSet(m,['GlobalChannelSettings','xlr1Aes'],true);
+  if(fontes.some(function(f){return f==='AES3-5'||f==='AES3-6';}))sjSet(m,['GlobalChannelSettings','xlr6Aes'],true);
   sjSet(m,['system','name'],nome);
   return sjDump(m)+'\n';
 }
@@ -2279,9 +2291,9 @@ function viewScorpio(c,R,M){
     :'<div class="alerta ok">A cena e o gravador estão iguais.</div>')+
     '<div class="linha" style="margin-top:.7rem"><button class="btn" type="button" data-act="mtrazer">Trazer do gravador para a cena</button><span class="hint" style="margin:0">Copia ON, ARM, routing, trim, HPF, fase, delay, buses e saídas do arquivo para esta cena. Os nomes continuam vindo das pessoas. Dá para desfazer.</span></div></div>';
   var ded=deduzidosUsados(M,R);
-  h+='<div class="painel"><h3>Exportar a cena para o Scorpio</h3><p class="hint">Gera um settings novo a partir do arquivo acima, mudando só nomes de pista, fontes, ON, ARM, routing, buses, saídas e os ajustes que você preencheu. Pistas vazias ficam "Ch N" sem fonte. Teste em casa, com backup dos settings atuais, antes de usar no set.</p>'+
+  h+='<div class="painel"><h3>Exportar a cena para o Scorpio</h3><p class="hint">Gera um settings novo a partir do arquivo acima, mudando só nomes de pista, fontes, ON, ARM, routing, buses, saídas e os ajustes que você preencheu. Pistas vazias na cena ficam como estão no arquivo base. Saídas em par (link) só são separadas se a cena mudar a fonte delas. Teste em casa, com backup dos settings atuais, antes de usar no set.</p>'+
     (ded.length?'<div class="alerta warn">Usa códigos ainda não conferidos no aparelho: '+esc(ded.join(', '))+'. Confira essas saídas depois de carregar.</div>':'')+
-    '<div class="linha"><label class="campo">Nome do arquivo<input type="text" id="mscnome" value="'+esc(nomeArq(c.nome)+'_EP'+UI.ep)+'" maxlength="24"></label><button class="btn pri" type="button" data-act="mexport" style="align-self:flex-end">Baixar settings</button></div></div>';
+    '<div class="linha"><label class="campo">Nome do arquivo<input type="text" id="mscnome" value="'+esc(nomeArq(c.nome)+'_EP'+UI.ep)+'" maxlength="24"></label><button class="btn pri" type="button" data-act="mexport" style="align-self:flex-end">Baixar settings desta cena</button><button class="btn" type="button" data-act="mexptodas" style="align-self:flex-end">Baixar todas as cenas</button></div></div>';
   return h+resumoCanais(R,M);
 }
 function resumoCanais(R,M){
@@ -2333,6 +2345,9 @@ function cliqueMesa(a,el){
   if(a==='mreaper'){var cr=cenaAtual();baixarTxt('PericiaLab_Reaper_'+nomeArq(cr.nome)+'_EP'+UI.ep+'.txt',reaperTxt(cr));toast('Arquivo do Reaper baixado. No Reaper, rode a ação "PericiaLab_Reaper" e escolha o arquivo.');return true;}
   if(a==='mexport'){if(!SC)return true;var c4=cenaAtual(),R4=resolver(c4,UI.ep),M4=mesaEf(c4,R4),nm=nomeArq($('#mscnome').value||c4.nome);
     try{baixar(nm+'.json',exportar(c4,R4,M4,nm));toast('Settings gerado: '+nm+'.json');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
+  if(a==='mexptodas'){if(!SC)return true;var LL=cenasLista(),k5=0;
+    if(!confirm('Baixar '+LL.length+' arquivos de settings, um por cena (EP '+UI.ep+')? O navegador pode pedir permissão para vários downloads.'))return true;
+    LL.forEach(function(c5,i){setTimeout(function(){try{var R5=resolver(c5,UI.ep),M5=mesaEf(c5,R5),n5=nomeArq(c5.nome+'_EP'+UI.ep);baixar(n5+'.json',exportar(c5,R5,M5,n5));k5++;if(k5===LL.length)toast(k5+' settings gerados');}catch(e){toast('Cena "'+c5.nome+'": '+e.message,true);}},i*700);});return true;}
   return false;
 }
 function mudancaMesa(a,el){
