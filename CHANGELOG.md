@@ -13,6 +13,11 @@
 
 
 
+
+## v1.56 · 06/11
+- Colinha agora ocupa as pistas 17–32 com todo mundo: transmissores em ordem (host, mentores e participantes), quem está sem TX, boom, gooseneck e Mix B.
+- A colinha pode ser editada à mão no mixer e fica como você deixar (a ordem automática é só o ponto de partida). Botão "↺ Refazer colinha" volta para a ordem automática.
+- Cenas antigas (colinha em 23–32) são convertidas uma vez para o formato novo.
 ## v1.55 · 05/11
 - Equipamento da Clara: seriais e fotos (TX 11 SMQV M 16492, TX 12 SMQV E 7547, TX 13 SMa 712; receptores UCR411A 21827, 26631, 16581). Receptores ganharam foto no inventário (coluna Foto).
 - Fichas: número da pista no canto da foto.
