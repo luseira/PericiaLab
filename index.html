@@ -539,7 +539,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.50 · 03/11 22:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.51 · 05/11 19:45</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -841,7 +841,7 @@ function avatar(p,cls){
 }
 /* enquadramento do rosto nos cards (4:3), calculado por detecção de rosto em cada foto: [zoom, x0, y0] da janela visível.
    Vale só para a foto daquele momento (o final do endereço confere); foto nova volta ao enquadramento central. */
-var ENQ={RAMIRO:['NjP_W8Em',1,0,.127],TELMA:['QfjQLcVu',1,0,.135],SALADA:['2_Qtp5X9',1,0,.104],P01:['BAlYWypw',1,0,.22],P02:['5SCnK9j0',1,0,.25],P03:['iPqEwJhD',1,0,.178],P04:['-zh57TzM',1,0,.234],P05:['m6ZXJCSf',1,0,.223],P06:['KaZLt2Ix',1,0,.09],P07:['dNvsF_N8',1,0,.156],P08:['TNbZBixE',1,0,.19],P09:['wvJ85Ub6',1.463,.158,.078],P10:['jaAXZ7mp',1,0,.106]};
+var ENQ={RAMIRO:['NjP_W8Em',1,0,.127],TELMA:['QfjQLcVu',1,0,.135],SALADA:['2_Qtp5X9',1,0,.104],P11:['QxBo-di5',1,0,0],P02:['5SCnK9j0',1,0,.25],P03:['iPqEwJhD',1,0,.178],P04:['-zh57TzM',1,0,.234],P05:['m6ZXJCSf',1,0,.223],P06:['KaZLt2Ix',1,0,.09],P07:['dNvsF_N8',1,0,.156],P08:['TNbZBixE',1,0,.19],P09:['wvJ85Ub6',1.463,.158,.078],P10:['jaAXZ7mp',1,0,.106]};
 function estiloEnq(p){var e=ENQ[p.id];if(!e||!p.foto||String(p.foto).slice(-8)!==e[0])return '';var z=e[1];
   return ' style="inset:auto;width:'+(z*100).toFixed(1)+'%;height:auto;aspect-ratio:1;object-fit:cover;left:'+(-e[2]*z*100).toFixed(1)+'%;top:'+(-e[3]*z/0.75*100).toFixed(1)+'%"';}
 function fotoGrande(p,card){

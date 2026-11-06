@@ -8,6 +8,9 @@
 
 
 
+
+## v1.51 · 05/11
+- Elenco atualizado pela seleção "Apresentação Canal": sai o David, entra a Amanda (foto nova, rosto enquadrado). Nomes só com o primeiro nome.
 ## v1.50 · 03/11
 - Setas entre pessoas: a lista fica fixa enquanto a caixa está aberta. Antes, com filtro de time ligado, tirar o time de alguém tirava a pessoa da lista e as setas travavam.
 ## v1.49 · 03/11
