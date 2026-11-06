@@ -16,6 +16,10 @@
 
 
 
+
+## v1.59 · 06/11
+- Mixer (Buses, Outputs, Routing): o painel escuro fica grudado na barra de navegação, como na tela das pistas; as listas vêm embaixo.
+- Tabela "Todos os buses" (nome, retorno, canais mandando e saídas que recebem) em Buses e em Outputs.
 ## v1.58 · 06/11
 - Ordem dos participantes dentro dos times: padrão agora é por transmissor (cenas novas, cenas sem ordem definida e "Restaurar estrutura base"). Alfabética continua disponível no seletor.
 ## v1.57 · 06/11

@@ -398,6 +398,8 @@ table.sd-mx{border-collapse:separate;border-spacing:4px}
 .mx{width:2.6rem;height:2.4rem;border:0;border-radius:3px;background:#48484b;color:#1b2340;font-size:.66rem;font-weight:700}
 .sd-nav{display:flex;gap:.1rem;background:#1c1c1e;border-radius:0 0 12px 12px;padding:.3rem;margin:0 auto 0;overflow-x:auto;width:100%;justify-content:safe center}
 .console{border-radius:12px 12px 0 0}
+.sdr.comnav{border-radius:12px 12px 0 0;margin-top:0}
+.mixdoc{margin-top:.9rem}
 .sd-nav.solo{border-radius:12px;margin-top:.6rem}
 .sd-nav button{background:none;border:0;color:#8e8e93;display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.68rem;padding:.3rem .5rem;min-width:3.3rem;border-radius:8px}
 .sd-nav svg{width:1.25rem;height:1.25rem;fill:currentColor}
@@ -554,7 +556,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.58 · 06/11 00:40</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.59 · 06/11 00:55</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1787,8 +1789,11 @@ function viewMix(){
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+'</p>';
   if(pg!=='pistas'){
-    h+='<section class="doc'+(pg==='rota'?' tabela':'')+'"><div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
-      ({rota:viewRota,bus:viewBus,out:viewOut}[pg]?{rota:viewRota,bus:viewBus,out:viewOut}[pg](R,M):viewScorpio(c,R,M))+'</section>';
+    var cab='<div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>';
+    var fn={rota:viewRota,bus:viewBus,out:viewOut}[pg],corpo=fn?fn(R,M):viewScorpio(c,R,M),pt=corpo.split('<!--NAV-->');
+    /* painel escuro grudado na barra de navegação, como na tela das pistas; listas embaixo, no papel branco */
+    if(pt.length>1)return h+'<div class="soimpr-hide">'+pt[0].replace('<div class="sdr','<div class="sdr comnav')+sdNav()+'</div><section class="doc mixdoc'+(pg==='rota'?' tabela':'')+'">'+cab+pt.slice(1).join('')+'</section>'+logHtml();
+    h+='<section class="doc'+(pg==='rota'?' tabela':'')+'">'+cab+corpo+'</section>';
     return h+sdNav(true)+logHtml();
   }
   h+='<div class="console">';
@@ -2026,6 +2031,12 @@ function esvaziarSel(){
 }
 var COPIA_ITENS=[['hpf','HPF'],['ph','Phase'],['on','Mute'],['conteudo','Source + Name'],['rota','Route'],['dly','Delay'],['arm','Arm'],['trim','Trim']];
 
+/* lista de todos os buses: nome, fonte, quantos canais mandam e quais saídas recebem */
+function tabelaBuses(R,M,sel){
+  return '<h3>Todos os buses</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Bus</th><th>Nome</th><th>Fonte (retorno)</th><th>Canais mandando</th><th>Saídas que recebem</th></tr></thead><tbody>'+
+    BUSES.map(function(b){var x=M.bus[b]||{},ch=R.S.filter(function(s){return M.ch[s.n].r[b];}),sa=SAIDAS.filter(function(k){return (M.out[k].src||'')==='bus:'+b;});
+      return '<tr'+(b===sel?' style="background:#fff6d6"':'')+'><td><span class="tag sm">'+(b==='L'||b==='R'?b:b)+'</span></td><td class="n">'+esc(busNome(b,M))+'</td><td>'+esc(x.src?((RET_COD.filter(function(r){return r[0]===x.src;})[0]||[0,x.src])[1]):'')+'</td><td class="w">'+(ch.length?ch.length+': '+esc(ch.map(function(s){return s.n+(s.p?' '+nomePista(s.p):'');}).join(', ')):'—')+'</td><td>'+esc(sa.join(', ')||'—')+'</td></tr>';}).join('')+'</tbody></table></div>';
+}
 function busNome(b,M){var x=M&&M.bus[b];return (x&&x.nome)||(b==='L'||b==='R'?'Mix '+b:'Bus '+b);}
 function busCurto(b){return b==='L'||b==='R'?b:b;}
 function busPadrao(){
@@ -2426,7 +2437,7 @@ function viewRota(R,M){
   R.S.forEach(function(s){var ch=M.ch[s.n],f=s.cn?fonteTxt(fonteSlot(s)):'';
     h+='<tr><th class="rl'+(ch.arm?' arm':'')+'"><span>'+s.n+':</span> '+esc(s.p?nomePista(s.p):'—')+(f?'<i>['+esc(f)+']</i>':'')+'</th>'+
       BUSES.map(function(b){var v=ch.r[b]||'';return '<td><button type="button" class="mx '+rotaCls(v)+'" data-act="mrota" data-n="'+s.n+'" data-b="'+b+'" title="Ch '+s.n+' → '+esc(busNome(b,M))+': '+ROTA_TXT[v]+(v==='send'?' '+(ch.sg[b]||0)+' dB':'')+'">'+(v==='send'&&ch.sg[b]?esc(String(ch.sg[b])):'')+'</button></td>';}).join('')+'</tr>';});
-  h+='</tbody></table></div>';
+  h+='</tbody></table></div><!--NAV-->';
   h+='<p class="hint">Toque para trocar: cinza desligado → <span class="chip r-post">pós</span> → <span class="chip r-pre">pré</span> → <span class="chip r-send">send</span>. Nome em vermelho = pista armada. O ganho do send fica na tela do canal.</p>';
   return h;
 }
@@ -2443,6 +2454,7 @@ function viewBus(R,M){
   else h+='<span class="sd-l"></span><p class="sd-nota">L e R não recebem retorno.</p>';
   h+='</div></div></div>';
   h+='<div class="sd-tabs">'+BUSES.map(function(k){return '<button type="button" class="sd-tab'+(k===b?' sel':'')+'" data-act="mbussel" data-v="'+k+'">Bus '+k+(M.bus[k].nome?'<small>'+esc(M.bus[k].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
+  h+='<!--NAV-->'+tabelaBuses(R,M,b);
   h+='<p class="hint">ISO colorido = canal mandando para este bus (toque para trocar). * = código ainda não conferido no aparelho. Rtn B ← 633 X3/X4 (Clara) · Com Rtn 1 ← rádio.</p>';
   h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
   return h;
@@ -2467,9 +2479,9 @@ function viewOut(R,M){
   h+='<span class="sd-l"></span><div>'+sdK('Silêncio',!src?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v=""')+'</div>';
   h+='</div></div></div>';
   h+='<div class="sd-tabs">'+SAIDAS.map(function(x){return '<button type="button" class="sd-tab'+(x===k?' sel':'')+'" data-act="moutsel" data-v="'+x+'">'+(x==='L'||x==='R'?x+' Out':x)+(M.out[x].nome?'<small>'+esc(M.out[x].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
-  h+='<h3>Todas as saídas</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th><th>Ganho</th><th>Delay</th></tr></thead><tbody>'+
+  h+='<!--NAV--><h3>Todas as saídas</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th><th>Ganho</th><th>Delay</th></tr></thead><tbody>'+
     SAIDAS.map(function(x){var q=M.out[x];return '<tr><td><span class="tag sm">'+x+'</span></td><td class="n">'+esc(q.nome)+'</td><td>'+esc(saidaTxt(q.src,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(q.nivel||'');})[0]||['',''])[1])+'</td><td>'+(q.gain==null?'—':q.gain+' dB')+'</td><td>'+(q.dly==null?'—':q.dly+' ms')+'</td></tr>';}).join('')+'</tbody></table></div>';
-  h+='<p class="hint">* = código ainda não conferido no aparelho. Dante e AES ficam como estão no gravador.</p>';
+  h+='<p class="hint">* = código ainda não conferido no aparelho. Dante e AES ficam como estão no gravador.</p>'+tabelaBuses(R,M,'');
   h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
   return h;
 }
