@@ -496,7 +496,7 @@ small.ad{font-size:.7rem;color:var(--ink2)}
 .btn.lp{padding:.15rem .5rem;min-height:0}
 table.tab.con td small,table.tab.il td.n small{display:block;font-weight:400;font-size:.72rem;color:var(--ink2);text-transform:none}
 table.tab.il td.w{white-space:normal;min-width:9rem;max-width:18rem}
-table.tab.inv td.th{width:2.4rem;padding:.15rem}table.tab.inv td.th img,table.tab.inv td.th svg{width:2.2rem;height:2.2rem;object-fit:cover;border-radius:4px;display:block;background:#eceef1}
+table.tab.invtab td.th{width:2.4rem;padding:.15rem}table.tab.invtab td.th img,table.tab.invtab td.th svg{width:2.2rem;height:2.2rem;object-fit:cover;border-radius:4px;display:block;background:#eceef1}
 .rfbox{background:#14171c;border-radius:8px;padding:.4rem;margin:.4rem 0 .8rem}
 svg.rfg{width:100%;height:270px;display:block}
 svg.rfg .gd{stroke:#2c323b;stroke-width:1}svg.rfg .tk{fill:#8d939d;font-size:12px;text-anchor:middle}
@@ -539,7 +539,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.52 · 05/11 22:15</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.53 · 05/11 22:35</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1061,20 +1061,22 @@ function ultimoReport(){var u=D.imp[D.imp.length-1];return u?u.gerado:'';}
 /* cena usada na input list: "Todos juntos" */
 function cenaTodos(){var L=cenasLista();return L.filter(function(c){return c.id==='base';})[0]||L.filter(function(c){return /todos/i.test(c.nome);})[0]||L[0];}
 /* linhas da input list: pistas da cena, em ordem de canal, sem cópias */
-function linhasIL(){
+function linhasIL(tudo){
   var c=cenaTodos(),R=resolver(c,UI.ep),M=mesaEf(c,R),L=[],vistos={};
-  R.S.forEach(function(sl){if(sl.copia)return;
+  R.S.forEach(function(sl){
+    if(tudo&&(sl.copia||(!sl.p&&!sl.fx))){L.push({n:sl.n,p:sl.p||null,e:sl.e||{},t:sl.p?sl.t:null,cn:sl.cn,copia:sl.copia||0,vazio:!sl.p&&!sl.fx});return;}
+    if(sl.copia)return;
     if(sl.p){vistos[sl.p.id]=1;L.push({n:sl.n,p:sl.p,e:sl.e||{},t:sl.t,cn:sl.cn});}
     else if(sl.fx)L.push({n:sl.n,fx:true,nome:nomeFx(sl,M),cn:sl.cn});});
   var s=situacao(UI.ep),fora=s.pessoas.filter(function(x){return x.ativo&&!vistos[x.p.id];});
   return {c:c,R:R,M:M,L:L,fora:fora};
 }
-function ilNome(x){return x.fx?x.nome:primeiroNome(x.p);}
+function ilNome(x){return x.fx?x.nome:x.p?primeiroNome(x.p):'—';}
 function ilMic(x){var e=x.e||{};if(x.fx||!e.cap)return '';var k=compatCap(D.capPor[e.cap],x.t);return capTag(e.cap,'sm')+invIcon(e.cap,1)+(k.ok&&k.ad?' <small class="ad">+AD'+(e.ad?' '+esc(adCurto(e.ad)):'')+'</small>':'');}
 function viewDoc(){
-  var I=linhasIL(),fich=UI.fmt==='fichas',s=situacao(UI.ep);
+  var I=linhasIL(!!UI.il32),fich=UI.fmt==='fichas',s=situacao(UI.ep);
   var h='<div class="bar noprint"><span class="seg" role="group" aria-label="Formato"><button type="button" data-act="fmt" data-v="lista" aria-pressed="'+!fich+'">Lista</button><button type="button" data-act="fmt" data-v="fichas" aria-pressed="'+fich+'">Fichas</button></span>'+
-    '<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+    '<button type="button" class="btn" data-act="il32" aria-pressed="'+!!UI.il32+'">'+(UI.il32?'− Só as pistas principais':'＋ Ver até o canal 32 (colinha)')+'</button><span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(s.graves)h+='<div class="banner err noprint">A escalação tem '+s.graves+' problema(s). Confira no Carômetro antes de imprimir.</div>';
   if(fich)h+='<style>@page{size:A4 landscape;margin:10mm}</style>';
   h+='<section class="doc il"><div class="dochead"><div><h1>Perícia Lab · Input list</h1><p>Cena "'+esc(I.c.nome)+'" · EP '+UI.ep+' · '+I.L.length+' pistas</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
@@ -1084,7 +1086,7 @@ function viewDoc(){
   }else{
     h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>Pista</th><th>Nome</th><th>Source</th><th>Mic</th><th>Transmissor</th><th>Receptor</th><th>Freq.</th><th>Bloco</th></tr></thead><tbody>'+
       I.L.map(function(x){var t=x.t;
-        var r='<tr'+(x.fx?' class="fx"':'')+'><td><span class="tag sm">'+x.n+'</span></td><td class="n">'+esc(ilNome(x))+'</td><td><b>'+esc(x.cn||'')+'</b></td><td>'+ilMic(x)+'</td><td>'+esc(t?txNome(t):'')+'</td><td>'+esc(t?rxTxt(t):'')+'</td><td>'+(t&&!isNaN(t.freq)?mhz(t.freq):'')+'</td><td>'+esc(t?t.bloco:'')+'</td></tr>';
+        var r='<tr'+(x.fx||x.copia||x.vazio?' class="fx"':'')+'><td><span class="tag sm">'+x.n+'</span></td><td class="n">'+esc(ilNome(x))+(x.copia?'<small>colinha · = Ch '+x.copia+'</small>':'')+'</td><td><b>'+esc(x.cn||'')+'</b></td><td>'+ilMic(x)+'</td><td>'+esc(t?txNome(t):'')+'</td><td>'+esc(t?rxTxt(t):'')+'</td><td>'+(t&&!isNaN(t.freq)?mhz(t.freq):'')+'</td><td>'+esc(t?t.bloco:'')+'</td></tr>';
         if(x.p&&x.p.papel==='MENTOR'&&t&&t.rxM)r+='<tr class="sub"><td></td><td colspan="2">↳ sala dos mentores</td><td></td><td></td><td>'+esc(t.rxM)+'</td><td colspan="2">'+esc(t.canalM)+'</td></tr>';
         return r;}).join('')+'</tbody></table></div>';
   }
@@ -1378,7 +1380,7 @@ function viewInv(){
     equip:[['Item','Item'],['Categoria','Categoria'],['Modelo','Modelo'],['Serial','Serial'],['Qtd','Qtd'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']]}[t];
   if(t==='tx')L.sort(function(a,b){return (int(a['TX'])||(/^S/.test(str(a['TX']))?95:90))-(int(b['TX'])||(/^S/.test(str(b['TX']))?95:90));});
   h+='<section class="doc"><div class="dochead"><div><h1>Inventário · '+esc(INVT.filter(function(x){return x[0]===t;})[0][1])+'</h1><p>'+L.length+' item(ns)</p></div><div class="r">Gerado em '+agora()+'</div></div>';
-  h+='<div class="tabwrap"><table class="tab il inv"><thead><tr>'+(t==='tx'||t==='cap'?'<th></th>':'')+cols.map(function(c){return '<th>'+c[1]+'</th>';}).join('')+'<th class="noprint"></th></tr></thead><tbody>'+
+  h+='<div class="tabwrap"><table class="tab il invtab"><thead><tr>'+(t==='tx'||t==='cap'?'<th></th>':'')+cols.map(function(c){return '<th>'+c[1]+'</th>';}).join('')+'<th class="noprint"></th></tr></thead><tbody>'+
     L.map(function(o){var id=str(o[ch]),it=t==='tx'?D.txPor[id]:t==='cap'?D.capPor[id]:null;
       return '<tr>'+(it?'<td class="th">'+fotoEquip(t,it)+'</td>':'')+cols.map(function(c,i){var v=o[c[0]];var txt=c[0]==='Manutenção'?simTxt(v):c[0]==='Devolve após EP'?(str(v)?'EP '+str(v):''):str(v);
         if(i===0)return '<td class="n">'+(t==='cap'?capTag(id,'sm'):esc(txt))+'</td>';return '<td'+(c[0]==='Observações'?' class="w"':'')+'>'+esc(txt)+'</td>';}).join('')+'<td class="noprint">'+lapis('invedit',t,id)+'</td></tr>';}).join('')+'</tbody></table></div>';
@@ -2486,6 +2488,7 @@ document.addEventListener('click',function(ev){
     var ops=recuperarConfig(v);if(v!=='car:auto')salvarConfig('car:auto','Último estado');escalarVarios(ops);toast('Configuração recuperada');}
   else if(a==='cfgzerar'){if(!confirm('Tirar o transmissor e a cápsula de todo mundo? O estado de agora fica guardado em "Último estado".'))return;salvarConfig('car:auto','Último estado');escalarVarios(zerarTudo());toast('Todos os transmissores e cápsulas foram tirados');}
   else if(a==='fmt'){UI.fmt=v;salvarUi();render();}
+  else if(a==='il32'){UI.il32=!UI.il32;salvarUi();render();}
   else if(a==='whats'){var tw=textoWhats();if(navigator.share&&/Mobi|Android|iPhone/i.test(navigator.userAgent)){navigator.share({text:tw}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(tw).then(function(){toast('Copiado. Cole no WhatsApp.');},function(){toast('Não consegui copiar.',true);});}}
   else if(a==='ft'){UI.ft=v;salvarUi();render();}
   else if(a==='print')window.print();

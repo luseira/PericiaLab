@@ -10,6 +10,10 @@
 
 
 
+
+## v1.53 · 05/11
+- Inventário: a tabela não aparecia (a classe "inv" colidia com o ícone de polaridade e virava uma bolinha roxa). Corrigido.
+- Input list: botão "＋ Ver até o canal 32 (colinha)" mostra todas as pistas do Scorpio, inclusive a colinha (= Ch n) e as vazias.
 ## v1.52 · 05/11
 - Colinha (pistas 23–32) sempre em ordem crescente de transmissor em todas as cenas. A cena "Todos juntos" estava com a colinha trocada à mão (C:5 antes de C:4, C:9 antes de C:8).
 ## v1.51 · 05/11
