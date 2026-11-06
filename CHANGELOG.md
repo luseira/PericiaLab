@@ -22,6 +22,10 @@
 
 
 
+
+## v1.65 · 06/11
+- Teste PL 0611 1 conferido e liberado para edição: link de canais (Stereo/MS, pares 1-2 … 15-16, pan ±100 automático), limiter do canal (os três campos juntos), Arm dos buses L/R/1/2, gain do bus em Off (−∞), Record/Stop Mute das saídas, nível Mic.
+- Tela do canal no formato das de Buses/Outputs: teclas Link, Fader, Pan, Automix, Limiter, Comp e EQ; Comp e EQ abrem uma linha/painel compacto (LF/MF/HF).
 ## v1.64 · 06/11
 - Telas de Buses e Outputs no formato do gravador (manual 6.5 e 6.6.1): barra do título, grade Iso/Bus/Com/Return com quadradinhos, Link no lugar do gravador e rodapé de teclas (Buses: More.., Gain, Mute Coms, Mute All; More..: Name, Comp, Limit; Outputs: Name, Delay, Gain, Level, Mute). Mostra o valor efetivo; contorno amarelo = mudado no site; voltar ao valor do gravador = "não mexer".
 ## v1.63 · 06/11

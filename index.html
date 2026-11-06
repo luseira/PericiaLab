@@ -368,6 +368,12 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .sd-sk.num input,.sd-sk.num select{width:4.2rem;background:#1c1c1e;color:#fff;border:1px solid #555;border-radius:4px;padding:.1rem .25rem;font-size:.85rem;text-align:center}
 .sd-sk.num input[type=text]{width:7rem}.sd-sk.num select{width:auto;text-align:left}
 .sd-mutes{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;font-size:.85rem;color:#d2d2d6}.sd-mutes .cx{display:inline-block;width:.9rem;height:.9rem;border:1px solid #aaa;border-radius:2px;margin-right:.3rem;vertical-align:middle}.sd-mutes .cx.on{background:#e2ae4e}
+.sd-chx{border-top:1px solid #2e2e31;margin-top:.4rem}
+.sd-sk.ro{opacity:.75}
+.sd-eq{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px;background:#18181a}
+.sd-band{background:#222225;border-radius:6px;padding:5px;display:grid;gap:4px}.sd-band .sd-sk.num{flex-direction:row;justify-content:space-between;padding:.2rem .45rem}.sd-band .sd-bh .sd-sk{flex-direction:row;justify-content:center;gap:.4rem;padding:.25rem}.sd-band .sd-bh{display:flex;gap:5px}.sd-band .sd-bh .sd-k{flex:1}.sd-band .sd-sk{min-width:0}
+.cxb{background:none;border:0;color:#d2d2d6;font:inherit;font-size:.85rem;display:flex;align-items:center;gap:.3rem;padding:.2rem .3rem;border-radius:4px;cursor:pointer}
+.cxb.mod{box-shadow:inset 0 0 0 2px #e2ae4e}
 .sd-mais{margin:.5rem .7rem;border-top:1px solid var(--sdln,#2e2e31);padding-top:.3rem}.sd-mais>summary{cursor:pointer;color:#b9bcc4;font-size:.85rem;padding:.35rem 0;list-style:none}.sd-mais>summary::before{content:'▸ ';}.sd-mais[open]>summary::before{content:'▾ ';}
 .sd-mais .sd-cols{margin:0}
 .sw{position:relative;width:3.1rem;height:1.8rem;border-radius:1rem;border:0;background:#3a3a3d;flex:none;transition:background .15s}
@@ -574,7 +580,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.64 · 06/11 02:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.65 · 06/11 10:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2130,7 +2136,7 @@ function srcDoArquivo(source,chan){
   if(source==='Comms'&&(chan===3||chan===4))return 'com:'+(chan-2);
   return 'raw:'+source+':'+chan;
 }
-var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV']];
+var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV'],['Mic','Mic']];
 /* ───────── fonte do canal a partir do transmissor ───────── */
 function fonteSlot(s){return s&&s.cn?fonteDeCanal(s.cn,s.t):'';}
 function fonteDeCanal(cn,t){var tt={canal:cn,input:t&&t.canal===cn?t.input:''};
@@ -2358,6 +2364,10 @@ function cliqueMesa(a,el){
   if(a==='mxt'){var al3=el.dataset.alvo,id3=el.dataset.id,k3=el.dataset.k,c3=cenaAtual(),M3=mesaEf(c3,resolver(c3,UI.ep)),ob3=al3==='ch'?M3.ch[+id3]:al3==='bus'?M3.bus[id3]:M3.out[id3];
     var f3=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k3;})[0],e3=xEf(al3,al3==='ch'?+id3:id3,f3,ob3),nv=!e3.v;
     setX(al3,al3==='ch'?+id3:id3,k3,e3.arq!==null&&nv===e3.arq?null:nv);return true;}
+  if(a==='mxc'){var al4=el.dataset.alvo,id4=el.dataset.id,k4=el.dataset.k,c4=cenaAtual(),M4=mesaEf(c4,resolver(c4,UI.ep)),ob4=al4==='ch'?M4.ch[+id4]:al4==='bus'?M4.bus[id4]:M4.out[id4];
+    var f4=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k4;})[0],e4=xEf(al4,al4==='ch'?+id4:id4,f4,ob4),op4=(f4[3]==='m3'?[['off'],['pre'],['post']]:f4[7]).map(function(o){return o[0];});
+    var nx=op4[(op4.indexOf(e4.v)+1)%op4.length];setX(al4,al4==='ch'?+id4:id4,k4,e4.arq!==null&&nx===e4.arq?null:nx);return true;}
+  if(a==='mchmais'){UI.chMais=UI.chMais===el.dataset.v?'':el.dataset.v;salvarUi();render();return true;}
   if(a==='mbusmais'){UI.busMais=!UI.busMais;salvarUi();render();return true;}
   if(a==='sdmais'){UI.sdMais=!UI.sdMais;salvarUi();return false;}
   if(a==='msw'){var cS=cenaAtual(),chS=mesaEf(cS,resolver(cS,UI.ep)).ch[MSEL],kk=el.dataset.k;
@@ -2423,27 +2433,30 @@ function sdNav(solo){
 /* ───── ajustes extras do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1) ─────
    Cada campo: [chave, rótulo, campo no settings, tipo, mín, máx, unidade, opções]. Tipos: n (número), n10 (décimos no arquivo),
    b (liga/desliga), bi (liga = campo falso), e (lista), m3 (Off/Pre/Post, composto). Valor vazio = não mexer no gravador. */
-var XCH=[['fad','Fader','faderdB10ths','n10',-127.5,16,'dB'],['pan','Pan (L −100 · C 0 · R +100)','lrPanPercentage','n',-100,100,'%'],['mix','Automix','duganEnabled','b'],
+var XCH=[['lim','Limiter','*lim','b'],['link','Link','*chlink','e',0,0,'',[['Unlinked','Off'],['Stereo','Stereo'],['MS','MS']]],['fad','Fader','faderdB10ths','n10',-127.5,16,'dB'],['pan','Pan (L −100 · C 0 · R +100)','lrPanPercentage','n',-100,100,'%'],['mix','Automix','duganEnabled','b'],
   ['cmode','Compressor','*comp','m3'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
 var XEQ=[['emode','EQ','*eq','m3'],
   ['lfon','LF ativo','lowEqBypassed','bi'],['lfhz','LF freq.','lowEqCutoffHz','n',20,20000,'Hz'],['lfg','LF ganho','lowEqGaindB10ths','n10',-24,24,'dB'],['lfq','LF Q','lowEqQ','n',0.5,10,''],['lft','LF tipo','lowEqType','e',0,0,'',[['lowshelf','Shelf'],['peaking','Peak']]],
   ['mfon','MF ativo','midEqBypassed','bi'],['mfhz','MF freq.','midEqCutoffHz','n',20,20000,'Hz'],['mfg','MF ganho','midEqGaindB10ths','n10',-24,24,'dB'],['mfq','MF Q','midEqQ','n',0.5,10,''],
   ['hfon','HF ativo','hiEqBypassed','bi'],['hfhz','HF freq.','hiEqCutoffHz','n',20,20000,'Hz'],['hfg','HF ganho','hiEqGaindB10ths','n10',-24,24,'dB'],['hfq','HF Q','hiEqQ','n',0.5,10,''],['hft','HF tipo','hiEqType','e',0,0,'',[['highshelf','Shelf'],['peaking','Peak']]]];
-var XBUS=[['gain','Gain','dB10ths','n10',-60,16,'dB'],['mute','Mute All','mute','b'],['cmute','Mute Coms','comsMute','b'],['lim','Limiter','limiterEnabled','b'],
+var XBUS=[['arm','Arm','arm','b'],['gain','Gain','dB10ths','n10',-127.5,16,'dB'],['mute','Mute All','mute','b'],['cmute','Mute Coms','comsMute','b'],['lim','Limiter','limiterEnabled','b'],
   ['sL','Mix L entra no bus','hasBusL','b'],['sR','Mix R entra no bus','hasBusR','b'],['s1','Bus 1 entra no bus','hasBus1','b'],['s2','Bus 2 entra no bus','hasBus2','b'],
   ['comp','Compressor','compressorEnabled','b'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
-var XOUT=[['mute','Mute','muted','b'],['link','Link com o par','*link','b']];
+var XOUT=[['mute','Mute','muted','b'],['link','Link com o par','*link','b'],['rmute','Record Mute','*am4','b'],['smute','Stop Mute','*am1','b'],['pmute','Play Mute','*am2','b']];
 function xBase(alvo,id){return alvo==='ch'?['InputChannel'+id]:alvo==='bus'?['OutputBusControl','obus'+id]:['AnalogOutputs',id];}
 function parOut(k){var m=/^X(\d+)$/.exec(k);if(!m)return null;var n=+m[1];return n%2?['X'+n,'X'+(n+1)]:['X'+(n-1),'X'+n];}
 /* valor que está no arquivo do gravador (null se não há arquivo) */
 function xArq(alvo,id,f){var sc=scCarregar();if(!sc)return null;var b=xBase(alvo,id),m=sc.m;
   if(f[2]==='*comp'){var en=sjGet(m,b.concat('compressorEnabled'));return !en?'off':sjGet(m,b.concat('compressorPreFader'))?'pre':'post';}
   if(f[2]==='*eq'){var e2=sjGet(m,b.concat('eqEnabled'));return !e2?'off':sjGet(m,b.concat('eqPreFader'))?'pre':'post';}
+  if(f[2]==='*lim')return !!(sjGet(m,b.concat('trimLimiterEnabled'))||sjGet(m,b.concat('faderLimiterEnabled'))||sjGet(m,b.concat('eqLimiterEnabled')));
+  if(f[2]==='*chlink')return sjGet(m,b.concat('linkType'))||'Unlinked';
+  if(/^\*am\d$/.test(f[2]))return !!((+sjGet(m,['AnalogOutputs',id,'autoMutOptions'])||0)&+f[2].slice(3));
   if(f[2]==='*link'){var pr=parOut(id);if(!pr)return null;var l=sjGet(m,['AnalogOutputs',id,'linkedToOutput']);return !!l&&l!=='nAnalogOutputs';}
   var v=sjGet(m,b.concat(f[2]));if(v===undefined)return null;
   if(f[3]==='n10')return v/10;if(f[3]==='bi')return !v;if(f[3]==='b')return !!v;return v;}
 function xTxt(f,v){if(v===null||v===undefined)return '';if(f[3]==='b'||f[3]==='bi')return v?'ligado':'desligado';if(f[3]==='m3')return {off:'Off',pre:'Pre',post:'Post'}[v]||v;
-  if(f[3]==='e'){var o=(f[7]||[]).filter(function(x){return x[0]===v;})[0];return o?o[1]:v;}if(f[3]==='n10'&&v<=-127)return '−∞';return v+(f[6]?' '+f[6]:'');}
+  if(f[3]==='e'){var o=(f[7]||[]).filter(function(x){return x[0]===v;})[0];return o?o[1]:v;}if(f[3]==='n10'&&v<=-127)return '−∞';return (typeof v==='number'?Math.round(v*100)/100:v)+(f[6]?' '+f[6]:'');}
 function xCampo(alvo,id,f,obj){var cur=obj?obj['x_'+f[0]]:undefined,arq=xArq(alvo,id,f),set=cur!==null&&cur!==undefined;
   var at='data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+f[0]+'"',dica=!set&&arq!==null?'<i class="sd-dim">gravador: '+esc(xTxt(f,arq))+'</i>':(set&&arq!==null&&String(arq)!==String(cur)?'<i class="sd-dim">era '+esc(xTxt(f,arq))+'</i>':'');
   var c;
@@ -2458,13 +2471,19 @@ function xTog(alvo,id,k,obj,lbl,specs,ast){var f=specs.filter(function(x){return
 function xSk(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
   return '<button type="button" class="sd-sk'+(e.v?' on':'')+(e.set?' mod':'')+'" data-act="mxt" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'">'+esc(lbl)+'<small>'+(e.v==null?'—':e.v?'On':'Off')+'</small></button>';}
 function xSkNum(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
-  return '<label class="sd-sk num'+(e.set?' mod':'')+'">'+esc(lbl)+'<span><input type="number" step="any" min="'+f[4]+'" max="'+f[5]+'" data-act="mxn" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'" value="'+(e.v==null?'':e.v)+'" placeholder="—">'+esc(f[6]||'')+'</span></label>';}
+  return '<label class="sd-sk num'+(e.set?' mod':'')+'">'+esc(lbl)+'<span><input type="number" step="any" min="'+f[4]+'" max="'+f[5]+'" data-act="mxn" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'" value="'+(e.v==null?'':(e.v<=-127?-127.5:Math.round(e.v*100)/100))+'" placeholder="—">'+esc(f[6]||'')+'</span></label>';}
+function xSkC(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
+  return '<button type="button" class="sd-sk'+(e.v&&e.v!=='off'&&e.v!=='Unlinked'?' on':'')+(e.set?' mod':'')+'" data-act="mxc" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'">'+esc(lbl)+'<small>'+esc(e.v==null?'—':xTxt(f,e.v))+'</small></button>';}
 function xSo(lbl,v){return '<div class="sd-row"><span class="sd-l">'+esc(lbl)+':</span><span class="sd-v"><i class="sd-dim">'+esc(v)+' · só leitura, falta testar</i></span></div>';}
 function setX(alvo,id,k,v){mudarMesa(function(m){var c=alvo==='ch'?m.ch:alvo==='bus'?m.bus:m.out;var o=c[id]=c[id]||{};if(v===null||v===undefined)delete o['x_'+k];else o['x_'+k]=v;});}
 /* grava no settings os ajustes extras definidos (só os que não estão em "não mexer") */
 function xExport(m,alvo,id,obj,specs){var b=xBase(alvo,id);specs.forEach(function(f){var v=obj&&obj['x_'+f[0]];if(v===null||v===undefined)return;
   if(f[2]==='*comp'){sjSet(m,b.concat('compressorEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('compressorPreFader'),v==='pre');return;}
   if(f[2]==='*eq'){sjSet(m,b.concat('eqEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('eqPreFader'),v==='pre');return;}
+  if(f[2]==='*lim'){['trimLimiterEnabled','faderLimiterEnabled','eqLimiterEnabled'].forEach(function(k){sjSet(m,b.concat(k),!!v);});return;}
+  if(f[2]==='*chlink'){var n0=+id;if(n0%2!==1||n0>15)return;[n0,n0+1].forEach(function(q,i){sjSet(m,['InputChannel'+q,'linkType'],v);sjSet(m,['InputChannel'+q,'linkedToId'],v==='Unlinked'?-1:n0);
+      if(v!=='Unlinked'&&!(obj&&obj.x_pan!=null))sjSet(m,['InputChannel'+q,'lrPanPercentage'],i?100:-100);});return;}
+  if(/^\*am\d$/.test(f[2])){var bit=+f[2].slice(3),op=+sjGet(m,['AnalogOutputs',id,'autoMutOptions'])||0;op=v?(op|bit):(op&~bit);sjSet(m,['AnalogOutputs',id,'autoMutOptions'],op);sjSet(m,['AnalogOutputs',id,'autoMute'],!!(op&1));return;}
   if(f[2]==='*link'){var pr=parOut(id);if(!pr)return;pr.forEach(function(o){sjSet(m,['AnalogOutputs',o,'linkedToOutput'],v?pr[0]:'nAnalogOutputs');});return;}
   var val=f[3]==='n10'?Math.round(v*10):f[3]==='bi'?!v:f[3]==='b'?!!v:f[3]==='n'?+v:v;
   if(sjGet(m,b.concat(f[2]))===undefined)return; /* campo que o arquivo não tem: não cria */
@@ -2514,7 +2533,19 @@ function painelSlot(R,M){
   h+=sdRow('HPF:',sdNum('mhpfhz','hpfhz',ch.hpf===null||ch.hpf===undefined?(ch.hpfhz||''):hz,'Hz')+sdSw(ch.hpf==null?null:ch.hpf>0,'data-act="msw" data-k="hpf"'));
   h+=sdRow('Iso:','<span class="sd-btn pre" title="As pistas gravam sempre pré-fader">Pre</span><i class="sd-dim">sempre</i>');
   h+=sdRow('Delay:',sdNum('mchn','dly',ch.dly,'ms',n>16)+(n<=16?gv(ch.dly,function(a){return a.dly+' ms';}):''));
-  var MAIS=function(){var sc=scCarregar(),ln=sc?sjGet(sc.m,['InputChannel'+n,'linkType']):null;
+  var MAIS=function(){
+    var sc=scCarregar(),qual=UI.chMais||'',X=function(k){return XCH.concat(XEQ).filter(function(f){return f[0]===k;});};
+    var r='<div class="sd-soft">';
+    if(n%2===1&&n<=15)r+=xSkC('ch',n,'link',ch,'Link '+n+'-'+(n+1),XCH);
+    else if(n%2===0&&n<=16){var lp=sc?sjGet(sc.m,['InputChannel'+(n-1),'linkType']):null;r+='<span class="sd-sk ro">Link<small>'+(lp&&lp!=='Unlinked'?esc(lp)+' com '+(n-1):'pelo ch '+(n-1))+'</small></span>';}
+    r+=xSkNum('ch',n,'fad',ch,'Fader',XCH)+xSkNum('ch',n,'pan',ch,'Pan',XCH)+xSk('ch',n,'mix',ch,'Automix',XCH)+xSk('ch',n,'lim',ch,'Limiter',XCH)+
+      '<button type="button" class="sd-sk'+(qual==='comp'?' on':'')+(['cmode','cthr','crat','catt','crel'].some(function(k){return ch['x_'+k]!=null;})?' mod':'')+'" data-act="mchmais" data-v="comp">Comp<small>'+esc(xTxt(X('cmode')[0],xEf('ch',n,X('cmode')[0],ch).v)||'—')+'</small></button>'+
+      (n<=16?'<button type="button" class="sd-sk'+(qual==='eq'?' on':'')+(XEQ.some(function(f){return ch['x_'+f[0]]!=null;})?' mod':'')+'" data-act="mchmais" data-v="eq">EQ<small>'+esc(xTxt(X('emode')[0],xEf('ch',n,X('emode')[0],ch).v)||'—')+'</small></button>':'')+'</div>';
+    if(qual==='comp')r+='<div class="sd-soft sub">'+xSkC('ch',n,'cmode',ch,'Comp',XCH)+['cthr','crat','catt','crel'].map(function(k){return xSkNum('ch',n,k,ch,{cthr:'Threshold',crat:'Ratio',catt:'Attack',crel:'Release'}[k],XCH);}).join('')+'</div>';
+    if(qual==='eq'&&n<=16){r+='<div class="sd-soft sub">'+xSkC('ch',n,'emode',ch,'EQ',XEQ)+'</div><div class="sd-eq">'+[['lf','LF',1],['mf','MF',0],['hf','HF',1]].map(function(bd){
+        return '<div class="sd-band"><div class="sd-bh">'+xTog('ch',n,bd[0]+'on',ch,bd[1],XEQ)+(bd[2]?xSkC('ch',n,bd[0]+'t',ch,'Tipo',XEQ):'')+'</div>'+xSkNum('ch',n,bd[0]+'hz',ch,'Freq.',XEQ)+xSkNum('ch',n,bd[0]+'g',ch,'Gain',XEQ)+xSkNum('ch',n,bd[0]+'q',ch,'Q',XEQ)+'</div>';}).join('')+'</div>';}
+    return '<div class="sd-chx">'+r+'<p class="sd-nota">Contorno amarelo = mudado no site. O resto fica como está no gravador'+(sc?'':' (carregue o settings em Scorpio para ver os valores)')+'.</p></div>';};
+  var MAIS_OLD=function(){var sc=scCarregar(),ln=sc?sjGet(sc.m,['InputChannel'+n,'linkType']):null;
     return '<details class="sd-mais"'+(UI.sdMais?' open':'')+'><summary data-act="sdmais">Mais ajustes do gravador · fader, pan, automix, compressor'+(n<=16?', EQ':'')+'</summary><div class="sd-cols"><div class="sd-col">'+
       XCH.map(function(f){return xCampo('ch',n,f,ch);}).join('')+(ln!=null?xSo('Link',ln):'')+'</div><div class="sd-col">'+
       (n<=16?XEQ.map(function(f){return xCampo('ch',n,f,ch);}).join(''):'<p class="sd-nota">EQ só nos canais 1–16 (manual, cap. 4).</p>')+'</div></div>'+
@@ -2575,7 +2606,7 @@ function viewBus(R,M){
   /* rodapé de teclas, como no gravador: página 1 e "More.." */
   var mais=!!UI.busMais;
   h+='<div class="sd-soft"><button type="button" class="sd-sk'+(mais?' on':'')+'" data-act="mbusmais">More..</button>';
-  if(!mais)h+=xSkNum('bus',b,'gain',x,'Gain',XBUS)+xSk('bus',b,'cmute',x,'Mute Coms',XBUS)+xSk('bus',b,'mute',x,'Mute All',XBUS);
+  if(!mais)h+=(/^(L|R|1|2)$/.test(b)?xSk('bus',b,'arm',x,'Arm',XBUS):'')+xSkNum('bus',b,'gain',x,'Gain',XBUS)+xSk('bus',b,'cmute',x,'Mute Coms',XBUS)+xSk('bus',b,'mute',x,'Mute All',XBUS);
   else h+='<label class="sd-sk num">Name<span><input type="text" maxlength="12" data-act="mbusnome" data-b="'+b+'" value="'+esc(x.nome)+'" placeholder="'+esc(busNome(b))+'"></span></label>'+xSk('bus',b,'comp',x,'Comp',XBUS)+xSk('bus',b,'lim',x,'Limit',XBUS);
   h+='</div>';
   if(mais)h+='<div class="sd-soft sub">'+['cthr','crat','catt','crel'].map(function(k){return xSkNum('bus',b,k,x,{cthr:'Threshold',crat:'Ratio',catt:'Attack',crel:'Release'}[k],XBUS);}).join('')+'</div>';
@@ -2601,8 +2632,8 @@ function viewOut(R,M){
     (pr?'<span style="grid-column:span 2;display:grid">'+xTog('out',k,'link',o,'Link '+pr[0]+pr[1],XOUT)+'</span>':'')+'</div>';
   h+='<span class="sd-l">Return</span><div class="sd-grid g8">'+RET_ORD.map(function(r){return sdK(r,src==='ret:'+r?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="ret:'+r+'"',r!=='B1');}).join('')+'</div>';
   h+='<span class="sd-l"></span><div class="sd-grid g8"><span style="grid-column:span 2;display:grid">'+sdK('Silêncio',!src?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v=""')+'</span></div>';
-  if(scO){var am=sjGet(scO.m,['AnalogOutputs',k,'autoMute']),ao=sjGet(scO.m,['AnalogOutputs',k,'autoMutOptions']);
-    h+='<span class="sd-l"></span><div class="sd-mutes" title="só leitura até o teste">'+['Record Mute','Stop Mute','Play Mute'].map(function(t){return '<span><i class="cx'+(am?' on':'')+'"></i>'+t+'</span>';}).join('')+'<i class="sd-dim">'+(am?'(código '+ao+')':'')+' só leitura</i></div>';}
+  h+='<span class="sd-l"></span><div class="sd-mutes">'+[['rmute','Record Mute'],['smute','Stop Mute'],['pmute','Play Mute']].map(function(q){var f=XOUT.filter(function(z){return z[0]===q[0];})[0],e=xEf('out',k,f,o);
+      return '<button type="button" class="cxb'+(e.set?' mod':'')+'" data-act="mxt" data-alvo="out" data-id="'+k+'" data-k="'+q[0]+'"><i class="cx'+(e.v?' on':'')+'"></i>'+q[1]+(q[0]==='pmute'?'<sup>*</sup>':'')+'</button>';}).join('')+'</div>';
   h+='</div>';
   h+='<div class="sd-soft"><label class="sd-sk num">Name<span><input type="text" maxlength="12" data-act="moutv" data-o="'+k+'" data-k="nome" value="'+esc(o.nome)+'"></span></label>'+
     '<label class="sd-sk num'+(o.dly!=null?' mod':'')+'">Delay<span><input type="number" step="any" min="0" max="500" data-act="moutn" data-o="'+k+'" data-k="dly" value="'+(o.dly!=null?o.dly:AO?AO.dly:'')+'" placeholder="—">ms</span></label>'+
