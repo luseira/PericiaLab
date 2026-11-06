@@ -9,6 +9,9 @@
 
 
 
+
+## v1.52 · 05/11
+- Colinha (pistas 23–32) sempre em ordem crescente de transmissor em todas as cenas. A cena "Todos juntos" estava com a colinha trocada à mão (C:5 antes de C:4, C:9 antes de C:8).
 ## v1.51 · 05/11
 - Elenco atualizado pela seleção "Apresentação Canal": sai o David, entra a Amanda (foto nova, rosto enquadrado). Nomes só com o primeiro nome.
 ## v1.50 · 03/11

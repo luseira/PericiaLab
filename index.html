@@ -539,7 +539,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.51 · 05/11 19:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.52 · 05/11 22:15</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1519,7 +1519,10 @@ function cenasLista(){
 /* cenas antigas tinham a colinha fixa por pessoa (P:...) em 23–32: passa para a colinha automática */
 function migrarColinha(c){
   var bloco=c.pistas.slice(22,32);
-  if(bloco.some(function(t){return /^C:/.test(t||'');}))return c;
+  /* colinha 23–32 sempre em ordem de transmissor: C:1…C:10, mesmo que a cena tenha sido reordenada à mão */
+  if(bloco.some(function(t){return /^C:/.test(t||'');})){
+    if(bloco.every(function(t,i){return t==='C:'+(i+1);}))return c;
+    c=clone(c);for(var j=0;j<10;j++)c.pistas[22+j]='C:'+(j+1);return c;}
   var velho=bloco.every(function(t){if(!t)return true;var m=/^P:(.+)$/.exec(t);var p=m&&D.pPor[m[1]];return p&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO');});
   if(!velho)return c;
   c=clone(c);for(var i=0;i<10;i++)c.pistas[22+i]='C:'+(i+1);return c;
