@@ -21,6 +21,9 @@
 
 
 
+
+## v1.64 · 06/11
+- Telas de Buses e Outputs no formato do gravador (manual 6.5 e 6.6.1): barra do título, grade Iso/Bus/Com/Return com quadradinhos, Link no lugar do gravador e rodapé de teclas (Buses: More.., Gain, Mute Coms, Mute All; More..: Name, Comp, Limit; Outputs: Name, Delay, Gain, Level, Mute). Mostra o valor efetivo; contorno amarelo = mudado no site; voltar ao valor do gravador = "não mexer".
 ## v1.63 · 06/11
 - Mixer com os ajustes do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1), cada um com o valor atual do arquivo em cinza e "não mexer" por padrão:
   - Canal: fader, pan, automix, compressor (Off/Pre/Post, threshold, ratio, attack, release) e EQ de 3 bandas (1–16).

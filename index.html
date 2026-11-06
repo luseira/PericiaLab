@@ -352,6 +352,22 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .sd-in.nome input{width:11rem;text-align:right;text-transform:uppercase;font-weight:600}
 .sd-in input:disabled{opacity:.35}.sd-in i{font-style:normal;color:#8d8d93;font-size:.8rem;min-width:1.4rem}
 .sd-sel{background:#2a2a2d;color:#fff;border:1px solid #3c3c40;border-radius:4px;min-height:2.2rem;max-width:15rem}
+.sdscr .sd-bar{display:flex;align-items:baseline;gap:.8rem;background:linear-gradient(90deg,#1fc42c 0,#1fc42c 55%,#2a2a2d 55%);color:#fff;padding:.35rem .8rem;font-size:1.1rem}
+.sdscr .sd-bar span{margin-left:auto;font-size:.8rem;color:#e8ffe8}
+.sdscr .sd-src{grid-template-columns:5rem 1fr;gap:.45rem .5rem;padding:.6rem .8rem}
+.sdscr .sd-l small{display:block;font-size:.7rem;color:#a5a5ab;line-height:1.35;margin-top:.15rem}
+.lg{display:inline-block;width:.6rem;height:.6rem;border-radius:2px;vertical-align:middle}.lg.r-pre{background:#7a9c5c}.lg.r-post{background:#dca244}.lg.r-send{background:#b4c0ee}
+.sd-grid.g8{grid-template-columns:repeat(8,minmax(2.4rem,1fr));max-width:34rem}
+.sd-k.mod,.sd-sk.mod{box-shadow:inset 0 0 0 2px #e2ae4e}
+.sd-k.ro{opacity:.8;cursor:default;display:grid;place-items:center}
+.sd-soft{display:flex;gap:5px;padding:6px;background:#111113;border-top:1px solid #2e2e31;flex-wrap:wrap}
+.sd-soft.sub{background:#18181a}
+.sd-sk{flex:1 1 6rem;min-width:5.5rem;background:#3a3a3e;color:#ececee;border:0;border-radius:6px;padding:.35rem .4rem;text-align:center;font-size:.85rem;line-height:1.15;display:flex;flex-direction:column;align-items:center;gap:.1rem}
+.sd-sk small{font-size:.78rem;color:#cfd0d4}.sd-sk.on{background:#2f5fd6}.sd-sk.on small{color:#fff}
+.sd-sk.num span{display:flex;align-items:center;gap:.2rem;font-size:.75rem;color:#cfd0d4}
+.sd-sk.num input,.sd-sk.num select{width:4.2rem;background:#1c1c1e;color:#fff;border:1px solid #555;border-radius:4px;padding:.1rem .25rem;font-size:.85rem;text-align:center}
+.sd-sk.num input[type=text]{width:7rem}.sd-sk.num select{width:auto;text-align:left}
+.sd-mutes{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;font-size:.85rem;color:#d2d2d6}.sd-mutes .cx{display:inline-block;width:.9rem;height:.9rem;border:1px solid #aaa;border-radius:2px;margin-right:.3rem;vertical-align:middle}.sd-mutes .cx.on{background:#e2ae4e}
 .sd-mais{margin:.5rem .7rem;border-top:1px solid var(--sdln,#2e2e31);padding-top:.3rem}.sd-mais>summary{cursor:pointer;color:#b9bcc4;font-size:.85rem;padding:.35rem 0;list-style:none}.sd-mais>summary::before{content:'▸ ';}.sd-mais[open]>summary::before{content:'▾ ';}
 .sd-mais .sd-cols{margin:0}
 .sw{position:relative;width:3.1rem;height:1.8rem;border-radius:1rem;border:0;background:#3a3a3d;flex:none;transition:background .15s}
@@ -558,7 +574,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.63 · 06/11 01:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.64 · 06/11 02:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2339,6 +2355,10 @@ function cliqueMesa(a,el){
   if(a==='moutsrc'){var oo=el.dataset.o,ov=el.dataset.v;mudarMesa(function(m){m.out[oo]=Object.assign({},m.out[oo]||{},{src:ov});});return true;}
   if(a==='mxs'){var al=el.dataset.alvo,id=el.dataset.id,kx=el.dataset.k,cX=cenaAtual(),MX=mesaEf(cX,resolver(cX,UI.ep)),ob=al==='ch'?MX.ch[+id]:al==='bus'?MX.bus[id]:MX.out[id],cv=ob?ob['x_'+kx]:null;
     setX(al,al==='ch'?+id:id,kx,cv==null?true:cv===true?false:null);return true;}
+  if(a==='mxt'){var al3=el.dataset.alvo,id3=el.dataset.id,k3=el.dataset.k,c3=cenaAtual(),M3=mesaEf(c3,resolver(c3,UI.ep)),ob3=al3==='ch'?M3.ch[+id3]:al3==='bus'?M3.bus[id3]:M3.out[id3];
+    var f3=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k3;})[0],e3=xEf(al3,al3==='ch'?+id3:id3,f3,ob3),nv=!e3.v;
+    setX(al3,al3==='ch'?+id3:id3,k3,e3.arq!==null&&nv===e3.arq?null:nv);return true;}
+  if(a==='mbusmais'){UI.busMais=!UI.busMais;salvarUi();render();return true;}
   if(a==='sdmais'){UI.sdMais=!UI.sdMais;salvarUi();return false;}
   if(a==='msw'){var cS=cenaAtual(),chS=mesaEf(cS,resolver(cS,UI.ep)).ch[MSEL],kk=el.dataset.k;
     if(kk==='ph')setCh(MSEL,{ph:chS.ph==null?true:chS.ph===true?false:null});
@@ -2374,13 +2394,15 @@ function mudancaMesa(a,el){
   if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){logMix(['Nome de pista: '+nomePista(sp.p)+' → '+semAcento(el.value.trim()).toUpperCase()]);fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   if(a==='mhpfhz'){var hzv=el.value===''?null:parseFloat(el.value),cH=cenaAtual(),chH=mesaEf(cH,resolver(cH,UI.ep)).ch[MSEL],pt={hpfhz:hzv};if(chH.hpf>0&&hzv>0)pt.hpf=hzv;setCh(MSEL,pt);return true;}
   if(a==='mxn'||a==='mxe'){var al2=el.dataset.alvo,id2=el.dataset.id,kx2=el.dataset.k,v2=el.value;
-    if(a==='mxn'){v2=v2===''?null:parseFloat(v2);if(v2!==null&&isNaN(v2))return true;var fx=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===kx2;})[0];if(v2!==null&&fx&&fx[4]!=null){v2=Math.max(fx[4],Math.min(fx[5],v2));}}
+    var fx=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===kx2;})[0];
+    if(a==='mxn'){v2=v2===''?null:parseFloat(v2);if(v2!==null&&isNaN(v2))return true;if(v2!==null&&fx&&fx[4]!=null){v2=Math.max(fx[4],Math.min(fx[5],v2));}}
     else v2=v2===''?null:v2;
+    if(v2!==null&&fx){var aq=xArq(al2,al2==='ch'?+id2:id2,fx);if(aq!==null&&String(aq)===String(v2))v2=null;} /* igual ao gravador = não mexer */
     setX(al2,al2==='ch'?+id2:id2,kx2,v2);return true;}
   if(a==='mbusnome'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{nome:el.value.trim().toUpperCase()});});return true;}
   if(a==='mbussrc'){mudarMesa(function(m){m.bus[b]=Object.assign({},m.bus[b]||{},{src:el.value});});return true;}
   if(a==='moutv'){var o=el.dataset.o;mudarMesa(function(m){var x={};x[k]=k==='nome'?el.value.trim().toUpperCase():el.value;m.out[o]=Object.assign({},m.out[o]||{},x);});return true;}
-  if(a==='moutn'){var o2=el.dataset.o;mudarMesa(function(m){var x={};x[k]=el.value===''?null:parseFloat(el.value);m.out[o2]=Object.assign({},m.out[o2]||{},x);});return true;}
+  if(a==='moutn'){var o2=el.dataset.o,scN=scCarregar(),aqN=scN?(scN._A||(scN._A=lerArquivo(scN.m))).out[o2]:null;mudarMesa(function(m){var x={};x[k]=el.value===''?null:parseFloat(el.value);if(x[k]!==null&&aqN&&+aqN[k]===x[k])x[k]=null;m.out[o2]=Object.assign({},m.out[o2]||{},x);});return true;}
   if(a==='mscfile'&&el.files[0]){var f=el.files[0];f.text().then(function(t){try{scGuardar(f.name,t);toast('Settings lido');render();}catch(e){toast(e.message,true);}});return true;}
   return false;
 }
@@ -2430,6 +2452,13 @@ function xCampo(alvo,id,f,obj){var cur=obj?obj['x_'+f[0]]:undefined,arq=xArq(alv
     c='<select class="sd-sel" data-act="mxe" '+at+'><option value="">— não mexer</option>'+op.map(function(o){return '<option value="'+o[0]+'"'+(set&&cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';}
   else c='<span class="sd-in"><input type="number" step="any" min="'+f[4]+'" max="'+f[5]+'" data-act="mxn" '+at+' value="'+(set?cur:'')+'" placeholder="'+(arq!==null?esc(xTxt(f,arq).replace(/ [^ ]+$/,'')):'—')+'"><i>'+esc(f[6]||'')+'</i></span>';
   return sdRow(esc(f[1])+':',c+dica);}
+function xEf(alvo,id,f,obj){var cur=obj?obj['x_'+f[0]]:undefined,set=cur!==null&&cur!==undefined;return {v:set?cur:xArq(alvo,id,f),set:set,arq:xArq(alvo,id,f)};}
+function xTog(alvo,id,k,obj,lbl,specs,ast){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
+  return '<button type="button" class="sd-k'+(e.v?' sel':'')+(e.set?' mod':'')+'" data-act="mxt" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'" title="'+esc(f[1])+': '+(e.v?'ligado':'desligado')+(e.set?' (mudado no site; gravador: '+xTxt(f,e.arq)+')':'')+'">'+esc(lbl)+(ast?'<sup>*</sup>':'')+'</button>';}
+function xSk(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
+  return '<button type="button" class="sd-sk'+(e.v?' on':'')+(e.set?' mod':'')+'" data-act="mxt" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'">'+esc(lbl)+'<small>'+(e.v==null?'—':e.v?'On':'Off')+'</small></button>';}
+function xSkNum(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
+  return '<label class="sd-sk num'+(e.set?' mod':'')+'">'+esc(lbl)+'<span><input type="number" step="any" min="'+f[4]+'" max="'+f[5]+'" data-act="mxn" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'" value="'+(e.v==null?'':e.v)+'" placeholder="—">'+esc(f[6]||'')+'</span></label>';}
 function xSo(lbl,v){return '<div class="sd-row"><span class="sd-l">'+esc(lbl)+':</span><span class="sd-v"><i class="sd-dim">'+esc(v)+' · só leitura, falta testar</i></span></div>';}
 function setX(alvo,id,k,v){mudarMesa(function(m){var c=alvo==='ch'?m.ch:alvo==='bus'?m.bus:m.out;var o=c[id]=c[id]||{};if(v===null||v===undefined)delete o['x_'+k];else o['x_'+k]=v;});}
 /* grava no settings os ajustes extras definidos (só os que não estão em "não mexer") */
@@ -2529,47 +2558,58 @@ function viewRota(R,M){
 }
 /* buses: um bus por vez, fonte à direita, abas embaixo */
 function viewBus(R,M){
-  var b=UI.mbus&&M.bus[UI.mbus]?UI.mbus:'L',x=M.bus[b],lr=b==='L'||b==='R';
-  var h='<div class="sdr"><div class="sd-hd"><span class="sd-ch">'+(lr?'Bus '+b:'Bus '+b)+'</span><div class="sd-who"><b>'+esc(x.nome||busNome(b))+'</b><span>'+R.S.filter(function(s){return M.ch[s.n].r[b];}).length+' canais mandando</span></div></div>';
-  h+='<div class="sd-cols"><div class="sd-col">'+sdRow('Name:','<span class="sd-in nome"><input type="text" maxlength="12" data-act="mbusnome" data-b="'+b+'" value="'+esc(x.nome)+'" placeholder="'+esc(busNome(b))+'"></span>')+
-    XBUS.filter(function(f){return ['gain','mute','cmute','lim'].indexOf(f[0])>=0;}).map(function(f){return xCampo('bus',b,f,x);}).join('')+
-    (b!=='L'&&b!=='R'&&b!=='1'&&b!=='2'?'<div class="sd-row"><span class="sd-l">Fontes de bus:</span><span class="sd-v"><i class="sd-dim">o que entra neste bus além dos canais</i></span></div>'+XBUS.filter(function(f){return /^s[LR12]$/.test(f[0]);}).map(function(f){return xCampo('bus',b,f,x);}).join(''):'')+
-    (function(){var sc=scCarregar();if(!sc)return '';var lk=sjGet(sc.m,['OutputBusControl','obus'+b,'linkedToBus']),ar=sjGet(sc.m,['OutputBusControl','obus'+b,'arm']);return xSo('Link (*-*)',lk==='nOutBuses'||!lk?'desligado':'com '+String(lk).replace('obus','bus '))+(ar!=null?xSo('Arm (trilha do bus)',ar?'armado':'desarmado'):'');})()+
-    '<details class="sd-mais"'+(UI.sdMais?' open':'')+'><summary data-act="sdmais">Compressor do bus</summary>'+XBUS.filter(function(f){return /^(comp|cthr|crat|catt|crel)$/.test(f[0]);}).map(function(f){return xCampo('bus',b,f,x);}).join('')+'</details>'+
-    '<p class="sd-nota">Vazio / "não mexer" = fica como está no gravador.</p></div><div class="sd-col"><div class="sd-src"><span class="sd-l">ISO</span><div class="sd-grid">';
+  var b=UI.mbus&&M.bus[UI.mbus]?UI.mbus:'L',x=M.bus[b],lr=b==='L'||b==='R',sc=scCarregar();
+  var lk=sc?sjGet(sc.m,['OutputBusControl','obus'+b,'linkedToBus']):null,par=lr?'L-R':(+b%2?b+'-'+(+b+1):(+b-1)+'-'+b);
+  var h='<div class="sdr sdscr"><div class="sd-bar"><b>Bus '+b+': '+esc(x.nome||busNome(b))+'</b><span>'+(function(q){return q+(q===1?' canal':' canais');})(R.S.filter(function(s){return M.ch[s.n].r[b];}).length)+'</span></div>';
+  h+='<div class="sd-src">';
+  h+='<span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i><br>Send <i class="lg r-send"></i></small></span><div class="sd-grid g8">';
   for(var n=1;n<=32;n++){var v=M.ch[n].r[b]||'';h+=sdK(String(n),rotaCls(v),'data-act="mrota" data-n="'+n+'" data-b="'+b+'" title="Ch '+n+': '+ROTA_TXT[v]+'"');}
   h+='</div>';
-  if(!lr){h+='<span class="sd-l">Com</span><div class="sd-grid w2">'+sdK('Rtn 1',x.src==='_1'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_1"',1)+sdK('Rtn 2',x.src==='_2'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_2"',0)+'</div>'+
-    '<span class="sd-l">Return</span><div class="sd-grid">'+RET_COD.map(function(r){return sdK(r[1],x.src===r[0]?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="'+r[0]+'"',r[0]!=='Bl'&&r[0]!=='Al');}).join('')+'</div>';}
-  else h+='<span class="sd-l"></span><p class="sd-nota">L e R não recebem retorno.</p>';
-  h+='</div></div></div>';
+  /* Bus: L, R (e 1, 2 nos buses 3–10) entrando neste bus */
+  h+='<span class="sd-l">Bus</span><div class="sd-grid g8">'+(lr?'<i class="sd-dim">—</i>':xTog('bus',b,'sL',x,'L',XBUS)+xTog('bus',b,'sR',x,'R',XBUS)+(b!=='1'&&b!=='2'?xTog('bus',b,'s1',x,'1',XBUS)+xTog('bus',b,'s2',x,'2',XBUS):''))+'</div>';
+  if(!lr){h+='<span class="sd-l">Com</span><div class="sd-grid g8">'+sdK('Rtn 1',x.src==='_1'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_1"')+sdK('Rtn 2',x.src==='_2'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_2"')+
+      '<span class="sd-k ro'+(lk&&lk!=='nOutBuses'?' sel':'')+'" title="Link de buses: só leitura até o teste" style="grid-column:span 2">Link '+par+'<sup>*</sup></span></div>'+
+    '<span class="sd-l">Return</span><div class="sd-grid g8">'+RET_COD.map(function(r){return sdK(r[1],x.src===r[0]?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="'+r[0]+'"',r[0]!=='Bl'&&r[0]!=='Al');}).join('')+'</div>';}
+  else h+='<span class="sd-l">Link</span><div class="sd-grid g8"><span class="sd-k ro'+(lk&&lk!=='nOutBuses'?' sel':'')+'" style="grid-column:span 2" title="só leitura até o teste">Link L-R<sup>*</sup></span></div>';
+  h+='</div>';
+  /* rodapé de teclas, como no gravador: página 1 e "More.." */
+  var mais=!!UI.busMais;
+  h+='<div class="sd-soft"><button type="button" class="sd-sk'+(mais?' on':'')+'" data-act="mbusmais">More..</button>';
+  if(!mais)h+=xSkNum('bus',b,'gain',x,'Gain',XBUS)+xSk('bus',b,'cmute',x,'Mute Coms',XBUS)+xSk('bus',b,'mute',x,'Mute All',XBUS);
+  else h+='<label class="sd-sk num">Name<span><input type="text" maxlength="12" data-act="mbusnome" data-b="'+b+'" value="'+esc(x.nome)+'" placeholder="'+esc(busNome(b))+'"></span></label>'+xSk('bus',b,'comp',x,'Comp',XBUS)+xSk('bus',b,'lim',x,'Limit',XBUS);
+  h+='</div>';
+  if(mais)h+='<div class="sd-soft sub">'+['cthr','crat','catt','crel'].map(function(k){return xSkNum('bus',b,k,x,{cthr:'Threshold',crat:'Ratio',catt:'Attack',crel:'Release'}[k],XBUS);}).join('')+'</div>';
+  h+='<p class="sd-nota">Contorno amarelo = mudado no site (o resto fica como está no gravador'+(sc?'':'; carregue o settings em Scorpio para ver os valores')+'). * = ainda não conferido no aparelho.</p>';
   h+='<div class="sd-tabs">'+BUSES.map(function(k){return '<button type="button" class="sd-tab'+(k===b?' sel':'')+'" data-act="mbussel" data-v="'+k+'">Bus '+k+(M.bus[k].nome?'<small>'+esc(M.bus[k].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
   h+='<!--NAV-->'+tabelaBuses(R,M,b);
-  h+='<p class="hint">ISO colorido = canal mandando para este bus (toque para trocar). * = código ainda não conferido no aparelho. Rtn B ← 633 X3/X4 (Clara) · Com Rtn 1 ← rádio.</p>';
+  h+='<p class="hint">Rtn B ← 633 X3/X4 (Clara) · Com Rtn 1 ← rádio.</p>';
   h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
   return h;
 }
 /* outputs: uma saída por vez, fonte única à direita */
 function viewOut(R,M){
   var k=UI.mout&&M.out[UI.mout]?UI.mout:'L',o=M.out[k],src=o.src||'',a=src.split(':');
-  var h='<div class="sdr"><div class="sd-hd"><span class="sd-ch">'+(k==='L'||k==='R'?k+' Out':k)+'</span><div class="sd-who"><b>'+esc(o.nome||k)+'</b><span>'+esc(saidaTxt(src,M,R))+'</span></div></div>';
-  h+='<div class="sd-cols"><div class="sd-col">'+
-    sdRow('Name:','<span class="sd-in nome"><input type="text" maxlength="12" data-act="moutv" data-o="'+k+'" data-k="nome" value="'+esc(o.nome)+'"></span>')+
-    sdRow('Gain:',sdNum('moutn','gain',o.gain,'dB',false,' data-o="'+k+'"'))+
-    sdRow('Delay:',sdNum('moutn','dly',o.dly,'ms',false,' data-o="'+k+'"'))+
-    XOUT.filter(function(f){return f[0]!=='link'||parOut(k);}).map(function(f){return xCampo('out',k,f,o);}).join('')+
-    (function(){var sc=scCarregar();if(!sc)return '';var am=sjGet(sc.m,['AnalogOutputs',k,'autoMute']),ao=sjGet(sc.m,['AnalogOutputs',k,'autoMutOptions']);return xSo('Record/Stop/Play Mute',am?'ligado ('+ao+')':'desligado');})()+
-    sdRow('Nível:','<select class="sd-sel" data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+nv[1]+'</option>';}).join('')+'</select>')+
-    '<p class="sd-nota">"—" = fica como está no gravador.</p></div><div class="sd-col"><div class="sd-src"><span class="sd-l">ISO</span><div class="sd-grid">';
+  var scO=scCarregar(),AO=scO?(scO._A||(scO._A=lerArquivo(scO.m))).out[k]:null,pr=parOut(k);
+  var h='<div class="sdr sdscr"><div class="sd-bar"><b>'+(k==='L'||k==='R'?k+' Out':k+' Out')+(o.nome?': '+esc(o.nome):'')+'</b><span>'+esc(saidaTxt(src,M,R))+'</span></div>';
+  h+='<div class="sd-src"><span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i></small></span><div class="sd-grid g8">';
   for(var n=1;n<=32;n++){var s=R.S[n-1];h+=sdK(String(n),a[0]==='iso'&&+a[1]===n?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="iso:'+n+':'+(a[0]==='iso'?a[2]:'pre')+'" title="ISO '+n+(s&&s.p?' · '+esc(nomePista(s.p)):'')+'"');}
   h+='</div>';
   if(a[0]==='iso')h+='<span class="sd-l"></span><span class="seg sd-seg"><button type="button" data-act="moutsrc" data-o="'+k+'" data-v="iso:'+a[1]+':pre" aria-pressed="'+(a[2]!=='post')+'">ISO pré</button><button type="button" data-act="moutsrc" data-o="'+k+'" data-v="iso:'+a[1]+':post" aria-pressed="'+(a[2]==='post')+'">ISO pós</button></span>';
-  h+='<span class="sd-l">Bus</span><div class="sd-grid">'+BUSES.map(function(b){return sdK(b,src==='bus:'+b?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="bus:'+b+'" title="'+esc(busNome(b,M))+'"',0);}).join('')+
+  h+='<span class="sd-l">Bus</span><div class="sd-grid g8">'+BUSES.map(function(b){return sdK(b,src==='bus:'+b?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="bus:'+b+'" title="'+esc(busNome(b,M))+'"',0);}).join('')+
     sdK('HP-L',src==='hp:L'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:L"')+sdK('HP-R',src==='hp:R'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:R"',0)+'</div>';
-  h+='<span class="sd-l">Com</span><div class="sd-grid w2">'+sdK('Rtn 1',src==='com:1'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:1"')+sdK('Rtn 2',src==='com:2'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:2"',1)+'</div>';
-  h+='<span class="sd-l">Return</span><div class="sd-grid">'+RET_ORD.map(function(r){return sdK(r,src==='ret:'+r?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="ret:'+r+'"',r!=='B1');}).join('')+'</div>';
-  h+='<span class="sd-l"></span><div>'+sdK('Silêncio',!src?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v=""')+'</div>';
-  h+='</div></div></div>';
+  h+='<span class="sd-l">Com</span><div class="sd-grid g8">'+sdK('Rtn 1',src==='com:1'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:1"')+sdK('Rtn 2',src==='com:2'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:2"',1)+
+    (pr?'<span style="grid-column:span 2;display:grid">'+xTog('out',k,'link',o,'Link '+pr[0]+pr[1],XOUT)+'</span>':'')+'</div>';
+  h+='<span class="sd-l">Return</span><div class="sd-grid g8">'+RET_ORD.map(function(r){return sdK(r,src==='ret:'+r?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="ret:'+r+'"',r!=='B1');}).join('')+'</div>';
+  h+='<span class="sd-l"></span><div class="sd-grid g8"><span style="grid-column:span 2;display:grid">'+sdK('Silêncio',!src?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v=""')+'</span></div>';
+  if(scO){var am=sjGet(scO.m,['AnalogOutputs',k,'autoMute']),ao=sjGet(scO.m,['AnalogOutputs',k,'autoMutOptions']);
+    h+='<span class="sd-l"></span><div class="sd-mutes" title="só leitura até o teste">'+['Record Mute','Stop Mute','Play Mute'].map(function(t){return '<span><i class="cx'+(am?' on':'')+'"></i>'+t+'</span>';}).join('')+'<i class="sd-dim">'+(am?'(código '+ao+')':'')+' só leitura</i></div>';}
+  h+='</div>';
+  h+='<div class="sd-soft"><label class="sd-sk num">Name<span><input type="text" maxlength="12" data-act="moutv" data-o="'+k+'" data-k="nome" value="'+esc(o.nome)+'"></span></label>'+
+    '<label class="sd-sk num'+(o.dly!=null?' mod':'')+'">Delay<span><input type="number" step="any" min="0" max="500" data-act="moutn" data-o="'+k+'" data-k="dly" value="'+(o.dly!=null?o.dly:AO?AO.dly:'')+'" placeholder="—">ms</span></label>'+
+    '<label class="sd-sk num'+(o.gain!=null?' mod':'')+'">Gain<span><input type="number" step="any" min="-50" max="0" data-act="moutn" data-o="'+k+'" data-k="gain" value="'+(o.gain!=null?o.gain:AO?AO.gain:'')+'" placeholder="—">dB</span></label>'+
+    '<label class="sd-sk num'+(o.nivel?' mod':'')+'">Level<span><select data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+(nv[0]?nv[1]:(AO&&AO.nivel?(NIVEIS.filter(function(q){return q[0]===AO.nivel;})[0]||[0,AO.nivel])[1]:'—'))+'</option>';}).join('')+'</select></span></label>'+
+    xSk('out',k,'mute',o,'Mute',XOUT)+'</div>';
+  h+='<p class="sd-nota">Contorno amarelo = mudado no site; o resto fica como está no gravador.</p>';
   h+='<div class="sd-tabs">'+SAIDAS.map(function(x){return '<button type="button" class="sd-tab'+(x===k?' sel':'')+'" data-act="moutsel" data-v="'+x+'">'+(x==='L'||x==='R'?x+' Out':x)+(M.out[x].nome?'<small>'+esc(M.out[x].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
   h+='<!--NAV--><h3>Todas as saídas</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th><th>Ganho</th><th>Delay</th></tr></thead><tbody>'+
     SAIDAS.map(function(x){var q=M.out[x];return '<tr><td><span class="tag sm">'+x+'</span></td><td class="n">'+esc(q.nome)+'</td><td>'+esc(saidaTxt(q.src,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(q.nivel||'');})[0]||['',''])[1])+'</td><td>'+(q.gain==null?'—':q.gain+' dB')+'</td><td>'+(q.dly==null?'—':q.dly+' ms')+'</td></tr>';}).join('')+'</tbody></table></div>';
