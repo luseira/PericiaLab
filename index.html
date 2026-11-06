@@ -422,6 +422,11 @@ table.sd-mx{border-collapse:separate;border-spacing:4px}
 .sd-mx th.sd-corner span{display:block}.sd-mx th.sd-corner span:first-child{text-align:right}
 .sd-mx th.rl{position:sticky;left:0;z-index:1;background:#5d5d61;color:#fff;text-align:left;font-weight:500;border-radius:3px;padding:.3rem .5rem;white-space:nowrap;font-size:.86rem}
 .sd-mx th.rl.arm{background:#9b3d1f}.sd-mx th.rl span{opacity:.8}.sd-mx th.rl i{display:block;font-style:normal;font-size:.72rem;opacity:.85}
+.sd-mx thead th.gr{background:#6b3a3a;text-align:left;white-space:nowrap;padding:.3rem .5rem}.sd-mx th.fech,.sd-mx td.fech{min-width:1.2rem;background:#2a2a2d}
+.sd-mx tr.grr th.rl.gr{background:#3f2f7a}.sd-mx tr.grr td{background:#202022;border-radius:3px}
+.mxg{background:#1c1c1e;color:#fff;border:1px solid #777;border-radius:3px;width:1.4rem;height:1.4rem;line-height:1;padding:0;font-weight:700}
+.mx.on{background:#3a6ee8}.mx.no{display:block;background:#252527;cursor:default}.mx.mod{box-shadow:inset 0 0 0 2px #e2ae4e}
+.sd-tabs.dante{flex-wrap:wrap}.sd-tabs.dante .sd-tab{min-width:3.4rem;flex:0 0 auto}.sd-tab.mod{box-shadow:inset 0 0 0 2px #e2ae4e}
 .mx{width:2.6rem;height:2.4rem;border:0;border-radius:3px;background:#48484b;color:#1b2340;font-size:.66rem;font-weight:700}
 .sd-nav{display:flex;gap:.1rem;background:#1c1c1e;border-radius:0 0 12px 12px;padding:.3rem;margin:0 auto 0;overflow-x:auto;width:100%;justify-content:safe center}
 .console{border-radius:12px 12px 0 0}
@@ -431,7 +436,7 @@ table.sd-mx{border-collapse:separate;border-spacing:4px}
 .sd-nav button{background:none;border:0;color:#8e8e93;display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.68rem;padding:.3rem .5rem;min-width:3.3rem;border-radius:8px}
 .sd-nav svg{width:1.25rem;height:1.25rem;fill:currentColor}
 .sd-nav button.sel{color:#fff;background:#2c2c2f}
-.sd-nav button.gr{color:#e2ae4e}.sd-nav button.gr.sel{color:#1c1c1e;background:#e2ae4e}.sd-nav button.fim{margin-right:.5rem;position:relative}.sd-nav button.fim::after{content:'';position:absolute;right:-.35rem;top:20%;bottom:20%;border-right:1px solid #3a3a3e}
+.sd-nav button.gr{color:#e2ae4e}.sd-nav button.gr.sel{color:#1c1c1e;background:#e2ae4e}.sd-nav button.ini{margin-left:.5rem;position:relative}.sd-nav button.ini::before{content:'';position:absolute;left:-.35rem;top:20%;bottom:20%;border-left:1px solid #3a3a3e}
 @media print{.sdr{background:#fff;color:#000}.sd-nav{display:none}}
 /* mesa */
 .leds{display:flex;gap:3px;width:var(--sw);margin-bottom:7px;justify-content:center;padding:0 6px}
@@ -584,7 +589,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.67 · 06/11 11:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.68 · 06/11 12:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2096,7 +2101,7 @@ function mesaEf(c,R){
   });
   Object.keys(m.bus||{}).forEach(function(b){if(M.bus[b])Object.assign(M.bus[b],m.bus[b]);});
   Object.keys(m.out||{}).forEach(function(k){if(M.out[k])Object.assign(M.out[k],m.out[k]);});
-  M.sl=Object.assign({},m.sl||{});
+  M.sl=Object.assign({},m.sl||{});M.dante=Object.assign({},m.dante||{});M.hp=JSON.parse(JSON.stringify(m.hp||{}));
   return M;
 }
 function mudarMesa(fn){var c=clone(cenaAtual());c.mesa=c.mesa||{};c.mesa.ch=c.mesa.ch||{};c.mesa.bus=c.mesa.bus||{};c.mesa.out=c.mesa.out||{};fn(c.mesa,c);salvarCenaMix(c);}
@@ -2254,6 +2259,8 @@ function comparar(R,M,A){
   BUSES.forEach(function(b){xComparar(add,'Bus '+b,'bus',b,M.bus[b],XBUS);});
   SAIDAS.forEach(function(o){xComparar(add,'Saída '+o,'out',o,M.out[o],XOUT);});
   Object.keys(M.sl||{}).forEach(function(k){add('Slate/Coms',k,String(M.sl[k]),String(slArq(k)));});
+  Object.keys(M.dante||{}).forEach(function(d){add('Dante '+d,'Fonte',saidaTxt(M.dante[d],M,R),saidaTxt(danteArq(d)||'',M,R));});
+  Object.keys(M.hp||{}).forEach(function(pp){Object.keys(M.hp[pp]).forEach(function(f){add('HP '+pp,f,String(M.hp[pp][f]),String(hpArq(pp,f)));});});
   BUSES.forEach(function(b){add('Bus '+b,'Nome',M.bus[b].nome||'(mantém)',M.bus[b].nome?A.bus[b].nome:'(mantém)');if(b!=='L'&&b!=='R')add('Bus '+b,'Retorno',M.bus[b].src||'—',A.bus[b].src||'—');});
   SAIDAS.forEach(function(o){var c=M.out[o],a=A.out[o];add('Saída '+o,'Nome',c.nome,a.nome);add('Saída '+o,'Fonte',saidaTxt(c.src,M,R),saidaTxt(a.src,M,R));
     if(c.nivel)add('Saída '+o,'Nível',c.nivel,a.nivel);if(c.gain!=null)add('Saída '+o,'Ganho',c.gain+' dB',a.gain+' dB');if(c.dly!=null)add('Saída '+o,'Delay',c.dly+' ms',a.dly+' ms');});
@@ -2313,6 +2320,8 @@ function exportar(c,R,M,nome){
   if(fontes.some(function(f){return f==='AES3-1'||f==='AES3-2';}))sjSet(m,['GlobalChannelSettings','xlr1Aes'],true);
   if(fontes.some(function(f){return f==='AES3-5'||f==='AES3-6';}))sjSet(m,['GlobalChannelSettings','xlr6Aes'],true);
   SAIDAS.forEach(function(o){xExport(m,'out',o,M.out[o],XOUT);});
+  Object.keys(M.dante||{}).forEach(function(d){var f=srcParaArquivo(M.dante[d]);if(f&&sjGet(m,['DanteOutputs','Dante'+d,'source'])!==undefined){sjSet(m,['DanteOutputs','Dante'+d,'source'],f[0]);sjSet(m,['DanteOutputs','Dante'+d,'chan'],f[1]);}});
+  Object.keys(M.hp||{}).forEach(function(pp){Object.keys(M.hp[pp]).forEach(function(f){var v=M.hp[pp][f];if(sjGet(m,['HeadphoneOut',pp,f])===undefined)return;sjSet(m,['HeadphoneOut',pp,f],typeof v==='boolean'?v:String(v));});});
   Object.keys(M.sl||{}).forEach(function(k){var v=M.sl[k];if(v===null||v===undefined)return;
     if(/^rtn[ABC]$/.test(k)){['LVolume','RVolume'].forEach(function(z){if(sjGet(m,['SlateMicAndReturns',k+z])!==undefined)sjSet(m,['SlateMicAndReturns',k+z],+v);});return;}
     if(sjGet(m,[slSec(k),k])===undefined)return;sjSet(m,[slSec(k),k],typeof sjGet(m,[slSec(k),k])==='number'?+v:String(v));});
@@ -2378,6 +2387,18 @@ function cliqueMesa(a,el){
     var f4=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k4;})[0],e4=xEf(al4,al4==='ch'?+id4:id4,f4,ob4),op4=(f4[3]==='m3'?[['off'],['pre'],['post']]:f4[7]).map(function(o){return o[0];});
     var nx=op4[(op4.indexOf(e4.v)+1)%op4.length];setX(al4,al4==='ch'?+id4:id4,k4,e4.arq!==null&&nx===e4.arq?null:nx);return true;}
   if(a==='mchmais'){UI.chMais=UI.chMais===el.dataset.v?'':el.dataset.v;salvarUi();render();return true;}
+  if(a==='mdsel'){UI.mdante=+el.dataset.v;salvarUi();render();return true;}
+  if(a==='mdsrc'){var dd=el.dataset.d,dv=el.dataset.v,da=danteArq(dd);mudarMesa(function(m){m.dante=m.dante||{};if(dv==='*'||(da!==null&&dv===da))delete m.dante[dd];else m.dante[dd]=dv;});return true;}
+  if(a==='mhpsel'){UI.mhp=+el.dataset.v;salvarUi();render();return true;}
+  if(a==='mhpl'){UI.mhpl=el.dataset.v;salvarUi();render();return true;}
+  if(a==='mhpb'||a==='mhptok'||a==='mhpiso'){var hp=el.dataset.p,cH=cenaAtual(),MH=mesaEf(cH,resolver(cH,UI.ep));
+    var setHp=function(m,f,v){m.hp=m.hp||{};var o=m.hp[hp]=m.hp[hp]||{},aq=hpArq(hp,f);if(aq!==null&&String(aq)===String(v))delete o[f];else o[f]=v;if(!Object.keys(o).length)delete m.hp[hp];};
+    if(a==='mhpb'){var fb=el.dataset.f,eb=hpEf(MH,hp,fb);mudarMesa(function(m){setHp(m,fb,!eb.v);});return true;}
+    if(a==='mhptok'){var ft=el.dataset.f,tt=el.dataset.t,et=slToks(hpEf(MH,hp,ft).v);et=et.indexOf(tt)>=0?et.filter(function(z){return z!==tt;}):et.concat([tt]);mudarMesa(function(m){setHp(m,ft,et.join('+'));});return true;}
+    var Fh=HP_F[+el.dataset.l],ti=el.dataset.t,pr0=slToks(hpEf(MH,hp,Fh[0]).v),po0=slToks(hpEf(MH,hp,Fh[1]).v),stt=pr0.indexOf(ti)>=0?'pre':po0.indexOf(ti)>=0?'post':'';
+    pr0=pr0.filter(function(z){return z!==ti;});po0=po0.filter(function(z){return z!==ti;});if(stt==='')pr0.push(ti);else if(stt==='pre')po0.push(ti);
+    var so=function(x){return x.sort(function(u,w){return u-w;}).join('+');};mudarMesa(function(m){setHp(m,Fh[0],so(pr0));setHp(m,Fh[1],so(po0));});return true;}
+  if(a==='mxg'){UI.mxg=UI.mxg||{};var g=el.dataset.g;UI.mxg[g]=!mxAberto(g);salvarUi();render();return true;}
   if(a==='mmenu'){UI.mmenu=el.dataset.v;salvarUi();render();return true;}
   if(a==='mslr'){UI.slr=el.dataset.v;salvarUi();render();return true;}
   if(a==='mslk'){var cS2=cenaAtual(),MS2=mesaEf(cS2,resolver(cS2,UI.ep)),fS=el.dataset.f,tS=el.dataset.t,eS=slEf(MS2,fS),tk=slToks(eS.v),ord=fS.indexOf('Tracks')>0?null:(fS.indexOf('Outputs')>0?SL_OUT:SL_BUS);
@@ -2397,7 +2418,7 @@ function cliqueMesa(a,el){
   if(a==='mcopiafim'){COPIA=null;render();return true;}
   if(a==='mbusall'){if(!confirm('Copiar os buses, as saídas e o Slate/Coms/Returns desta cena para todas as outras?'))return true;
     var cur=cenaAtual(),mb=(cur.mesa&&cur.mesa.bus)||{},mo=(cur.mesa&&cur.mesa.out)||{};
-    cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);y.mesa.sl=clone((cur.mesa&&cur.mesa.sl)||{});salvarCena(y);});toast('Buses, saídas e Slate/Coms copiados para as outras cenas');return true;}
+    cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);y.mesa.sl=clone((cur.mesa&&cur.mesa.sl)||{});y.mesa.dante=clone((cur.mesa&&cur.mesa.dante)||{});y.mesa.hp=clone((cur.mesa&&cur.mesa.hp)||{});salvarCena(y);});toast('Buses, saídas e Slate/Coms copiados para as outras cenas');return true;}
   if(a==='mscdel'){SC=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
   if(a==='mtrazer'){if(!SC)return true;if(!confirm('Substituir ON, ARM, routing, ajustes, buses e saídas desta cena pelo que está no arquivo?'))return true;
     var c3=cenaAtual(),R3=resolver(c3,UI.ep);trazerDoArquivo(R3,lerArquivo(SC.m));toast('Cena atualizada com o gravador');return true;}
@@ -2419,6 +2440,7 @@ function mudancaMesa(a,el){
   if(a==='mfxnome'){setCh(MSEL,{nome:semAcento(el.value.trim()).toUpperCase()});return true;}
   if(a==='mpistac'){var sp=resolver(cenaAtual(),UI.ep).S[MSEL-1];if(sp&&sp.p){logMix(['Nome de pista: '+nomePista(sp.p)+' → '+semAcento(el.value.trim()).toUpperCase()]);fazer({acao:'pessoa',id:sp.p.id,pista:semAcento(el.value.trim()).toUpperCase()});toast('Nome de pista salvo');}return true;}
   if(a==='mhpfhz'){var hzv=el.value===''?null:parseFloat(el.value),cH=cenaAtual(),chH=mesaEf(cH,resolver(cH,UI.ep)).ch[MSEL],pt={hpfhz:hzv};if(chH.hpf>0&&hzv>0)pt.hpf=hzv;setCh(MSEL,pt);return true;}
+  if(a==='mhpnome'){var hpn=el.dataset.p,vn=el.value.slice(0,12),aqn=hpArq(hpn,'label');mudarMesa(function(m){m.hp=m.hp||{};var o=m.hp[hpn]=m.hp[hpn]||{};if(aqn!==null&&aqn===vn)delete o.label;else o.label=vn;});return true;}
   if(a==='msln'){var fN=el.dataset.f,mul=+el.dataset.mul,vN=el.value===''?null:Math.round(parseFloat(el.value))*mul,aqN2=slArq(fN);if(vN!==null&&isNaN(vN))return true;
     mudarMesa(function(m){m.sl=m.sl||{};if(vN===null||(aqN2!==null&&+aqN2===vN))delete m.sl[fN];else m.sl[fN]=vN;});return true;}
   if(a==='mxn'||a==='mxe'){var al2=el.dataset.alvo,id2=el.dataset.id,kx2=el.dataset.k,v2=el.value;
@@ -2436,7 +2458,7 @@ function mudancaMesa(a,el){
 }
 
 /* ───────── telas no estilo do SD-Remote ───────── */
-var SDNAV=[['scorpio','Scorpio','d'],['menu','Menu','m'],['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g']];
+var SDNAV=[['b1','1–8','f'],['b2','9–16','f'],['b3','17–24','f'],['b4','25–32','f'],['s1','1–16','f'],['s2','17–32','f'],['cl','CL-12','f'],['all','Tudo','f'],['bus','Buses','f'],['out','Outputs','f'],['rota','Routing','g'],['scorpio','Scorpio','d'],['menu','Menu','m']];
 var SDICO={m:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="3" height="12" rx="1"/><rect x="8" y="4" width="3" height="17" rx="1"/><rect x="13" y="7" width="3" height="14" rx="1"/><rect x="18" y="11" width="3" height="10" rx="1"/></svg>',
   g:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h18M3 16h18" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>',
   d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
@@ -2446,7 +2468,7 @@ function retTxt(c){if(!c)return '';if(c==='_1')return 'RTN 1';if(c==='_2')return
 var BUS_FONTES=[['','—'],['_1','Com Rtn 1 *'],['_2','Com Rtn 2 *']].concat(RET_COD.map(function(r){return [r[0],'Return '+r[1]+(r[0]==='Bl'?'':' *')];}));
 function sdNav(solo){
   var at=UI.mixp&&UI.mixp!=='pistas'?UI.mixp:UI.mixv;
-  return '<nav class="sd-nav noprint'+(solo?' solo':'')+'" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'" class="'+(x[0]===at?'sel ':'')+(x[0]==='scorpio'||x[0]==='menu'?'gr'+(x[0]==='menu'?' fim':''):'')+'"'+(x[0]===at?' aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
+  return '<nav class="sd-nav noprint'+(solo?' solo':'')+'" aria-label="Mixer">'+SDNAV.map(function(x){return '<button type="button" data-act="mnav" data-v="'+x[0]+'" class="'+(x[0]===at?'sel ':'')+(x[0]==='scorpio'||x[0]==='menu'?'gr'+(x[0]==='scorpio'?' ini':''):'')+'"'+(x[0]===at?' aria-current="page"':'')+'>'+SDICO[x[2]]+'<span>'+x[1]+'</span></button>';}).join('')+'</nav>';
 }
 /* ───── ajustes extras do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1) ─────
    Cada campo: [chave, rótulo, campo no settings, tipo, mín, máx, unidade, opções]. Tipos: n (número), n10 (décimos no arquivo),
@@ -2599,15 +2621,52 @@ function painelCopia(R){
   return h;
 }
 /* routing: matriz como a do SD-Remote */
+/* Routing (SD-Remote, "Routing Matrix"): De (linhas) → Para (colunas), grupos que abrem e fecham.
+   Verde = pré, laranja = pós, azul claro = send (só canal → bus), azul = ligado, escuro = não existe no gravador. */
+var MXG_PADRAO={'r:ch':1,'r:bus':1,'r:hp':0,'r:ret':1,'c:bus':1,'c:out':1,'c:dante':0};
+function mxAberto(g){var u=UI.mxg||{};return g in u?!!u[g]:!!MXG_PADRAO[g];}
 function viewRota(R,M){
-  var h='<div class="sdr sd-mxw"><table class="sd-mx"><thead><tr><th class="sd-corner"><span>To</span><span>From</span></th>'+
-    BUSES.map(function(b){return '<th class="'+(b==='L'||b==='R'?'lr':'')+'"><b>'+(b==='L'||b==='R'?b:'B'+b)+'</b><span class="vt">'+esc(busNome(b,M))+'</span></th>';}).join('')+'</tr></thead><tbody>';
-  R.S.forEach(function(s){var ch=M.ch[s.n],f=s.cn?fonteTxt(fonteSlot(s)):'';
-    h+='<tr><th class="rl'+(ch.arm?' arm':'')+'"><span>'+s.n+':</span> '+esc(s.p?nomePista(s.p):'—')+(f?'<i>['+esc(f)+']</i>':'')+'</th>'+
-      BUSES.map(function(b){var v=ch.r[b]||'';return '<td><button type="button" class="mx '+rotaCls(v)+'" data-act="mrota" data-n="'+s.n+'" data-b="'+b+'" title="Ch '+s.n+' → '+esc(busNome(b,M))+': '+ROTA_TXT[v]+(v==='send'?' '+(ch.sg[b]||0)+' dB':'')+'">'+(v==='send'&&ch.sg[b]?esc(String(ch.sg[b])):'')+'</button></td>';}).join('')+'</tr>';});
+  var RET=[['_1','Com Rtn 1','com:1'],['_2','Com Rtn 2','com:2']].concat(RET_COD.map(function(r){return [r[0],'Rtn '+r[1],'ret:'+r[1]];}));
+  var colGr=[['bus','Buses',BUSES.map(function(b){return {id:b,l:b==='L'||b==='R'?b:'B'+b,n:busNome(b,M),lr:b==='L'||b==='R'};})],
+    ['out','Analog Outs',SAIDAS.map(function(k){return {id:k,l:k,n:M.out[k].nome||''};})],
+    ['dante','Dante Outs',Array.apply(null,{length:32}).map(function(_,i){var d=i+1;return {id:String(d),l:'D'+d,n:d<=REAPER_N?'Reaper '+d:''};})]];
+  var rowGr=[['ch','Canais',R.S.map(function(s){return {id:String(s.n),l:s.n+': '+(s.p?nomePista(s.p):s.fx?nomeFx(s,M):'—'),sub:s.cn?fonteTxt(fonteSlot(s)):'',arm:M.ch[s.n].arm};})],
+    ['bus','Buses',BUSES.map(function(b){return {id:b,l:(b==='L'||b==='R'?'Bus ':'B')+b+': '+busNome(b,M)};})],
+    ['hp','HP',[{id:'L',l:'HP-L'},{id:'R',l:'HP-R'}]],
+    ['ret','Coms / Returns',RET.map(function(r){return {id:r[0],l:r[1],t:r[2]};})]];
+  var h='<div class="sdr sd-mxw"><table class="sd-mx"><thead><tr><th class="sd-corner" rowspan="2"><span>Para</span><span>De</span></th>';
+  colGr.forEach(function(g){var ab=mxAberto('c:'+g[0]);h+='<th class="gr" colspan="'+(ab?g[2].length:1)+'"><button type="button" class="mxg" data-act="mxg" data-g="c:'+g[0]+'">'+(ab?'−':'+')+'</button> '+g[1]+'</th>';});
+  h+='</tr><tr>';
+  colGr.forEach(function(g){if(!mxAberto('c:'+g[0])){h+='<th class="fech"></th>';return;}g[2].forEach(function(c){h+='<th class="'+(c.lr?'lr':'')+'"><b>'+esc(c.l)+'</b><span class="vt">'+esc(c.n)+'</span></th>';});});
+  h+='</tr></thead><tbody>';
+  rowGr.forEach(function(rg){var ab=mxAberto('r:'+rg[0]),ncol=colGr.reduce(function(t,g){return t+(mxAberto('c:'+g[0])?g[2].length:1);},0);
+    h+='<tr class="grr"><th class="rl gr"><button type="button" class="mxg" data-act="mxg" data-g="r:'+rg[0]+'">'+(ab?'−':'+')+'</button> '+rg[1]+'</th><td colspan="'+ncol+'"></td></tr>';
+    if(!ab)return;
+    rg[2].forEach(function(r){h+='<tr><th class="rl'+(r.arm?' arm':'')+'">'+esc(r.l)+(r.sub?'<i>['+esc(r.sub)+']</i>':'')+'</th>';
+      colGr.forEach(function(g){if(!mxAberto('c:'+g[0])){h+='<td class="fech"></td>';return;}g[2].forEach(function(c){h+='<td>'+mxCel(rg[0],r,g[0],c.id,M)+'</td>';});});
+      h+='</tr>';});});
   h+='</tbody></table></div><!--NAV-->';
-  h+='<p class="hint">Toque para trocar: cinza desligado → <span class="chip r-post">pós</span> → <span class="chip r-pre">pré</span> → <span class="chip r-send">send</span>. Nome em vermelho = pista armada. O ganho do send fica na tela do canal.</p>';
+  h+='<p class="hint">Toque nos quadrados: canal → bus alterna <span class="chip r-post">pós</span> → <span class="chip r-pre">pré</span> → <span class="chip r-send">send</span> → desligado; canal → saída alterna <span class="chip r-pre">pré</span> → <span class="chip r-post">pós</span> → desligado (cada saída tem uma fonte só, como no gravador). Quadrado escuro = combinação que o gravador não tem. "+"/"−" abre e fecha grupos. Nome em vermelho = pista armada. Contorno amarelo nas colunas Dante = mudado no site.</p>';
   return h;
+}
+function mxCel(rg,r,cg,cid,M){
+  var nada='<span class="mx no"></span>',b=function(cls,act,tt){return '<button type="button" class="mx '+cls+'" '+act+' title="'+esc(tt)+'"></button>';};
+  var src=cg==='out'?(M.out[cid].src||''):cg==='dante'?(danteEf(M,cid).v||''):'',dmod=cg==='dante'&&danteEf(M,cid).set?' mod':'';
+  var acOut=function(v){return cg==='out'?'data-act="moutsrc" data-o="'+cid+'" data-v="'+v+'"':'data-act="mdsrc" data-d="'+cid+'" data-v="'+v+'"';};
+  if(rg==='ch'){var n=r.id;
+    if(cg==='bus'){var v=M.ch[+n].r[cid]||'';return b(rotaCls(v),'data-act="mrota" data-n="'+n+'" data-b="'+cid+'"','Ch '+n+' → '+busNome(cid,M)+': '+ROTA_TXT[v]);}
+    var pr=src==='iso:'+n+':pre',po=src==='iso:'+n+':post';
+    return b((pr?'r-pre':po?'r-post':'')+((pr||po)?dmod:''),acOut(pr?'iso:'+n+':post':po?'':'iso:'+n+':pre'),'ISO '+n+' → '+cid+(pr?': pré':po?': pós':''));}
+  if(rg==='bus'){var bb=r.id;
+    if(cg==='bus'){var ok=bb!==cid&&cid!=='L'&&cid!=='R'&&((bb==='L'||bb==='R')||((bb==='1'||bb==='2')&&+cid>=3));if(!ok)return nada;
+      var x=M.bus[cid],e=xEf('bus',cid,XBUS.filter(function(f){return f[0]==='s'+bb;})[0],x);
+      return '<button type="button" class="mx'+(e.v?' on':'')+(e.set?' mod':'')+'" data-act="mxt" data-alvo="bus" data-id="'+cid+'" data-k="s'+bb+'" title="Bus '+bb+' entra no '+esc(busNome(cid,M))+'"></button>';}
+    var on=src==='bus:'+bb;return b((on?'on':'')+(on?dmod:''),acOut(on?'':'bus:'+bb),'Bus '+bb+' → '+cid);}
+  if(rg==='hp'){if(cg!=='out')return nada;var onh=src==='hp:'+r.id;return b(onh?'on':'',acOut(onh?'':'hp:'+r.id),'HP-'+r.id+' → '+cid);}
+  if(rg==='ret'){if(cg==='dante')return nada;
+    if(cg==='bus'){if(cid==='L'||cid==='R')return nada;var onb=M.bus[cid].src===r.id;return b(onb?'on':'','data-act="mbussrcb" data-b="'+cid+'" data-v="'+r.id+'"',r.l+' → '+busNome(cid,M));}
+    var ono=src===r.t;return b(ono?'on':'',acOut(ono?'':r.t),r.l+' → '+cid);}
+  return nada;
 }
 /* buses: um bus por vez, fonte à direita, abas embaixo */
 function viewBus(R,M){
@@ -2658,13 +2717,49 @@ function slNum(M,campo,lbl,un,mul,mn,mx){var e=slEf(M,campo),v=e.v==null?'':(e.v
 function viewMenu(R,M){
   var pg=UI.mmenu||'slate';
   var h='<div class="sdr sdscr"><div class="sd-bar"><b>Menu</b><span>Gravador</span></div><div class="sd-menu">'+
-    [['slate','Slate/Coms/Returns',1],['lim','Limiters',0],['dante','Dante Outputs',0],['hp','Headphones',0],['tc','Timecode',0]].map(function(x){return '<button type="button" class="sd-mi'+(pg===x[0]?' sel':'')+'" data-act="mmenu" data-v="'+x[0]+'"'+(x[2]?'':' disabled title="em breve"')+'>'+esc(x[1])+(x[2]?'':'<small>em breve</small>')+'</button>';}).join('')+'</div>';
-  if(pg==='slate')h+=viewSlate(M);
+    [['slate','Slate/Coms/Returns',1],['dante','Dante Outputs',1],['hp','Headphones',1]].map(function(x){return '<button type="button" class="sd-mi'+(pg===x[0]?' sel':'')+'" data-act="mmenu" data-v="'+x[0]+'"'+(x[2]?'':' disabled title="em breve"')+'>'+esc(x[1])+(x[2]?'':'<small>em breve</small>')+'</button>';}).join('')+'</div>';
+  if(pg==='slate')h+=viewSlate(M);else if(pg==='dante')h+=viewDante(R,M);else if(pg==='hp')h+=viewHp(M);
   h+='</div><!--NAV-->';
   h+='<p class="hint">Valores em cinza/sem contorno vêm do settings carregado em Scorpio. Contorno amarelo = mudado no site. * = código ainda não conferido no aparelho.</p>';
   h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar buses, saídas e Slate/Coms em todas as cenas</button></div>';
   return h;
 }
+/* ───── Dante Outputs (manual 6.6.4): fonte única por saída Dante, ISO pre/post ou bus ───── */
+function danteArq(d){var sc=scCarregar();if(!sc)return null;var so=sjGet(sc.m,['DanteOutputs','Dante'+d,'source']);if(so===undefined)return null;return srcDoArquivo(so,+sjGet(sc.m,['DanteOutputs','Dante'+d,'chan']));}
+function danteEf(M,d){var v=M.dante[d];return v!=null?{v:v,set:true}:{v:danteArq(d),set:false};}
+function viewDante(R,M){
+  var d=+UI.mdante||1,e=danteEf(M,d),src=e.v||'',a=src.split(':');
+  var h='<div class="sd-bar sub"><b>Dante '+d+'</b><span>'+esc(e.v==null?'— (carregue o settings em Scorpio)':saidaTxt(src,M,R))+(e.set?' · mudado no site':'')+'</span></div><div class="sd-src">';
+  h+='<span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i></small></span><div class="sd-grid g8">';
+  for(var n=1;n<=32;n++){var eu=a[0]==='iso'&&+a[1]===n,pp=eu?(a[2]==='post'?'post':'pre'):'',prox=!eu?'iso:'+n+':pre':pp==='pre'?'iso:'+n+':post':'';
+    h+=sdK(String(n),(pp?'r-'+pp:'')+(eu&&e.set?' mod':''),'data-act="mdsrc" data-d="'+d+'" data-v="'+prox+'" title="ISO '+n+(R.S[n-1]&&R.S[n-1].p?' · '+esc(nomePista(R.S[n-1].p)):'')+'"');}
+  h+='</div><span class="sd-l">Bus</span><div class="sd-grid g8">'+BUSES.map(function(b){var on=src==='bus:'+b;return sdK(b,(on?'sel':'')+(on&&e.set?' mod':''),'data-act="mdsrc" data-d="'+d+'" data-v="'+(on?'':'bus:'+b)+'" title="'+esc(busNome(b,M))+'"');}).join('')+'</div>';
+  h+='<span class="sd-l"></span><div class="sd-grid g8"><span style="grid-column:span 2;display:grid">'+sdK('Silêncio',!src&&e.v!=null?'sel':'','data-act="mdsrc" data-d="'+d+'" data-v=""')+'</span>'+(e.set?'<span style="grid-column:span 3;display:grid">'+sdK('↺ Como no gravador','','data-act="mdsrc" data-d="'+d+'" data-v="*"')+'</span>':'')+'</div></div>';
+  h+='<div class="sd-tabs dante">';for(var q=1;q<=32;q++){var eq=danteEf(M,q);h+='<button type="button" class="sd-tab'+(q===d?' sel':'')+(eq.set?' mod':'')+'" data-act="mdsel" data-v="'+q+'">'+q+'<small>'+esc(eq.v==null?'':eq.v.replace(/^iso:(\d+):pre$/,'Pre $1').replace(/^iso:(\d+):post$/,'Post $1').replace(/^bus:/,'Bus ')||'—')+'</small></button>';}
+  h+='</div><p class="sd-nota">O Reaper recebe Dante 1–16. Saída "Output" como fonte do Dante ainda não testada, por isso não aparece.</p>';
+  return h;
+}
+/* ───── Headphones (manual 6.6.7): presets do usuário 1–12, HP L e R ───── */
+var HP_F=[['PreFaderL','PostFaderL','busL','ReturnsL'],['PreFaderR','PostFaderR','busR','ReturnsR']];
+function hpArq(p,f){var sc=scCarregar();if(!sc)return null;var v=sjGet(sc.m,['HeadphoneOut',p,f]);return v===undefined?null:v;}
+function hpEf(M,p,f){var o=M.hp[p]||{};return o[f]!=null?{v:o[f],set:true}:{v:hpArq(p,f),set:false};}
+function viewHp(M){
+  var p='Preset'+(+UI.mhp||1),lado=UI.mhpl==='R'?1:0,F=HP_F[lado],nm=hpEf(M,p,'label');
+  var h='<div class="sd-bar sub"><b>HP Preset '+(+UI.mhp||1)+': '+esc(nm.v||'')+'</b><span>'+(scCarregar()?'':'carregue o settings em Scorpio para ver os presets')+'</span></div>';
+  h+='<div class="sd-tabs">'+['L','R'].map(function(x,i){return '<button type="button" class="sd-tab'+(i===lado?' sel':'')+'" data-act="mhpl" data-v="'+x+'">HP '+(x==='L'?'Left':'Right')+'</button>';}).join('')+'</div><div class="sd-src">';
+  var pre=slToks(hpEf(M,p,F[0]).v),pos=slToks(hpEf(M,p,F[1]).v),mod=hpEf(M,p,F[0]).set||hpEf(M,p,F[1]).set;
+  h+='<span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i></small></span><div class="sd-grid g8">';
+  for(var n=1;n<=32;n++){var t=String(n),st=pre.indexOf(t)>=0?'pre':pos.indexOf(t)>=0?'post':'';h+=sdK(t,(st?'r-'+st:'')+(st&&mod?' mod':''),'data-act="mhpiso" data-p="'+p+'" data-l="'+lado+'" data-t="'+t+'"');}
+  h+='</div><span class="sd-l">Bus</span><div class="sd-grid g8">'+['L','R','1','2','3','4','5','6','7','8','9','10'].map(function(b){return hpKey(M,p,F[2],b,b);}).join('')+'</div>';
+  h+='<span class="sd-l">Com</span><div class="sd-grid g8">'+hpKey(M,p,F[3],'_1','Rtn 1')+hpKey(M,p,F[3],'_2','Rtn 2')+'</div>';
+  h+='<span class="sd-l">Return</span><div class="sd-grid g8">'+RET_COD.map(function(r){return hpKey(M,p,F[3],r[0],r[1]);}).join('')+'</div></div>';
+  var tg=function(f,l){var e=hpEf(M,p,f);return '<button type="button" class="sd-sk'+(e.v?' on':'')+(e.set?' mod':'')+'" data-act="mhpb" data-p="'+p+'" data-f="'+f+'">'+l+'<small>'+(e.v==null?'—':e.v?'On':'Off')+'</small></button>';};
+  h+='<div class="sd-soft"><label class="sd-sk num'+(nm.set?' mod':'')+'">Name<span><input type="text" maxlength="12" data-act="mhpnome" data-p="'+p+'" value="'+esc(nm.v||'')+'"></span></label>'+tg('mono','Mono')+tg('ms','MS')+tg('isInList','Na lista')+'</div>';
+  h+='<div class="sd-tabs">';for(var q=1;q<=12;q++){var pq='Preset'+q,lq=hpEf(M,pq,'label').v,mq=Object.keys(M.hp[pq]||{}).length;h+='<button type="button" class="sd-tab'+(pq===p?' sel':'')+(mq?' mod':'')+'" data-act="mhpsel" data-v="'+q+'">'+q+'<small>'+esc(lq||'')+'</small></button>';}
+  h+='</div><p class="sd-nota">Mais de uma fonte no mesmo lado do HP é gravada como "11+12" (padrão dos outros roteamentos; conferir no gravador). A aba "Play" do modo Headphones Only fica como está no gravador.</p>';
+  return h;
+}
+function hpKey(M,p,f,tok,lbl){var e=hpEf(M,p,f),on=slToks(e.v).indexOf(tok)>=0;return '<button type="button" class="sd-k'+(on?' sel':'')+(on&&e.set?' mod':'')+'" data-act="mhptok" data-p="'+p+'" data-f="'+f+'" data-t="'+tok+'">'+esc(lbl)+'</button>';}
 function viewSlate(M){
   var r=UI.slr&&SL_ROT[UI.slr]?UI.slr:'slate',D2=SL_ROT[r],sc=scCarregar();
   var src=sc?sjGet(sc.m,['SlateMicAndReturns','slateMicSrc']):null,ext=/ext/i.test(src||'');

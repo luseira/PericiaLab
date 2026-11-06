@@ -25,6 +25,11 @@
 
 
 
+
+## v1.68 · 06/11
+- Scorpio e Menu voltaram para o fim da barra (depois de Routing), em amarelo.
+- Menu: Dante Outputs (fonte de cada Dante 1–32: ISO pre/post ou bus) e Headphones (presets 1–12: ISO, Bus, Com, Return por lado, Name, Mono, MS, Na lista). Limiters e Timecode saíram.
+- Routing refeito no formato da Routing Matrix do SD-Remote: De (Canais, Buses, HP, Coms/Returns) → Para (Buses, Analog Outs, Dante Outs), grupos com +/−, cores pré/pós/send/ligado e quadrado escuro onde o gravador não tem a combinação.
 ## v1.67 · 06/11
 - Mixer: teclas Scorpio e Menu no começo da barra, em destaque.
 - Menu do gravador › Slate/Coms/Returns (manual 6.14): gain do slate mic, Slate / Com Send 1 / Com Send 2 Routing (Track, Output, Bus, HP), Duck Bus/HP e gains dos retornos (Com Rtn 1/2, Rtn A/B/C). Fonte do mic só leitura até o teste.
