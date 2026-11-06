@@ -12,6 +12,11 @@
 
 
 
+
+## v1.55 · 05/11
+- Equipamento da Clara: seriais e fotos (TX 11 SMQV M 16492, TX 12 SMQV E 7547, TX 13 SMa 712; receptores UCR411A 21827, 26631, 16581). Receptores ganharam foto no inventário (coluna Foto).
+- Fichas: número da pista no canto da foto.
+- Mixer: faixa do Reaper escondida por enquanto.
 ## v1.54 · 05/11
 - Input list em bancos de 16 (Canais 1–16 aberto, 17–32 fechado). Bancos, Buses e Outputs abrem e fecham; o site lembra. Na impressão, tudo sai aberto.
 - Fichas com a cor do time no fundo.

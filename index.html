@@ -170,6 +170,8 @@ label.campo input,label.campo select{display:block;width:100%;margin-top:.15rem;
 .ficha .ft{position:relative;display:grid;place-items:center;color:#fff;font:700 2rem/1 var(--fc);min-height:100%}
 .ficha .ft img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ficha .bd{padding:.45rem .55rem}
+.ficha .ftw{position:relative;display:grid}.ficha .ftw .ft{min-height:100%}
+.ficha .pnum{position:absolute;top:5px;left:5px;min-width:1.9rem;height:1.9rem;padding:0 .3rem;border-radius:6px;background:rgba(10,12,16,.78);color:#fff;font:700 1.15rem/1.9rem var(--fc);text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ficha.tv{border-color:var(--c-A);background:color-mix(in srgb,var(--c-A) 14%,#fff)}.ficha.tz{border-color:var(--c-B);background:color-mix(in srgb,var(--c-B) 14%,#fff)}
 .ficha.tv .ft,.ficha.tz .ft{border-right:6px solid}.ficha.tv .ft{border-color:var(--c-A)}.ficha.tz .ft{border-color:var(--c-B)}
 .ficha.tv,.ficha.tz,.ficha.tv .ft,.ficha.tz .ft{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -552,7 +554,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.54 · 05/11 23:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.55 · 05/11 23:55</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -657,7 +659,7 @@ function normalizar(R){
     .filter(function(t){return t.num;});
   d.tx.forEach(function(t){var g=gradeTx(t,t.freq);t.grade=g;if(g.cod)t.cod=g.cod;t.mon=/monitora/.test(t.uso);});
   d.txPor={};d.tx.forEach(function(t){d.txPor[t.num]=t;});
-  d.rx=linhas(R,'rx').map(function(o){return {id:str(o['Receptor']),modelo:str(o['Modelo']),rxch:str(o['Canal do receptor']),input:str(o['Input do Scorpio']),conector:str(o['Conector']),canal:str(o['Canal no gravador']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações'])};}).filter(function(r){return r.id;});
+  d.rx=linhas(R,'rx').map(function(o){return {id:str(o['Receptor']),modelo:str(o['Modelo']),rxch:str(o['Canal do receptor']),input:str(o['Input do Scorpio']),conector:str(o['Conector']),canal:str(o['Canal no gravador']),dono:str(o['Dono']),dev:int(o['Devolve após EP']),obs:str(o['Observações']),foto:str(o['Foto'])};}).filter(function(r){return r.id;});
   d.rxPor={};d.rx.forEach(function(r){d.rxPor[r.id]=r;});
   d.cap=linhas(R,'cap').map(function(o){
     var dig=campo(o,['Compatível com digital','Digital?','Digital']),inv=campo(o,['Polaridade invertida','INV. ?','INV.?','Inv.','Polaridade']);
@@ -1052,10 +1054,10 @@ function ordenar(L,ordem,col){
     var ta=a.e&&a.e.tx?(int(a.e.tx)||90):99,tb=b.e&&b.e.tx?(int(b.e.tx)||90):99;return ta-tb;
   });
 }
-function fichaHtml(x,col){
+function fichaHtml(x,col,n){
   var p=x.p,e=x.e||{},t=x.t,ch=col&&col.map[p.id];
   function d(k,v){return '<dt>'+k+'</dt><dd>'+(v?esc(v):'—')+'</dd>';}
-  return '<article class="ficha'+(e.time&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?' '+timeCls(e.time):'')+'">'+fotoGrande(p)+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><div><h4>'+esc(p.nome)+'</h4><div class="sub">'+esc(papelTxt(p))+(e.time?' · '+timeNome(e.time):'')+(ch?' · colinha '+ch:'')+'</div></div></div>'+
+  return '<article class="ficha'+(e.time&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?' '+timeCls(e.time):'')+'">'+(n?'<div class="ftw">'+fotoGrande(p)+'<span class="pnum" title="pista '+n+'">'+n+'</span></div>':fotoGrande(p))+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><div><h4>'+esc(p.nome)+'</h4><div class="sub">'+esc(papelTxt(p))+(e.time?' · '+timeNome(e.time):'')+(ch?' · colinha '+ch:'')+'</div></div></div>'+
     '<dl>'+'<dt>Cápsula</dt><dd>'+(e.cap?bolinha(e.cap)+esc(e.cap)+(corDe(e.cap)?' ('+corDe(e.cap)+')':'')+(capInv(e.cap)?' '+invIcon(e.cap,1)+' inverter no TX':'')+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?' + adaptador → '+esc(k.ad):'';})():'—')+'</dd>'+d('Receptor',t?rxTxt(t):'')+d('Canal',t?t.canal:'')+d('Freq. MHz',t?mhz(t.freq):'')+d('Bloco',t?t.bloco:'')+d('Modulação',t?t.mod:'')+(t&&t.cod?d('Código',t.cod):'')+
     (p.papel==='MENTOR'&&t&&t.rxM?'<div class="nota">Sala dos mentores: '+esc(t.rxM)+' · '+esc(t.canalM)+'</div>':'')+
     (e.obs?'<div class="nota">'+esc(e.obs)+'</div>':'')+'</dl></div></article>';
@@ -1098,8 +1100,8 @@ function viewDoc(){
   if(fich)h+='<style>@page{size:A4 landscape;margin:10mm}</style>';
   h+='<section class="doc il"><div class="dochead"><div><h1>Perícia Lab · Input list</h1><p>Cena "'+esc(I.c.nome)+'" · EP '+UI.ep+' · '+I.L.length+' pistas</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
   if(fich){
-    var col=colinhaMap(UI.ep),pp=I.L.filter(function(x){return x.p;}).map(function(x){return s.pessoas.filter(function(y){return y.p.id===x.p.id;})[0];}).filter(Boolean);
-    h+='<div class="fichas">'+pp.map(function(x){return fichaHtml(x,col);}).join('')+'</div>';
+    var col=colinhaMap(UI.ep),pp=I.L.filter(function(x){return x.p;}).map(function(x){var y=s.pessoas.filter(function(z){return z.p.id===x.p.id;})[0];return y?{x:y,n:x.n}:null;}).filter(Boolean);
+    h+='<div class="fichas">'+pp.map(function(o){return fichaHtml(o.x,col,o.n);}).join('')+'</div>';
   }else{
     var cab='<div class="tabwrap"><table class="tab il"><thead><tr><th>Pista</th><th>Nome</th><th>Source</th><th>Mic</th><th>Transmissor</th><th>Receptor</th><th>Freq.</th><th>Bloco</th></tr></thead><tbody>';
     function linhaIL(x){var t=x.t;
@@ -1187,11 +1189,13 @@ function viewTec(){
 var WIZ=null; /* {id, passo:'tx'|'cap', tx, cap} */
 function fotoEquip(tipo,o){
   var f=o.foto;
-  if(!f){var L=tipo==='tx'?D.tx:D.cap;var irmao=L.filter(function(y){return y.foto&&y.modelo===o.modelo&&(tipo==='tx'||y.cor===o.cor);})[0];if(irmao)f=irmao.foto;}
+  if(!f&&tipo==='rx')f=/UCR411/i.test(o.modelo||'')?'img/rx/ucr411.webp':'';
+  if(!f&&tipo==='tx')f=imgModeloTx(o.modelo); /* foto do modelo antes da foto de outro aparelho (ex.: SMQV da Clara) */
+  if(!f&&tipo!=='rx'){var L=tipo==='tx'?D.tx:D.cap;var irmao=L.filter(function(y){return y.foto&&y.modelo===o.modelo&&(tipo==='tx'||y.cor===o.cor);})[0];if(irmao)f=irmao.foto;}
   if(!f&&tipo==='tx')f=imgModeloTx(o.modelo);
   if(!f&&tipo==='cap'&&CAP_FOTOS.indexOf(o.id)>=0)f='img/cap/'+o.id.toLowerCase().replace(/\s+/g,'-')+'.webp';
   if(f)return '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">';
-  if(tipo==='tx')return '<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="12" y="10" width="36" height="62" rx="6" fill="#2b3038"/><rect x="18" y="18" width="24" height="12" rx="2" fill="#57616e"/><rect x="36" y="2" width="4" height="10" rx="1.5" fill="#2b3038"/><circle cx="30" cy="52" r="6" fill="#3b424d"/></svg>';
+  if(tipo==='tx'||tipo==='rx')return '<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="12" y="10" width="36" height="62" rx="6" fill="#2b3038"/><rect x="18" y="18" width="24" height="12" rx="2" fill="#57616e"/><rect x="36" y="2" width="4" height="10" rx="1.5" fill="#2b3038"/><circle cx="30" cy="52" r="6" fill="#3b424d"/></svg>';
   var cc={bege:'#d8c3a2',preto:'#15181d',marrom:'#6a4630'}[o.cor]||'#555';
   return '<svg viewBox="0 0 60 80" aria-hidden="true"><path d="M30 34 C 30 52, 18 58, 22 76" stroke="'+cc+'" stroke-width="3" fill="none"/><rect x="24" y="14" width="12" height="22" rx="6" fill="'+cc+'" stroke="rgba(0,0,0,.35)"/></svg>';
 }
@@ -1402,8 +1406,8 @@ function viewInv(){
   if(t==='tx')L.sort(function(a,b){return (int(a['TX'])||(/^S/.test(str(a['TX']))?95:90))-(int(b['TX'])||(/^S/.test(str(b['TX']))?95:90));});
   h+='<div class="busca noprint"><input type="search" id="ibusca" data-act="ibusca" value="'+esc(IBUSCA)+'" placeholder="Buscar no inventário: nome, modelo, serial, dono…" aria-label="Buscar no inventário" autocomplete="off"><span class="hint" id="nibusca" style="margin:0"></span></div>';
   h+='<section class="doc"><div class="dochead"><div><h1>Inventário · '+esc(INVT.filter(function(x){return x[0]===t;})[0][1])+'</h1><p>'+L.length+' item(ns)</p></div><div class="r">Gerado em '+agora()+'</div></div>';
-  h+='<div class="tabwrap"><table class="tab il invtab"><thead><tr>'+(t==='tx'||t==='cap'?'<th></th>':'')+cols.map(function(c){return '<th>'+c[1]+'</th>';}).join('')+'<th class="noprint"></th></tr></thead><tbody>'+
-    L.map(function(o){var id=str(o[ch]),it=t==='tx'?D.txPor[id]:t==='cap'?D.capPor[id]:null;
+  h+='<div class="tabwrap"><table class="tab il invtab"><thead><tr>'+(t==='tx'||t==='cap'?'<th></th>':t==='rx'?'<th></th>':'')+cols.map(function(c){return '<th>'+c[1]+'</th>';}).join('')+'<th class="noprint"></th></tr></thead><tbody>'+
+    L.map(function(o){var id=str(o[ch]),it=t==='tx'?D.txPor[id]:t==='cap'?D.capPor[id]:t==='rx'?D.rxPor[id]:null;
       return '<tr data-ibusca="'+esc(semAcento(cols.map(function(c){return str(o[c[0]]);}).join(' ')).toLowerCase())+'">'+(it?'<td class="th"><button type="button" class="fotobtn" data-act="zoom" data-tipo="'+t+'" data-id="'+esc(id)+'" title="Ver foto grande">'+fotoEquip(t,it)+'</button></td>':'')+cols.map(function(c,i){var v=o[c[0]];var txt=c[0]==='Manutenção'?simTxt(v):c[0]==='Devolve após EP'?(str(v)?'EP '+str(v):''):str(v);
         if(i===0)return '<td class="n">'+(t==='cap'?capTag(id,'sm'):esc(txt))+'</td>';return '<td'+(c[0]==='Observações'?' class="w"':'')+'>'+esc(txt)+'</td>';}).join('')+'<td class="noprint">'+lapis('invedit',t,id)+'</td></tr>';}).join('')+'</tbody></table></div>';
   h+='<div class="linha noprint" style="margin-top:.6rem"><button class="btn sm" type="button" data-act="invedit" data-aba="'+t+'" data-v="">＋ Novo</button></div></section>';
@@ -1414,9 +1418,9 @@ function viewInv(){
 var IBUSCA='';
 function aplicarIBusca(){var q=termos(IBUSCA),n=0;document.querySelectorAll('tr[data-ibusca]').forEach(function(r){var ok=casa(r.dataset.ibusca,q);r.classList.toggle('oculto',!ok);if(ok)n++;});var c=$('#nibusca');if(c)c.textContent=q.length?n+' encontrado(s)':'';}
 /* foto grande de transmissor ou cápsula */
-function abrirZoom(tipo,id){var o=tipo==='tx'?D.txPor[id]:D.capPor[id];if(!o)return;var tmp=document.createElement('div');tmp.innerHTML=fotoEquip(tipo,o);var im=tmp.querySelector('img');
+function abrirZoom(tipo,id){var o=tipo==='tx'?D.txPor[id]:tipo==='rx'?D.rxPor[id]:D.capPor[id];if(!o)return;var tmp=document.createElement('div');tmp.innerHTML=fotoEquip(tipo,o);var im=tmp.querySelector('img');
   var z=document.createElement('div');z.id='zoom';z.setAttribute('role','dialog');z.setAttribute('aria-label','Foto');
-  z.innerHTML='<figure>'+(im?'<img src="'+esc(im.getAttribute('src'))+'" alt="">':tmp.innerHTML)+'<figcaption>'+esc(tipo==='tx'?(o.nome||'TX '+o.num):o.id)+'<small>'+esc(tipo==='tx'?[o.modelo,o.bloco?'bloco '+o.bloco:'',isNaN(o.freq)?'':mhz(o.freq)+' MHz'].filter(Boolean).join(' · '):[o.modelo,o.cor,o.term,o.serial].filter(Boolean).join(' · '))+'</small></figcaption></figure>';
+  z.innerHTML='<figure>'+(im?'<img src="'+esc(im.getAttribute('src'))+'" alt="">':tmp.innerHTML)+'<figcaption>'+esc(tipo==='tx'?(o.nome||'TX '+o.num):o.id)+'<small>'+esc(tipo==='rx'?[o.modelo,o.dono].filter(Boolean).join(' · '):tipo==='tx'?[o.modelo,o.bloco?'bloco '+o.bloco:'',isNaN(o.freq)?'':mhz(o.freq)+' MHz'].filter(Boolean).join(' · '):[o.modelo,o.cor,o.term,o.serial].filter(Boolean).join(' · '))+'</small></figcaption></figure>';
   z.addEventListener('click',function(){z.remove();});document.body.appendChild(z);}
 /* scan de RF: guardado na planilha (aba Cenas, linha rf:scan) para aparecer em qualquer aparelho */
 var SCAN=null;try{SCAN=JSON.parse(localStorage.getItem('plc_scan')||'null');}catch(e){}
@@ -1686,9 +1690,9 @@ function linhaMix(R,a,b,v,M){
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     var zl=i===1?'Frente · '+timeNome(R.frente)+' ('+R.F.length+')':i===2?'Trás · '+timeNome(R.frente==='A'?'B':'A')+' ('+R.T.length+') · Clara':z[2];
-    h+='<span class="band zb z'+i+'" style="grid-row:3;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
-  (function(){var x=Math.max(a,1),y=Math.min(b,REAPER_N);if(x<=y)h+='<span class="band rp" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'" title="Dante '+x+'–'+y+' pré-fader entram nas pistas '+x+'–'+y+' do Reaper">→ Reaper · Dante '+x+'–'+y+' · pré-fader</span>';})();
-  S.forEach(function(s,i){h+='<span style="grid-row:4;grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
+    h+='<span class="band zb z'+i+'" style="grid-row:'+(FAIXA_REAPER?3:2)+';grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
+  (function(){var x=Math.max(a,1),y=Math.min(b,REAPER_N);if(FAIXA_REAPER&&x<=y)h+='<span class="band rp" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'" title="Dante '+x+'–'+y+' pré-fader entram nas pistas '+x+'–'+y+' do Reaper">→ Reaper · Dante '+x+'–'+y+' · pré-fader</span>';})();
+  S.forEach(function(s,i){h+='<span style="grid-row:'+(FAIXA_REAPER?4:3)+';grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
   return h+'</div>';
 }
 function aplicarBuscaMix(){
@@ -2268,7 +2272,7 @@ function resumoCanais(R,M){
   return h+'</tbody></table></div>';
 }
 /* Reaper: pistas 1–16 do Scorpio saem no Dante 1–16 (ISO pré-fader) e entram nas pistas 1–16 do Reaper */
-var REAPER_N=16;
+var REAPER_N=16,FAIXA_REAPER=false; /* faixa verde no mixer: escondida a pedido (05/11) */
 function corCat(s){var k=(catStrip(s)||'').trim();return {'k-host':'host','k-mentor':'mentor','k-tv':'A','k-tz':'B','k-boom':'boom','k-goose':'goose'}[k]||'';}
 function reaperTxt(c){var R=resolver(c,UI.ep),M=mesaEf(c,R),L=['PERICIALAB-REAPER 1\tcena: '+c.nome+'\tEP '+UI.ep+'\t'+agora()];
   R.S.slice(0,REAPER_N).forEach(function(sl){var nome=sl.p?nomePista(sl.p):sl.fx?semAcento(nomeFx(sl,M)).toUpperCase():'Ch '+sl.n,k=sl.p?corCat(sl):'';
