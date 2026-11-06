@@ -17,6 +17,11 @@
 
 
 
+
+## v1.60 · 06/11
+- Buses e saídas partem do settings do gravador (PL 1104 1): buses 4 e 5 = A e B, fontes Com Rtn 1 nos buses 1–3, Rtn B no bus 5, saídas com os nomes e fontes do arquivo. Edições feitas no site continuam valendo.
+- Fonte dos buses aparece como no gravador: RTN 1, RTN 2, RTN B1…
+- Tirado o envio automático de Thelma/Salada para os buses 4/5.
 ## v1.59 · 06/11
 - Mixer (Buses, Outputs, Routing): o painel escuro fica grudado na barra de navegação, como na tela das pistas; as listas vêm embaixo.
 - Tabela "Todos os buses" (nome, retorno, canais mandando e saídas que recebem) em Buses e em Outputs.

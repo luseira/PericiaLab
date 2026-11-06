@@ -556,7 +556,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.59 · 06/11 00:55</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.60 · 06/11 01:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1131,7 +1131,7 @@ function busSaidasHtml(I){
   var M=I.M,R=I.R,h='<div class="quebra">';
   var bs=BUSES.filter(function(b){return M.bus[b]&&M.bus[b].nome;});
   if(bs.length)h+=secao('ilbus','Buses',bs.length+' com nome',true,'<div class="tabwrap"><table class="tab il"><thead><tr><th>Bus</th><th>Nome</th><th>Retorno</th></tr></thead><tbody>'+bs.map(function(b){var x=M.bus[b];
-    return '<tr><td><span class="tag sm">'+esc(b)+'</span></td><td class="n">'+esc(x.nome)+'</td><td>'+esc(x.src?((RET_COD.filter(function(r){return r[0]===x.src;})[0]||[0,x.src])[1]):'')+'</td></tr>';}).join('')+'</tbody></table></div>');
+    return '<tr><td><span class="tag sm">'+esc(b)+'</span></td><td class="n">'+esc(x.nome)+'</td><td>'+esc(retTxt(x.src))+'</td></tr>';}).join('')+'</tbody></table></div>');
   var usados={};
   var tb='<div class="tabwrap"><table class="tab il"><thead><tr><th>Output</th><th>Nome</th><th>Source</th><th>Nível</th><th>Transmissor</th><th>Receptor</th></tr></thead><tbody>'+
     SAIDAS.map(function(k){var o=M.out[k],tx=D.tx.filter(function(t){return t.mon&&t.saida&&t.saida.toUpperCase()===k;});tx.forEach(function(t){usados[t.num]=1;});
@@ -2035,16 +2035,18 @@ var COPIA_ITENS=[['hpf','HPF'],['ph','Phase'],['on','Mute'],['conteudo','Source 
 function tabelaBuses(R,M,sel){
   return '<h3>Todos os buses</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Bus</th><th>Nome</th><th>Fonte (retorno)</th><th>Canais mandando</th><th>Saídas que recebem</th></tr></thead><tbody>'+
     BUSES.map(function(b){var x=M.bus[b]||{},ch=R.S.filter(function(s){return M.ch[s.n].r[b];}),sa=SAIDAS.filter(function(k){return (M.out[k].src||'')==='bus:'+b;});
-      return '<tr'+(b===sel?' style="background:#fff6d6"':'')+'><td><span class="tag sm">'+(b==='L'||b==='R'?b:b)+'</span></td><td class="n">'+esc(busNome(b,M))+'</td><td>'+esc(x.src?((RET_COD.filter(function(r){return r[0]===x.src;})[0]||[0,x.src])[1]):'')+'</td><td class="w">'+(ch.length?ch.length+': '+esc(ch.map(function(s){return s.n+(s.p?' '+nomePista(s.p):'');}).join(', ')):'—')+'</td><td>'+esc(sa.join(', ')||'—')+'</td></tr>';}).join('')+'</tbody></table></div>';
+      return '<tr'+(b===sel?' style="background:#fff6d6"':'')+'><td><span class="tag sm">'+(b==='L'||b==='R'?b:b)+'</span></td><td class="n">'+esc(busNome(b,M))+'</td><td>'+esc(retTxt(x.src))+'</td><td class="w">'+(ch.length?ch.length+': '+esc(ch.map(function(s){return s.n+(s.p?' '+nomePista(s.p):'');}).join(', ')):'—')+'</td><td>'+esc(sa.join(', ')||'—')+'</td></tr>';}).join('')+'</tbody></table></div>';
 }
 function busNome(b,M){var x=M&&M.bus[b];return (x&&x.nome)||(b==='L'||b==='R'?'Mix '+b:'Bus '+b);}
 function busCurto(b){return b==='L'||b==='R'?b:b;}
 function busPadrao(){
-  var n={L:'Mix L',R:'Mix R','1':'CTK 1','2':'CTK 2','3':'MIX','4':'TELMA','5':'SALADA','6':'ASSIST 1','7':'ASSIST 2','8':'','9':'','10':''},o={};
-  BUSES.forEach(function(b){o[b]={nome:n[b],src:''};});return o;
+  /* nomes e fontes dos buses como estão no settings do gravador (PL 1104 1, 05/11) */
+  var n={L:'Mix L',R:'Mix R','1':'CTK 1','2':'CTK 2','3':'MIX','4':'A','5':'B','6':'ASSIST 1','7':'ASSIST 2','8':'','9':'','10':''},f={'1':'_1','2':'_1','3':'_1','5':'Bl'},o={};
+  BUSES.forEach(function(b){o[b]={nome:n[b],src:f[b]||''};});return o;
 }
 function saidasPadrao(){
-  var o={L:{nome:'CTRL A',src:'bus:L'},R:{nome:'CTRL B',src:'bus:R'},X6:{nome:'CAM',src:'bus:3'},X7:{nome:'ASSIST 1',src:'bus:6'},X8:{nome:'ASSIST 2',src:'bus:7'},X9:{nome:'CTK 1',src:'bus:1'},X10:{nome:'CTK 2',src:'bus:2'}};
+  /* saídas como estão no settings do gravador (PL 1104 1, 05/11) */
+  var o={L:{nome:'CTRL A',src:''},R:{nome:'CTRL B',src:''},X6:{nome:'CAM TX',src:'com:1'},X7:{nome:'ASSIST 1 TX',src:'hp:R'},X8:{nome:'ASSIST 2 TX',src:'hp:R'},X9:{nome:'CTK 1',src:'hp:L'},X10:{nome:'CTK 2',src:'hp:R'}};
   for(var i=1;i<=5;i++)o['X'+i]={nome:'ISO B'+i,src:'iso:'+(8+i)+':pre'};
   SAIDAS.forEach(function(k){o[k]=Object.assign({nome:'',src:'',nivel:'',gain:null,dly:null},o[k]||{});});
   return o;
@@ -2053,7 +2055,7 @@ function saidasPadrao(){
 function chPadrao(s){
   var occ=!!(s.p||s.fx),r={};BUSES.forEach(function(b){r[b]='';});
   if(occ&&s.n<=16&&!s.copia){r.L='post';r.R='post';r['3']='post';
-    if(s.p&&s.p.id==='TELMA')r['4']='pre';if(s.p&&s.p.id==='SALADA')r['5']='pre';}
+}
   return {on:occ,arm:occ&&!/^C:/.test(s.tok||''),r:r,sg:{},iso:'pre',trim:null,hpf:null,ph:null,dly:null};
 }
 function mesaEf(c,R){
@@ -2079,7 +2081,7 @@ function opcoesSaida(M,R){
   var g=[['Desligada',[['','Silêncio']]]],iso=[],isop=[];
   for(var n=1;n<=32;n++){var s=R.S[n-1],q=s&&s.p?' · '+nomePista(s.p):'';iso.push(['iso:'+n+':pre','ISO '+n+' pré'+q]);isop.push(['iso:'+n+':post','ISO '+n+' pós'+q]);}
   g.push(['ISO pré-fader',iso],['ISO pós-fader',isop]);
-  g.push(['Bus',BUSES.map(function(b){return ['bus:'+b,'Bus '+b+(M.bus[b].nome?' · '+M.bus[b].nome:'')+(b==='3'?'':' *')];}).concat([['hp:L','HP-L'],['hp:R','HP-R *']])]);
+  g.push(['Bus',BUSES.map(function(b){return ['bus:'+b,'Bus '+b+(M.bus[b].nome?' · '+M.bus[b].nome:'')];}).concat([['hp:L','HP-L'],['hp:R','HP-R *']])]);
   g.push(['Retornos',[['ret:A1','Return A1 *'],['ret:A2','Return A2 *'],['ret:B1','Return B1'],['ret:B2','Return B2 *'],['ret:C1','Return C1 *'],['ret:C2','Return C2 *'],['com:1','Com Rtn 1'],['com:2','Com Rtn 2 *']]]);
   return g;
 }
@@ -2232,9 +2234,9 @@ function trazerDoArquivo(R,A){
 }
 function deduzidosUsados(M,R){
   var d=[];
-  if(R)R.S.forEach(function(x){var f=x.cn?fonteSlot(x):'';if(/^AES3-[1-4]$/.test(f))d.push('Ch '+x.n+' ← '+f+' (fonte)');});
-  SAIDAS.forEach(function(o){var s=M.out[o].src||'';if(/^bus:(?!3$)/.test(s)||s==='hp:R'||/^ret:(?!B1$)/.test(s)||s==='com:2')d.push(o+' ← '+s.replace(':',' '));});
-  BUSES.forEach(function(b){var s=M.bus[b].src;if(s&&s!=='Bl')d.push('Bus '+b+' ← '+s);});
+  /* confirmados nos testes de 05/11: entradas AES3-n, saída ← Bus n (n+6), HP-L/R, Com Rtn 1; fontes de bus Al, Bl, _1, _2 */
+  SAIDAS.forEach(function(o){var s=M.out[o].src||'';if(/^ret:(?!B1$)/.test(s)||s==='com:2')d.push(o+' ← '+s.replace(':',' '));});
+  BUSES.forEach(function(b){var s=M.bus[b].src;if(s&&['Al','Bl','_1','_2'].indexOf(s)<0)d.push('Bus '+b+' ← '+s);});
   return d;
 }
 function exportar(c,R,M,nome){
@@ -2357,6 +2359,8 @@ var SDICO={f:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" widt
   g:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v18M16 3v18M3 8h18M3 16h18" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>',
   d:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v7m-3-3 3 3 3-3" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
 var RET_COD=[['Al','A1'],['Ar','A2'],['Bl','B1'],['Br','B2'],['Cl','C1'],['Cr','C2']];
+/* fonte do bus como o gravador mostra: Com Rtn 1 → RTN 1, Return B L → RTN B1 */
+function retTxt(c){if(!c)return '';if(c==='_1')return 'RTN 1';if(c==='_2')return 'RTN 2';var r=RET_COD.filter(function(x){return x[0]===c;})[0];return r?'RTN '+r[1]:c;}
 var BUS_FONTES=[['','—'],['_1','Com Rtn 1 *'],['_2','Com Rtn 2 *']].concat(RET_COD.map(function(r){return [r[0],'Return '+r[1]+(r[0]==='Bl'?'':' *')];}));
 function sdNav(solo){
   var at=UI.mixp&&UI.mixp!=='pistas'?UI.mixp:UI.mixv;
@@ -2449,8 +2453,8 @@ function viewBus(R,M){
     '<p class="sd-nota">Ganho, limiter e mute do bus ficam como estão no gravador.</p></div><div class="sd-col"><div class="sd-src"><span class="sd-l">ISO</span><div class="sd-grid">';
   for(var n=1;n<=32;n++){var v=M.ch[n].r[b]||'';h+=sdK(String(n),rotaCls(v),'data-act="mrota" data-n="'+n+'" data-b="'+b+'" title="Ch '+n+': '+ROTA_TXT[v]+'"');}
   h+='</div>';
-  if(!lr){h+='<span class="sd-l">Com</span><div class="sd-grid w2">'+sdK('Rtn 1',x.src==='_1'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_1"',1)+sdK('Rtn 2',x.src==='_2'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_2"',1)+'</div>'+
-    '<span class="sd-l">Return</span><div class="sd-grid">'+RET_COD.map(function(r){return sdK(r[1],x.src===r[0]?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="'+r[0]+'"',r[0]!=='Bl');}).join('')+'</div>';}
+  if(!lr){h+='<span class="sd-l">Com</span><div class="sd-grid w2">'+sdK('Rtn 1',x.src==='_1'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_1"',1)+sdK('Rtn 2',x.src==='_2'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_2"',0)+'</div>'+
+    '<span class="sd-l">Return</span><div class="sd-grid">'+RET_COD.map(function(r){return sdK(r[1],x.src===r[0]?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="'+r[0]+'"',r[0]!=='Bl'&&r[0]!=='Al');}).join('')+'</div>';}
   else h+='<span class="sd-l"></span><p class="sd-nota">L e R não recebem retorno.</p>';
   h+='</div></div></div>';
   h+='<div class="sd-tabs">'+BUSES.map(function(k){return '<button type="button" class="sd-tab'+(k===b?' sel':'')+'" data-act="mbussel" data-v="'+k+'">Bus '+k+(M.bus[k].nome?'<small>'+esc(M.bus[k].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
@@ -2472,8 +2476,8 @@ function viewOut(R,M){
   for(var n=1;n<=32;n++){var s=R.S[n-1];h+=sdK(String(n),a[0]==='iso'&&+a[1]===n?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="iso:'+n+':'+(a[0]==='iso'?a[2]:'pre')+'" title="ISO '+n+(s&&s.p?' · '+esc(nomePista(s.p)):'')+'"');}
   h+='</div>';
   if(a[0]==='iso')h+='<span class="sd-l"></span><span class="seg sd-seg"><button type="button" data-act="moutsrc" data-o="'+k+'" data-v="iso:'+a[1]+':pre" aria-pressed="'+(a[2]!=='post')+'">ISO pré</button><button type="button" data-act="moutsrc" data-o="'+k+'" data-v="iso:'+a[1]+':post" aria-pressed="'+(a[2]==='post')+'">ISO pós</button></span>';
-  h+='<span class="sd-l">Bus</span><div class="sd-grid">'+BUSES.map(function(b){return sdK(b,src==='bus:'+b?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="bus:'+b+'" title="'+esc(busNome(b,M))+'"',b!=='3');}).join('')+
-    sdK('HP-L',src==='hp:L'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:L"')+sdK('HP-R',src==='hp:R'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:R"',1)+'</div>';
+  h+='<span class="sd-l">Bus</span><div class="sd-grid">'+BUSES.map(function(b){return sdK(b,src==='bus:'+b?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="bus:'+b+'" title="'+esc(busNome(b,M))+'"',0);}).join('')+
+    sdK('HP-L',src==='hp:L'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:L"')+sdK('HP-R',src==='hp:R'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:R"',0)+'</div>';
   h+='<span class="sd-l">Com</span><div class="sd-grid w2">'+sdK('Rtn 1',src==='com:1'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:1"')+sdK('Rtn 2',src==='com:2'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:2"',1)+'</div>';
   h+='<span class="sd-l">Return</span><div class="sd-grid">'+RET_ORD.map(function(r){return sdK(r,src==='ret:'+r?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="ret:'+r+'"',r!=='B1');}).join('')+'</div>';
   h+='<span class="sd-l"></span><div>'+sdK('Silêncio',!src?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v=""')+'</div>';
