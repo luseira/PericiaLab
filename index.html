@@ -554,7 +554,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.57 · 06/11 00:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.58 · 06/11 00:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -674,7 +674,7 @@ function normalizar(R){
   d.eps=linhas(R,'eps').map(function(o){return {ep:int(o['EP']),a:int(campo(o,['Time A','Vermelho','Equipe A'])),b:int(campo(o,['Time B','Azul','Equipe B'])),data:str(o['Data de gravação'])};}).filter(function(e){return e.ep;}).sort(function(a,b){return a.ep-b.ep;});
   if(!d.eps.length)for(var i=1;i<=8;i++)d.eps.push({ep:i,a:0,b:0,data:''});
   d.imp=linhas(R,'imp').map(function(o){return {gerado:str(o['Report gerado em']),em:str(o['Importado em']),por:str(o['Por']),n:str(o['Transmissores atualizados']),mud:str(o['Mudanças']),nao:str(o['Nomes sem correspondência'])};});
-  d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}var pos=null;if(pp&&!Array.isArray(pp)){mm=pp.m||null;pos=pp.pos!=null?+pp.pos:null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;if(pos==null&&str(o['Posição'])!=='')pos=num(o['Posição']);if(pos!=null&&!isNaN(pos))c.pos=pos;return c;}).filter(function(c){return c.id;}):null;
+  d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}var pos=null;if(pp&&!Array.isArray(pp)){mm=pp.m||null;pos=pp.pos!=null?+pp.pos:null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'tx',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;if(pos==null&&str(o['Posição'])!=='')pos=num(o['Posição']);if(pos!=null&&!isNaN(pos))c.pos=pos;return c;}).filter(function(c){return c.id;}):null;
   d.configs=(Array.isArray(R&&R.cenas)?R.cenas:[]).filter(function(o){return /^car:/.test(str(o['ID']));}).map(function(o){var x={};try{x=JSON.parse(str(o['Pistas'])||'{}');}catch(e){}return {id:str(o['ID']),nome:str(o['Nome']),em:str(o['Atualizado em']),por:str(o['Por']),car:x.car||{}};});
   if(Array.isArray(d.cenas))d.cenas=d.cenas.filter(function(c){return !/^(car|rf):/.test(c.id);});
   d.rfscan=null;(Array.isArray(R&&R.cenas)?R.cenas:[]).forEach(function(o){if(str(o['ID'])==='rf:scan'){try{var x=JSON.parse(str(o['Pistas'])||'{}');if(x.scan)d.rfscan=x.scan;}catch(e){}}});
@@ -1558,7 +1558,7 @@ function cenaBase(){
 }
 function cenasPadrao(){
   var b=cenaBase(),it=b.slice();it[0]='P:GOOSENECK';it[14]='';
-  return [{id:'base',nome:'Todos juntos',ordem:'alfa',pistas:b},{id:'interrog',nome:'Interrogatório',ordem:'alfa',pistas:it}];
+  return [{id:'base',nome:'Todos juntos',ordem:'tx',pistas:b},{id:'interrog',nome:'Interrogatório',ordem:'tx',pistas:it}];
 }
 function cenasCompartilhadas(){return D.cenas!==null;}
 function cenasLista(){
@@ -1600,7 +1600,7 @@ function timeDe(ep,t,ordem){
   var EF=efetivo(ep);
   var L=D.elenco.filter(function(p){return ativo(p,ep)&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')&&(EF[p.id]||{}).time===t;});
   return L.sort(function(a,b){
-    if(ordem==='tx'){var x=int((EF[a.id]||{}).tx)||99,y=int((EF[b.id]||{}).tx)||99;return x-y;}
+    if(ordem!=='alfa'){var x=int((EF[a.id]||{}).tx)||99,y=int((EF[b.id]||{}).tx)||99;return x-y;}
     return nat(a.nome,b.nome);
   });
 }
@@ -1776,7 +1776,7 @@ function viewMix(){
     '<button class="btn sm'+(CENAOP==='nova'?' pri':'')+'" type="button" data-act="mnova">＋ Nova cena</button><button class="btn sm'+(CENAOP==='colar'?' pri':'')+'" type="button" data-act="mcolar">⧉ Colar de outra cena</button><button class="btn sm" type="button" data-act="mren">Renomear</button>'+(L.length>1?'<span class="seg"><button type="button" data-act="mmover" data-v="-1" title="Mover a cena para a esquerda">◀</button><button type="button" data-act="mmover" data-v="1" title="Mover a cena para a direita">▶</button></span>':'')+''+(L.length>1?'<button class="btn sm dan" type="button" data-act="mdel">Excluir</button>':'')+'</div>';
   if(CENAOP)h+=cenaOpHtml(L,c);
   h+='<div class="bar">'+
-    '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="alfa"'+(c.ordem!=='tx'?' selected':'')+'>Alfabética</option><option value="tx"'+(c.ordem==='tx'?' selected':'')+'>Transmissor</option></select></label>'+
+    '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="tx"'+(c.ordem!=='alfa'?' selected':'')+'>Transmissor</option><option value="alfa"'+(c.ordem==='alfa'?' selected':'')+'>Alfabética</option></select></label>'+
     '<span class="sp"></span><button class="btn sm" type="button" data-act="mreaper" title="Arquivo com nome e cor das pistas 1–16 para o script do Reaper">⤓ Exportar para o Reaper</button><a class="btn sm" href="reaper/PericiaLab_Reaper.lua" download title="Instalar uma vez no Reaper: Actions › Load ReaScript">Script do Reaper</a><button class="btn sm" type="button" data-act="mcolauto" title="Volta as pistas 17–32 para a ordem automática (por transmissor)">↺ Refazer colinha</button><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button><button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
   h+='<div class="busca noprint"><input type="search" id="mbusca" data-act="mbusca" value="'+esc(MBUSCA)+'" placeholder="Achar no mixer: nome, TX, canal, cápsula…" aria-label="Buscar no mixer" autocomplete="off">'+
     '<button class="btn sm'+(MVARIOS?' pri':'')+'" type="button" data-act="mvarios" title="Tocar em várias pistas para selecionar (no computador: Shift ou Ctrl + clique)">☐ Selecionar vários</button>'+
@@ -1846,7 +1846,7 @@ function cliqueMix(a,el){
   if(a==='mcena'){UI.cena=el.dataset.v;MSEL=0;salvarUi();render();return true;}
   if(a==='mview'){UI.mixv=el.dataset.v;salvarUi();render();return true;}
   if(a==='mcolauto'){if(confirm('Voltar as pistas 17–32 desta cena para a ordem automática (transmissor 1 em diante, boom, gooseneck, Mix B)? As trocas que você fez à mão na colinha serão desfeitas.')){c=clone(cenaAtual());for(var ci=0;ci<COL_N;ci++)c.pistas[COL_INI-1+ci]='C:'+(ci+1);salvarCenaMix(c);toast('Colinha refeita');}return true;}
-  if(a==='mreset'){if(confirm('Voltar esta cena para a estrutura base (fixos 1–3, Time A 4–8, Time B 9–13, boom 14, gooseneck 15, colinha 17–32 em ordem de transmissor)?')){c=clone(cenaAtual());c.pistas=cenaBase();salvarCenaMix(c);}return true;}
+  if(a==='mreset'){if(confirm('Voltar esta cena para a estrutura base (fixos 1–3, Time A 4–8, Time B 9–13, boom 14, gooseneck 15, colinha 17–32 em ordem de transmissor; times também em ordem de transmissor)?')){c=clone(cenaAtual());c.pistas=cenaBase();c.ordem='tx';salvarCenaMix(c);}return true;}
   if(a==='minv'){MINV=!MINV;render();return true;}
   if(a==='mundo'){desfazerMix();return true;}
   if(a==='mredo'){refazerMix();return true;}
@@ -1859,7 +1859,7 @@ function cliqueMix(a,el){
   if(a==='mcolar'){CENAOP=CENAOP==='colar'?null:'colar';render();return true;}
   if(a==='mcenaopfim'){CENAOP=null;render();return true;}
   if(a==='mcriar'){var nome=($('#cnnome').value||'').trim();if(!nome){toast('Dê um nome para a cena',true);return true;}
-    var base=$('#cnbase').value,src=base==='__base'?{nome:'',ordem:'alfa',pistas:cenaBase()}:cenaPorId(base);
+    var base=$('#cnbase').value,src=base==='__base'?{nome:'',ordem:'tx',pistas:cenaBase()}:cenaPorId(base);
     c=clone(src);c.id='c'+Date.now().toString(36);c.nome=nome;if(base==='__base')delete c.mesa;
     salvarCena(c);logMix(['Cena nova: '+c.nome+' (a partir de '+(base==='__base'?'estrutura base':src.nome)+')']);UI.cena=c.id;CENAOP=null;salvarUi();render();return true;}
   if(a==='mcolarok'){var fonte=cenaPorId($('#ccfonte').value),alvo=clone(cenaAtual()),it=[];if(!fonte)return true;

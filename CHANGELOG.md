@@ -15,6 +15,9 @@
 
 
 
+
+## v1.58 · 06/11
+- Ordem dos participantes dentro dos times: padrão agora é por transmissor (cenas novas, cenas sem ordem definida e "Restaurar estrutura base"). Alfabética continua disponível no seletor.
 ## v1.57 · 06/11
 - Inventário: editar um transmissor sem trocar o número dava "Já existe TX 9". Corrigido no site (e no Codigo.gs 1.43, para quando for reimplantado).
 ## v1.56 · 06/11
