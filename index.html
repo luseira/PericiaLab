@@ -580,7 +580,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.65 · 06/11 10:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.66 · 06/11 10:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2136,7 +2136,7 @@ function srcDoArquivo(source,chan){
   if(source==='Comms'&&(chan===3||chan===4))return 'com:'+(chan-2);
   return 'raw:'+source+':'+chan;
 }
-var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV'],['Mic','Mic']];
+var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV'],['Mic','Mic'],['AES','AES (só L e R)']];
 /* ───────── fonte do canal a partir do transmissor ───────── */
 function fonteSlot(s){return s&&s.cn?fonteDeCanal(s.cn,s.t):'';}
 function fonteDeCanal(cn,t){var tt={canal:cn,input:t&&t.canal===cn?t.input:''};
@@ -2229,7 +2229,7 @@ function lerArquivo(m){
     A.ch[n]=ch;A.nomes[n]=sjGet(m,['MetaData','TrackName'+n])||'';A.fonte[n]=sjGet(m,[k,'inputSrcName'])||'';}
   BUSES.forEach(function(b){A.bus[b]={nome:sjGet(m,['OutputBusControl','obus'+b,'userName'])||'',src:b==='L'||b==='R'?'':(sjGet(m,['SlateMicAndReturns','bus'+b])||'')};});
   SAIDAS.forEach(function(o){var p=['AnalogOutputs',o];A.out[o]={nome:sjGet(m,p.concat('userName'))||'',src:srcDoArquivo(sjGet(m,p.concat('source')),sjGet(m,p.concat('chan'))),
-    nivel:sjGet(m,p.concat('lineMic'))||'',gain:(sjGet(m,p.concat('dB10thsGain'))||0)/10,dly:sjGet(m,p.concat('msDelay'))||0};});
+    nivel:sjGet(m,p.concat('isAes'))?'AES':(sjGet(m,p.concat('lineMic'))||''),gain:(sjGet(m,p.concat('dB10thsGain'))||0)/10,dly:sjGet(m,p.concat('msDelay'))||0};});
   return A;
 }
 function nomeArquivoPista(s,M){return s.p?nomePista(s.p).slice(0,16):s.fx?semAcento(nomeFx(s,M)).toUpperCase().slice(0,16):'Ch '+s.n;}
@@ -2295,7 +2295,8 @@ function exportar(c,R,M,nome){
   BUSES.forEach(function(b){var x=M.bus[b];if(x.nome)sjSet(m,['OutputBusControl','obus'+b,'userName'],x.nome);if(b!=='L'&&b!=='R')sjSet(m,['SlateMicAndReturns','bus'+b],x.src||'');});
   SAIDAS.forEach(function(o){var x=M.out[o],p=['AnalogOutputs',o],f=srcParaArquivo(x.src);
     sjSet(m,p.concat('userName'),x.nome||'');if(f){sjSet(m,p.concat('source'),f[0]);sjSet(m,p.concat('chan'),f[1]);}
-    if(x.nivel)sjSet(m,p.concat('lineMic'),x.nivel);if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));});
+    if(x.nivel==='AES'&&(o==='L'||o==='R'))sjSet(m,p.concat('isAes'),true);
+    else if(x.nivel&&x.nivel!=='AES'){sjSet(m,p.concat('lineMic'),x.nivel);if(sjGet(m,p.concat('isAes'))!==undefined)sjSet(m,p.concat('isAes'),false);}if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));});
   /* saídas em par (link) com fontes diferentes no plano: desfaz o link */
   for(var i=1;i<=9;i+=2){var a1='X'+i,a2='X'+(i+1),la=sjGet(m,['AnalogOutputs',a1,'linkedToOutput']),lb=sjGet(m,['AnalogOutputs',a2,'linkedToOutput']);
     var igual=(M.out[a1].src||'')===(srcAntes[a1]||'')&&(M.out[a2].src||'')===(srcAntes[a2]||'');
@@ -2439,11 +2440,13 @@ var XEQ=[['emode','EQ','*eq','m3'],
   ['lfon','LF ativo','lowEqBypassed','bi'],['lfhz','LF freq.','lowEqCutoffHz','n',20,20000,'Hz'],['lfg','LF ganho','lowEqGaindB10ths','n10',-24,24,'dB'],['lfq','LF Q','lowEqQ','n',0.5,10,''],['lft','LF tipo','lowEqType','e',0,0,'',[['lowshelf','Shelf'],['peaking','Peak']]],
   ['mfon','MF ativo','midEqBypassed','bi'],['mfhz','MF freq.','midEqCutoffHz','n',20,20000,'Hz'],['mfg','MF ganho','midEqGaindB10ths','n10',-24,24,'dB'],['mfq','MF Q','midEqQ','n',0.5,10,''],
   ['hfon','HF ativo','hiEqBypassed','bi'],['hfhz','HF freq.','hiEqCutoffHz','n',20,20000,'Hz'],['hfg','HF ganho','hiEqGaindB10ths','n10',-24,24,'dB'],['hfq','HF Q','hiEqQ','n',0.5,10,''],['hft','HF tipo','hiEqType','e',0,0,'',[['highshelf','Shelf'],['peaking','Peak']]]];
-var XBUS=[['arm','Arm','arm','b'],['gain','Gain','dB10ths','n10',-127.5,16,'dB'],['mute','Mute All','mute','b'],['cmute','Mute Coms','comsMute','b'],['lim','Limiter','limiterEnabled','b'],
+var XBUS=[['blink','Link','*blink','b'],['arm','Arm','arm','b'],['gain','Gain','dB10ths','n10',-127.5,16,'dB'],['mute','Mute All','mute','b'],['cmute','Mute Coms','comsMute','b'],['lim','Limiter','limiterEnabled','b'],
   ['sL','Mix L entra no bus','hasBusL','b'],['sR','Mix R entra no bus','hasBusR','b'],['s1','Bus 1 entra no bus','hasBus1','b'],['s2','Bus 2 entra no bus','hasBus2','b'],
   ['comp','Compressor','compressorEnabled','b'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
 var XOUT=[['mute','Mute','muted','b'],['link','Link com o par','*link','b'],['rmute','Record Mute','*am4','b'],['smute','Stop Mute','*am1','b'],['pmute','Play Mute','*am2','b']];
 function xBase(alvo,id){return alvo==='ch'?['InputChannel'+id]:alvo==='bus'?['OutputBusControl','obus'+id]:['AnalogOutputs',id];}
+/* pares de bus que o gravador aceita linkar: L-R, 1-2, 3-4, 5-6, 7-8, 9-10 (teste de 06/11) */
+function parBus(b){if(b==='L'||b==='R')return ['L','R'];var n=+b;if(!n)return null;return n%2?[String(n),String(n+1)]:[String(n-1),String(n)];}
 function parOut(k){var m=/^X(\d+)$/.exec(k);if(!m)return null;var n=+m[1];return n%2?['X'+n,'X'+(n+1)]:['X'+(n-1),'X'+n];}
 /* valor que está no arquivo do gravador (null se não há arquivo) */
 function xArq(alvo,id,f){var sc=scCarregar();if(!sc)return null;var b=xBase(alvo,id),m=sc.m;
@@ -2451,6 +2454,7 @@ function xArq(alvo,id,f){var sc=scCarregar();if(!sc)return null;var b=xBase(alvo
   if(f[2]==='*eq'){var e2=sjGet(m,b.concat('eqEnabled'));return !e2?'off':sjGet(m,b.concat('eqPreFader'))?'pre':'post';}
   if(f[2]==='*lim')return !!(sjGet(m,b.concat('trimLimiterEnabled'))||sjGet(m,b.concat('faderLimiterEnabled'))||sjGet(m,b.concat('eqLimiterEnabled')));
   if(f[2]==='*chlink')return sjGet(m,b.concat('linkType'))||'Unlinked';
+  if(f[2]==='*blink'){var lb=sjGet(m,b.concat('linkedToBus'));return !!lb&&lb!=='nOutBuses';}
   if(/^\*am\d$/.test(f[2]))return !!((+sjGet(m,['AnalogOutputs',id,'autoMutOptions'])||0)&+f[2].slice(3));
   if(f[2]==='*link'){var pr=parOut(id);if(!pr)return null;var l=sjGet(m,['AnalogOutputs',id,'linkedToOutput']);return !!l&&l!=='nAnalogOutputs';}
   var v=sjGet(m,b.concat(f[2]));if(v===undefined)return null;
@@ -2480,6 +2484,7 @@ function setX(alvo,id,k,v){mudarMesa(function(m){var c=alvo==='ch'?m.ch:alvo==='
 function xExport(m,alvo,id,obj,specs){var b=xBase(alvo,id);specs.forEach(function(f){var v=obj&&obj['x_'+f[0]];if(v===null||v===undefined)return;
   if(f[2]==='*comp'){sjSet(m,b.concat('compressorEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('compressorPreFader'),v==='pre');return;}
   if(f[2]==='*eq'){sjSet(m,b.concat('eqEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('eqPreFader'),v==='pre');return;}
+  if(f[2]==='*blink'){var pb=parBus(id);if(!pb)return;pb.forEach(function(q){sjSet(m,['OutputBusControl','obus'+q,'linkedToBus'],v?'obus'+pb[0]:'nOutBuses');});return;}
   if(f[2]==='*lim'){['trimLimiterEnabled','faderLimiterEnabled','eqLimiterEnabled'].forEach(function(k){sjSet(m,b.concat(k),!!v);});return;}
   if(f[2]==='*chlink'){var n0=+id;if(n0%2!==1||n0>15)return;[n0,n0+1].forEach(function(q,i){sjSet(m,['InputChannel'+q,'linkType'],v);sjSet(m,['InputChannel'+q,'linkedToId'],v==='Unlinked'?-1:n0);
       if(v!=='Unlinked'&&!(obj&&obj.x_pan!=null))sjSet(m,['InputChannel'+q,'lrPanPercentage'],i?100:-100);});return;}
@@ -2590,7 +2595,7 @@ function viewRota(R,M){
 /* buses: um bus por vez, fonte à direita, abas embaixo */
 function viewBus(R,M){
   var b=UI.mbus&&M.bus[UI.mbus]?UI.mbus:'L',x=M.bus[b],lr=b==='L'||b==='R',sc=scCarregar();
-  var lk=sc?sjGet(sc.m,['OutputBusControl','obus'+b,'linkedToBus']):null,par=lr?'L-R':(+b%2?b+'-'+(+b+1):(+b-1)+'-'+b);
+  var par=parBus(b).join('-');
   var h='<div class="sdr sdscr"><div class="sd-bar"><b>Bus '+b+': '+esc(x.nome||busNome(b))+'</b><span>'+(function(q){return q+(q===1?' canal':' canais');})(R.S.filter(function(s){return M.ch[s.n].r[b];}).length)+'</span></div>';
   h+='<div class="sd-src">';
   h+='<span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i><br>Send <i class="lg r-send"></i></small></span><div class="sd-grid g8">';
@@ -2599,9 +2604,9 @@ function viewBus(R,M){
   /* Bus: L, R (e 1, 2 nos buses 3–10) entrando neste bus */
   h+='<span class="sd-l">Bus</span><div class="sd-grid g8">'+(lr?'<i class="sd-dim">—</i>':xTog('bus',b,'sL',x,'L',XBUS)+xTog('bus',b,'sR',x,'R',XBUS)+(b!=='1'&&b!=='2'?xTog('bus',b,'s1',x,'1',XBUS)+xTog('bus',b,'s2',x,'2',XBUS):''))+'</div>';
   if(!lr){h+='<span class="sd-l">Com</span><div class="sd-grid g8">'+sdK('Rtn 1',x.src==='_1'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_1"')+sdK('Rtn 2',x.src==='_2'?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="_2"')+
-      '<span class="sd-k ro'+(lk&&lk!=='nOutBuses'?' sel':'')+'" title="Link de buses: só leitura até o teste" style="grid-column:span 2">Link '+par+'<sup>*</sup></span></div>'+
+      '<span style="grid-column:span 2;display:grid">'+xTog('bus',b,'blink',x,'Link '+par,XBUS)+'</span></div>'+
     '<span class="sd-l">Return</span><div class="sd-grid g8">'+RET_COD.map(function(r){return sdK(r[1],x.src===r[0]?'sel':'','data-act="mbussrcb" data-b="'+b+'" data-v="'+r[0]+'"',r[0]!=='Bl'&&r[0]!=='Al');}).join('')+'</div>';}
-  else h+='<span class="sd-l">Link</span><div class="sd-grid g8"><span class="sd-k ro'+(lk&&lk!=='nOutBuses'?' sel':'')+'" style="grid-column:span 2" title="só leitura até o teste">Link L-R<sup>*</sup></span></div>';
+  else h+='<span class="sd-l">Link</span><div class="sd-grid g8"><span style="grid-column:span 2;display:grid">'+xTog('bus',b,'blink',x,'Link L-R',XBUS)+'</span></div>';
   h+='</div>';
   /* rodapé de teclas, como no gravador: página 1 e "More.." */
   var mais=!!UI.busMais;
@@ -2623,9 +2628,9 @@ function viewOut(R,M){
   var scO=scCarregar(),AO=scO?(scO._A||(scO._A=lerArquivo(scO.m))).out[k]:null,pr=parOut(k);
   var h='<div class="sdr sdscr"><div class="sd-bar"><b>'+(k==='L'||k==='R'?k+' Out':k+' Out')+(o.nome?': '+esc(o.nome):'')+'</b><span>'+esc(saidaTxt(src,M,R))+'</span></div>';
   h+='<div class="sd-src"><span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i></small></span><div class="sd-grid g8">';
-  for(var n=1;n<=32;n++){var s=R.S[n-1];h+=sdK(String(n),a[0]==='iso'&&+a[1]===n?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="iso:'+n+':'+(a[0]==='iso'?a[2]:'pre')+'" title="ISO '+n+(s&&s.p?' · '+esc(nomePista(s.p)):'')+'"');}
+  for(var n=1;n<=32;n++){var s=R.S[n-1],eu=a[0]==='iso'&&+a[1]===n,pp=eu?(a[2]==='post'?'post':'pre'):'',prox=!eu?'iso:'+n+':pre':pp==='pre'?'iso:'+n+':post':'';
+    h+=sdK(String(n),pp?'r-'+pp:'','data-act="moutsrc" data-o="'+k+'" data-v="'+prox+'" title="ISO '+n+(s&&s.p?' · '+esc(nomePista(s.p)):'')+(pp?' · '+pp:'')+' (toque: desligado → pre → post)"');}
   h+='</div>';
-  if(a[0]==='iso')h+='<span class="sd-l"></span><span class="seg sd-seg"><button type="button" data-act="moutsrc" data-o="'+k+'" data-v="iso:'+a[1]+':pre" aria-pressed="'+(a[2]!=='post')+'">ISO pré</button><button type="button" data-act="moutsrc" data-o="'+k+'" data-v="iso:'+a[1]+':post" aria-pressed="'+(a[2]==='post')+'">ISO pós</button></span>';
   h+='<span class="sd-l">Bus</span><div class="sd-grid g8">'+BUSES.map(function(b){return sdK(b,src==='bus:'+b?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="bus:'+b+'" title="'+esc(busNome(b,M))+'"',0);}).join('')+
     sdK('HP-L',src==='hp:L'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:L"')+sdK('HP-R',src==='hp:R'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="hp:R"',0)+'</div>';
   h+='<span class="sd-l">Com</span><div class="sd-grid g8">'+sdK('Rtn 1',src==='com:1'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:1"')+sdK('Rtn 2',src==='com:2'?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="com:2"',1)+
@@ -2633,12 +2638,12 @@ function viewOut(R,M){
   h+='<span class="sd-l">Return</span><div class="sd-grid g8">'+RET_ORD.map(function(r){return sdK(r,src==='ret:'+r?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v="ret:'+r+'"',r!=='B1');}).join('')+'</div>';
   h+='<span class="sd-l"></span><div class="sd-grid g8"><span style="grid-column:span 2;display:grid">'+sdK('Silêncio',!src?'sel':'','data-act="moutsrc" data-o="'+k+'" data-v=""')+'</span></div>';
   h+='<span class="sd-l"></span><div class="sd-mutes">'+[['rmute','Record Mute'],['smute','Stop Mute'],['pmute','Play Mute']].map(function(q){var f=XOUT.filter(function(z){return z[0]===q[0];})[0],e=xEf('out',k,f,o);
-      return '<button type="button" class="cxb'+(e.set?' mod':'')+'" data-act="mxt" data-alvo="out" data-id="'+k+'" data-k="'+q[0]+'"><i class="cx'+(e.v?' on':'')+'"></i>'+q[1]+(q[0]==='pmute'?'<sup>*</sup>':'')+'</button>';}).join('')+'</div>';
+      return '<button type="button" class="cxb'+(e.set?' mod':'')+'" data-act="mxt" data-alvo="out" data-id="'+k+'" data-k="'+q[0]+'"><i class="cx'+(e.v?' on':'')+'"></i>'+q[1]+'</button>';}).join('')+'</div>';
   h+='</div>';
   h+='<div class="sd-soft"><label class="sd-sk num">Name<span><input type="text" maxlength="12" data-act="moutv" data-o="'+k+'" data-k="nome" value="'+esc(o.nome)+'"></span></label>'+
     '<label class="sd-sk num'+(o.dly!=null?' mod':'')+'">Delay<span><input type="number" step="any" min="0" max="500" data-act="moutn" data-o="'+k+'" data-k="dly" value="'+(o.dly!=null?o.dly:AO?AO.dly:'')+'" placeholder="—">ms</span></label>'+
     '<label class="sd-sk num'+(o.gain!=null?' mod':'')+'">Gain<span><input type="number" step="any" min="-50" max="0" data-act="moutn" data-o="'+k+'" data-k="gain" value="'+(o.gain!=null?o.gain:AO?AO.gain:'')+'" placeholder="—">dB</span></label>'+
-    '<label class="sd-sk num'+(o.nivel?' mod':'')+'">Level<span><select data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+(nv[0]?nv[1]:(AO&&AO.nivel?(NIVEIS.filter(function(q){return q[0]===AO.nivel;})[0]||[0,AO.nivel])[1]:'—'))+'</option>';}).join('')+'</select></span></label>'+
+    '<label class="sd-sk num'+(o.nivel?' mod':'')+'">Level<span><select data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.filter(function(nv){return nv[0]!=='AES'||k==='L'||k==='R';}).map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+(nv[0]?nv[1]:(AO&&AO.nivel?(NIVEIS.filter(function(q){return q[0]===AO.nivel;})[0]||[0,AO.nivel])[1]:'—'))+'</option>';}).join('')+'</select></span></label>'+
     xSk('out',k,'mute',o,'Mute',XOUT)+'</div>';
   h+='<p class="sd-nota">Contorno amarelo = mudado no site; o resto fica como está no gravador.</p>';
   h+='<div class="sd-tabs">'+SAIDAS.map(function(x){return '<button type="button" class="sd-tab'+(x===k?' sel':'')+'" data-act="moutsel" data-v="'+x+'">'+(x==='L'||x==='R'?x+' Out':x)+(M.out[x].nome?'<small>'+esc(M.out[x].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';

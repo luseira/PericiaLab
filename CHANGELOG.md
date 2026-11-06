@@ -23,6 +23,10 @@
 
 
 
+
+## v1.66 · 06/11
+- Teste PL 0611 2: link de buses liberado (pares L-R, 1-2, 3-4, 5-6, 7-8, 9-10), Play Mute confirmado, saída L/R em AES (Level → AES).
+- Outputs: tocar no número do ISO alterna desligado → pre (verde) → post (laranja), como no gravador.
 ## v1.65 · 06/11
 - Teste PL 0611 1 conferido e liberado para edição: link de canais (Stereo/MS, pares 1-2 … 15-16, pan ±100 automático), limiter do canal (os três campos juntos), Arm dos buses L/R/1/2, gain do bus em Off (−∞), Record/Stop Mute das saídas, nível Mic.
 - Tela do canal no formato das de Buses/Outputs: teclas Link, Fader, Pan, Automix, Limiter, Comp e EQ; Comp e EQ abrem uma linha/painel compacto (LF/MF/HF).
