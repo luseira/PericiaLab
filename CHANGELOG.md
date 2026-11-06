@@ -11,6 +11,13 @@
 
 
 
+
+## v1.54 · 05/11
+- Input list em bancos de 16 (Canais 1–16 aberto, 17–32 fechado). Bancos, Buses e Outputs abrem e fecham; o site lembra. Na impressão, tudo sai aberto.
+- Fichas com a cor do time no fundo.
+- Inventário: busca e foto grande ao tocar na foto (transmissor e cápsula).
+- RF: o scan agora fica guardado na planilha (aba Cenas, linha rf:scan) e aparece em qualquer aparelho.
+- Mixer: faixa "→ Reaper · Dante 1–16 · pré-fader" e botão "Exportar para o Reaper" (nomes e cores das pistas 1–16) + script do Reaper (reaper/PericiaLab_Reaper.lua).
 ## v1.53 · 05/11
 - Inventário: a tabela não aparecia (a classe "inv" colidia com o ícone de polaridade e virava uma bolinha roxa). Corrigido.
 - Input list: botão "＋ Ver até o canal 32 (colinha)" mostra todas as pistas do Scorpio, inclusive a colinha (= Ch n) e as vazias.

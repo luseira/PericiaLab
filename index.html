@@ -170,6 +170,19 @@ label.campo input,label.campo select{display:block;width:100%;margin-top:.15rem;
 .ficha .ft{position:relative;display:grid;place-items:center;color:#fff;font:700 2rem/1 var(--fc);min-height:100%}
 .ficha .ft img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ficha .bd{padding:.45rem .55rem}
+.ficha.tv{border-color:var(--c-A);background:color-mix(in srgb,var(--c-A) 14%,#fff)}.ficha.tz{border-color:var(--c-B);background:color-mix(in srgb,var(--c-B) 14%,#fff)}
+.ficha.tv .ft,.ficha.tz .ft{border-right:6px solid}.ficha.tv .ft{border-color:var(--c-A)}.ficha.tz .ft{border-color:var(--c-B)}
+.ficha.tv,.ficha.tz,.ficha.tv .ft,.ficha.tz .ft{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+details.sec{margin:.8rem 0}details.sec>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:.5rem;font:700 1rem/1.2 var(--f);padding:.45rem .2rem;border-bottom:2px solid var(--ink)}
+details.sec>summary::-webkit-details-marker{display:none}details.sec>summary::before{content:'▸';display:inline-block;transition:transform .15s}details.sec[open]>summary::before{transform:rotate(90deg)}
+details.sec>summary small{font-weight:400;color:var(--ink2);font-size:.8rem}
+@media print{details.sec>summary::before{display:none}}
+.fotobtn{border:0;padding:0;background:none;cursor:zoom-in;display:block}
+#zoom{position:fixed;inset:0;z-index:80;background:rgba(10,12,16,.82);display:grid;place-items:center;padding:1rem;cursor:zoom-out}
+#zoom figure{margin:0;background:#fff;border-radius:12px;padding:.8rem;max-width:min(92vw,640px);text-align:center}
+#zoom img{width:100%;height:auto;max-height:78vh;object-fit:contain;display:block;background:#eceef1;border-radius:8px}
+#zoom figcaption{font:700 1.1rem/1.3 var(--f);margin-top:.5rem}#zoom figcaption small{display:block;font-weight:400;font-size:.8rem;color:var(--ink2)}
+.band.rp{background:#2a6f4f;color:#e9fff3}
 .ficha .hd{display:flex;gap:.45rem;align-items:center;margin-bottom:.3rem;min-width:0}
 .ficha .hd .tag{flex:none}
 .ficha .hd>div{min-width:0}
@@ -539,7 +552,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.53 · 05/11 22:35</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.54 · 05/11 23:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -661,7 +674,8 @@ function normalizar(R){
   d.imp=linhas(R,'imp').map(function(o){return {gerado:str(o['Report gerado em']),em:str(o['Importado em']),por:str(o['Por']),n:str(o['Transmissores atualizados']),mud:str(o['Mudanças']),nao:str(o['Nomes sem correspondência'])};});
   d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}var pos=null;if(pp&&!Array.isArray(pp)){mm=pp.m||null;pos=pp.pos!=null?+pp.pos:null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'alfa',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;if(pos==null&&str(o['Posição'])!=='')pos=num(o['Posição']);if(pos!=null&&!isNaN(pos))c.pos=pos;return c;}).filter(function(c){return c.id;}):null;
   d.configs=(Array.isArray(R&&R.cenas)?R.cenas:[]).filter(function(o){return /^car:/.test(str(o['ID']));}).map(function(o){var x={};try{x=JSON.parse(str(o['Pistas'])||'{}');}catch(e){}return {id:str(o['ID']),nome:str(o['Nome']),em:str(o['Atualizado em']),por:str(o['Por']),car:x.car||{}};});
-  if(Array.isArray(d.cenas))d.cenas=d.cenas.filter(function(c){return !/^car:/.test(c.id);});
+  if(Array.isArray(d.cenas))d.cenas=d.cenas.filter(function(c){return !/^(car|rf):/.test(c.id);});
+  d.rfscan=null;(Array.isArray(R&&R.cenas)?R.cenas:[]).forEach(function(o){if(str(o['ID'])==='rf:scan'){try{var x=JSON.parse(str(o['Pistas'])||'{}');if(x.scan)d.rfscan=x.scan;}catch(e){}}});
   d.script=str(R&&R.script);
   d.saidas=linhas(R,'saidas').filter(function(o){return str(o['Saída']);});
   d.equip=linhas(R,'equip').filter(function(o){return str(o['Item']);});
@@ -1041,7 +1055,7 @@ function ordenar(L,ordem,col){
 function fichaHtml(x,col){
   var p=x.p,e=x.e||{},t=x.t,ch=col&&col.map[p.id];
   function d(k,v){return '<dt>'+k+'</dt><dd>'+(v?esc(v):'—')+'</dd>';}
-  return '<article class="ficha">'+fotoGrande(p)+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><div><h4>'+esc(p.nome)+'</h4><div class="sub">'+esc(papelTxt(p))+(e.time?' · '+timeNome(e.time):'')+(ch?' · colinha '+ch:'')+'</div></div></div>'+
+  return '<article class="ficha'+(e.time&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?' '+timeCls(e.time):'')+'">'+fotoGrande(p)+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><div><h4>'+esc(p.nome)+'</h4><div class="sub">'+esc(papelTxt(p))+(e.time?' · '+timeNome(e.time):'')+(ch?' · colinha '+ch:'')+'</div></div></div>'+
     '<dl>'+'<dt>Cápsula</dt><dd>'+(e.cap?bolinha(e.cap)+esc(e.cap)+(corDe(e.cap)?' ('+corDe(e.cap)+')':'')+(capInv(e.cap)?' '+invIcon(e.cap,1)+' inverter no TX':'')+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?' + adaptador → '+esc(k.ad):'';})():'—')+'</dd>'+d('Receptor',t?rxTxt(t):'')+d('Canal',t?t.canal:'')+d('Freq. MHz',t?mhz(t.freq):'')+d('Bloco',t?t.bloco:'')+d('Modulação',t?t.mod:'')+(t&&t.cod?d('Código',t.cod):'')+
     (p.papel==='MENTOR'&&t&&t.rxM?'<div class="nota">Sala dos mentores: '+esc(t.rxM)+' · '+esc(t.canalM)+'</div>':'')+
     (e.obs?'<div class="nota">'+esc(e.obs)+'</div>':'')+'</dl></div></article>';
@@ -1073,10 +1087,13 @@ function linhasIL(tudo){
 }
 function ilNome(x){return x.fx?x.nome:x.p?primeiroNome(x.p):'—';}
 function ilMic(x){var e=x.e||{};if(x.fx||!e.cap)return '';var k=compatCap(D.capPor[e.cap],x.t);return capTag(e.cap,'sm')+invIcon(e.cap,1)+(k.ok&&k.ad?' <small class="ad">+AD'+(e.ad?' '+esc(adCurto(e.ad)):'')+'</small>':'');}
+/* seção que abre e fecha; lembra o estado por aparelho */
+function secao(k,tit,sub,padrao,corpo){var ab=UI.secs&&k in UI.secs?UI.secs[k]:padrao;
+  return '<details class="sec" data-sec="'+k+'"'+(ab?' open':'')+'><summary>'+esc(tit)+(sub?' <small>'+esc(sub)+'</small>':'')+'</summary>'+corpo+'</details>';}
 function viewDoc(){
-  var I=linhasIL(!!UI.il32),fich=UI.fmt==='fichas',s=situacao(UI.ep);
+  var I=linhasIL(UI.fmt!=='fichas'),fich=UI.fmt==='fichas',s=situacao(UI.ep);
   var h='<div class="bar noprint"><span class="seg" role="group" aria-label="Formato"><button type="button" data-act="fmt" data-v="lista" aria-pressed="'+!fich+'">Lista</button><button type="button" data-act="fmt" data-v="fichas" aria-pressed="'+fich+'">Fichas</button></span>'+
-    '<button type="button" class="btn" data-act="il32" aria-pressed="'+!!UI.il32+'">'+(UI.il32?'− Só as pistas principais':'＋ Ver até o canal 32 (colinha)')+'</button><span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+    '<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(s.graves)h+='<div class="banner err noprint">A escalação tem '+s.graves+' problema(s). Confira no Carômetro antes de imprimir.</div>';
   if(fich)h+='<style>@page{size:A4 landscape;margin:10mm}</style>';
   h+='<section class="doc il"><div class="dochead"><div><h1>Perícia Lab · Input list</h1><p>Cena "'+esc(I.c.nome)+'" · EP '+UI.ep+' · '+I.L.length+' pistas</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
@@ -1084,32 +1101,36 @@ function viewDoc(){
     var col=colinhaMap(UI.ep),pp=I.L.filter(function(x){return x.p;}).map(function(x){return s.pessoas.filter(function(y){return y.p.id===x.p.id;})[0];}).filter(Boolean);
     h+='<div class="fichas">'+pp.map(function(x){return fichaHtml(x,col);}).join('')+'</div>';
   }else{
-    h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>Pista</th><th>Nome</th><th>Source</th><th>Mic</th><th>Transmissor</th><th>Receptor</th><th>Freq.</th><th>Bloco</th></tr></thead><tbody>'+
-      I.L.map(function(x){var t=x.t;
+    var cab='<div class="tabwrap"><table class="tab il"><thead><tr><th>Pista</th><th>Nome</th><th>Source</th><th>Mic</th><th>Transmissor</th><th>Receptor</th><th>Freq.</th><th>Bloco</th></tr></thead><tbody>';
+    function linhaIL(x){var t=x.t;
         var r='<tr'+(x.fx||x.copia||x.vazio?' class="fx"':'')+'><td><span class="tag sm">'+x.n+'</span></td><td class="n">'+esc(ilNome(x))+(x.copia?'<small>colinha · = Ch '+x.copia+'</small>':'')+'</td><td><b>'+esc(x.cn||'')+'</b></td><td>'+ilMic(x)+'</td><td>'+esc(t?txNome(t):'')+'</td><td>'+esc(t?rxTxt(t):'')+'</td><td>'+(t&&!isNaN(t.freq)?mhz(t.freq):'')+'</td><td>'+esc(t?t.bloco:'')+'</td></tr>';
         if(x.p&&x.p.papel==='MENTOR'&&t&&t.rxM)r+='<tr class="sub"><td></td><td colspan="2">↳ sala dos mentores</td><td></td><td></td><td>'+esc(t.rxM)+'</td><td colspan="2">'+esc(t.canalM)+'</td></tr>';
-        return r;}).join('')+'</tbody></table></div>';
+        return r;}
+    [[1,16],[17,32]].forEach(function(b){var Lb=I.L.filter(function(x){return x.n>=b[0]&&x.n<=b[1];}),usadas=Lb.filter(function(x){return !x.vazio;}).length;
+      h+=secao('il'+b[0],'Canais '+b[0]+'–'+b[1],usadas+' de 16 em uso'+(b[0]===17?' · colinha 23–32':''),b[0]===1,cab+Lb.map(linhaIL).join('')+'</tbody></table></div>');});
   }
-  if(I.fora.length)h+='<p class="livres"><b>Fora da cena "'+esc(I.c.nome)+'":</b> '+esc(I.fora.map(function(x){return primeiroNome(x.p)+(x.e&&x.e.tx?' ('+txNome(x.t,x.e.tx)+')':'');}).join(', '))+'</p>';
+  if(I.fora.length&&fich)h+='<p class="livres"><b>Fora da cena "'+esc(I.c.nome)+'":</b> '+esc(I.fora.map(function(x){return primeiroNome(x.p)+(x.e&&x.e.tx?' ('+txNome(x.t,x.e.tx)+')':'');}).join(', '))+'</p>';
+  if(I.fora.length&&!fich)h+='<p class="livres"><b>Fora da cena "'+esc(I.c.nome)+'":</b> '+esc(I.fora.map(function(x){return primeiroNome(x.p)+(x.e&&x.e.tx?' ('+txNome(x.t,x.e.tx)+')':'');}).join(', '))+'</p>';
   h+=busSaidasHtml(I)+'</section>';
   return h;
 }
 function busSaidasHtml(I){
   var M=I.M,R=I.R,h='<div class="quebra">';
   var bs=BUSES.filter(function(b){return M.bus[b]&&M.bus[b].nome;});
-  if(bs.length)h+='<h3>Buses</h3><div class="tabwrap"><table class="tab il"><thead><tr><th>Bus</th><th>Nome</th><th>Retorno</th></tr></thead><tbody>'+bs.map(function(b){var x=M.bus[b];
-    return '<tr><td><span class="tag sm">'+esc(b)+'</span></td><td class="n">'+esc(x.nome)+'</td><td>'+esc(x.src?((RET_COD.filter(function(r){return r[0]===x.src;})[0]||[0,x.src])[1]):'')+'</td></tr>';}).join('')+'</tbody></table></div>';
+  if(bs.length)h+=secao('ilbus','Buses',bs.length+' com nome',true,'<div class="tabwrap"><table class="tab il"><thead><tr><th>Bus</th><th>Nome</th><th>Retorno</th></tr></thead><tbody>'+bs.map(function(b){var x=M.bus[b];
+    return '<tr><td><span class="tag sm">'+esc(b)+'</span></td><td class="n">'+esc(x.nome)+'</td><td>'+esc(x.src?((RET_COD.filter(function(r){return r[0]===x.src;})[0]||[0,x.src])[1]):'')+'</td></tr>';}).join('')+'</tbody></table></div>');
   var usados={};
-  h+='<h3>Outputs</h3><div class="tabwrap"><table class="tab il"><thead><tr><th>Output</th><th>Nome</th><th>Source</th><th>Nível</th><th>Transmissor</th><th>Receptor</th></tr></thead><tbody>'+
+  var tb='<div class="tabwrap"><table class="tab il"><thead><tr><th>Output</th><th>Nome</th><th>Source</th><th>Nível</th><th>Transmissor</th><th>Receptor</th></tr></thead><tbody>'+
     SAIDAS.map(function(k){var o=M.out[k],tx=D.tx.filter(function(t){return t.mon&&t.saida&&t.saida.toUpperCase()===k;});tx.forEach(function(t){usados[t.num]=1;});
       return '<tr><td><span class="tag sm">'+k+'</span></td><td class="n">'+esc(o.nome)+'</td><td>'+esc(saidaTxt(o.src,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(o.nivel||'');})[0]||['',''])[1])+'</td><td>'+esc(tx.map(function(t){return t.nome+(isNaN(t.freq)?'':' '+mhz(t.freq));}).join(', '))+'</td><td>'+esc(tx.map(function(t){return t.rx;}).filter(Boolean).join(', '))+'</td></tr>';}).join('')+'</tbody></table></div>';
   var resto=D.tx.filter(function(t){return t.mon&&!usados[t.num];});
-  if(resto.length)h+='<p class="livres"><b>Monitoração sem saída definida:</b> '+esc(resto.map(function(t){return t.nome+(isNaN(t.freq)?'':' '+mhz(t.freq));}).join(', '))+'</p>';
+  if(resto.length)tb+='<p class="livres"><b>Monitoração sem saída definida:</b> '+esc(resto.map(function(t){return t.nome+(isNaN(t.freq)?'':' '+mhz(t.freq));}).join(', '))+'</p>';
+  h+=secao('ilout','Outputs',SAIDAS.length+' saídas',true,tb);
   return h+'</div>';
 }
 /* texto curto para mandar por WhatsApp */
 function textoWhats(){
-  var I=linhasIL(),L=['*Perícia Lab · Input list*','Cena '+I.c.nome+' · EP '+UI.ep,''];
+  var I=linhasIL(false),L=['*Perícia Lab · Input list*','Cena '+I.c.nome+' · EP '+UI.ep,''];
   I.L.forEach(function(x){var t=x.t,e=x.e||{};
     L.push(('0'+x.n).slice(-2)+' *'+ilNome(x).toUpperCase()+'* · '+(x.cn||'—')+(x.fx?'':' · '+(e.cap?capNome(e.cap)+(corDe(e.cap)?' '+corDe(e.cap):''):'sem mic')+' · '+(t?txNome(t)+(isNaN(t.freq)?'':' '+mhz(t.freq)):'sem TX')));});
   if(I.fora.length)L.push('','Fora da cena: '+I.fora.map(function(x){return primeiroNome(x.p);}).join(', '));
@@ -1379,17 +1400,31 @@ function viewInv(){
     cap:[['Cápsula','Cápsula'],['Tipo','Tipo'],['Modelo','Modelo'],['Cor','Cor'],['Terminação','Terminação'],['Serial','Serial'],['Manutenção','Manut.'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']],
     equip:[['Item','Item'],['Categoria','Categoria'],['Modelo','Modelo'],['Serial','Serial'],['Qtd','Qtd'],['Dono','Dono'],['Devolve após EP','Devolve'],['Observações','Obs.']]}[t];
   if(t==='tx')L.sort(function(a,b){return (int(a['TX'])||(/^S/.test(str(a['TX']))?95:90))-(int(b['TX'])||(/^S/.test(str(b['TX']))?95:90));});
+  h+='<div class="busca noprint"><input type="search" id="ibusca" data-act="ibusca" value="'+esc(IBUSCA)+'" placeholder="Buscar no inventário: nome, modelo, serial, dono…" aria-label="Buscar no inventário" autocomplete="off"><span class="hint" id="nibusca" style="margin:0"></span></div>';
   h+='<section class="doc"><div class="dochead"><div><h1>Inventário · '+esc(INVT.filter(function(x){return x[0]===t;})[0][1])+'</h1><p>'+L.length+' item(ns)</p></div><div class="r">Gerado em '+agora()+'</div></div>';
   h+='<div class="tabwrap"><table class="tab il invtab"><thead><tr>'+(t==='tx'||t==='cap'?'<th></th>':'')+cols.map(function(c){return '<th>'+c[1]+'</th>';}).join('')+'<th class="noprint"></th></tr></thead><tbody>'+
     L.map(function(o){var id=str(o[ch]),it=t==='tx'?D.txPor[id]:t==='cap'?D.capPor[id]:null;
-      return '<tr>'+(it?'<td class="th">'+fotoEquip(t,it)+'</td>':'')+cols.map(function(c,i){var v=o[c[0]];var txt=c[0]==='Manutenção'?simTxt(v):c[0]==='Devolve após EP'?(str(v)?'EP '+str(v):''):str(v);
+      return '<tr data-ibusca="'+esc(semAcento(cols.map(function(c){return str(o[c[0]]);}).join(' ')).toLowerCase())+'">'+(it?'<td class="th"><button type="button" class="fotobtn" data-act="zoom" data-tipo="'+t+'" data-id="'+esc(id)+'" title="Ver foto grande">'+fotoEquip(t,it)+'</button></td>':'')+cols.map(function(c,i){var v=o[c[0]];var txt=c[0]==='Manutenção'?simTxt(v):c[0]==='Devolve após EP'?(str(v)?'EP '+str(v):''):str(v);
         if(i===0)return '<td class="n">'+(t==='cap'?capTag(id,'sm'):esc(txt))+'</td>';return '<td'+(c[0]==='Observações'?' class="w"':'')+'>'+esc(txt)+'</td>';}).join('')+'<td class="noprint">'+lapis('invedit',t,id)+'</td></tr>';}).join('')+'</tbody></table></div>';
   h+='<div class="linha noprint" style="margin-top:.6rem"><button class="btn sm" type="button" data-act="invedit" data-aba="'+t+'" data-v="">＋ Novo</button></div></section>';
   return h;
 }
 
 /* ───────── RF ───────── */
+var IBUSCA='';
+function aplicarIBusca(){var q=termos(IBUSCA),n=0;document.querySelectorAll('tr[data-ibusca]').forEach(function(r){var ok=casa(r.dataset.ibusca,q);r.classList.toggle('oculto',!ok);if(ok)n++;});var c=$('#nibusca');if(c)c.textContent=q.length?n+' encontrado(s)':'';}
+/* foto grande de transmissor ou cápsula */
+function abrirZoom(tipo,id){var o=tipo==='tx'?D.txPor[id]:D.capPor[id];if(!o)return;var tmp=document.createElement('div');tmp.innerHTML=fotoEquip(tipo,o);var im=tmp.querySelector('img');
+  var z=document.createElement('div');z.id='zoom';z.setAttribute('role','dialog');z.setAttribute('aria-label','Foto');
+  z.innerHTML='<figure>'+(im?'<img src="'+esc(im.getAttribute('src'))+'" alt="">':tmp.innerHTML)+'<figcaption>'+esc(tipo==='tx'?(o.nome||'TX '+o.num):o.id)+'<small>'+esc(tipo==='tx'?[o.modelo,o.bloco?'bloco '+o.bloco:'',isNaN(o.freq)?'':mhz(o.freq)+' MHz'].filter(Boolean).join(' · '):[o.modelo,o.cor,o.term,o.serial].filter(Boolean).join(' · '))+'</small></figcaption></figure>';
+  z.addEventListener('click',function(){z.remove();});document.body.appendChild(z);}
+/* scan de RF: guardado na planilha (aba Cenas, linha rf:scan) para aparecer em qualquer aparelho */
 var SCAN=null;try{SCAN=JSON.parse(localStorage.getItem('plc_scan')||'null');}catch(e){}
+function scanDaPlanilha(){var r=D&&D.rfscan;if(r&&r.pts&&r.pts.length)return r;return null;}
+function guardarScan(sc){var pts=sc.pts;if(pts.length>2500){var st=Math.ceil(pts.length/2500),r=[];for(var i=0;i<pts.length;i+=st){var c=pts.slice(i,i+st);r.push([c[0][0],Math.max.apply(null,c.map(function(x){return x[1];}))]);}pts=r;}
+  var leve={nome:sc.nome,em:sc.em,pts:pts.map(function(x){return [Math.round(x[0]*1000)/1000,Math.round(x[1]*10)/10];})};
+  if(MODO==='api'||MODO==='demo')fazer({acao:'cena',id:'rf:scan',nome:'Scan de RF: '+sc.nome,ordem:'rf',pistas:JSON.stringify({scan:leve})});
+  return leve;}
 function lerScan(texto,nome){
   var pts=[];texto.split(/\r?\n/).forEach(function(l){var m=l.trim().split(/[;,\t ]+/).filter(Boolean);if(m.length<2)return;
     var f=parseFloat(m[0].replace(',','.')),v=parseFloat(m[1].replace(',','.'));if(isNaN(f)||isNaN(v))return;pts.push([f,v]);});
@@ -1420,14 +1455,14 @@ function imd(T){
     T.forEach(function(c){if(c===T[a]||c===T[b])return;if(Math.abs(c.freq-p)<0.1)out.push({c:c,a:T[a],b:T[b],d:Math.abs(c.freq-p)});});}
   return out;
 }
-function viewRf(){
+function viewRf(){SCAN=scanDaPlanilha()||SCAN;
   var T=txsRf(),h='<div class="bar noprint"><h2 style="margin:0">RF</h2><span class="sp"></span>'+
     '<label class="btn">Importar scan (.csv)<input type="file" accept=".csv,.txt,text/csv" data-act="scan" class="sr"></label>'+
     '<label class="btn">Importar report (.html)<input type="file" accept=".html,.htm,text/html" data-act="report" class="sr"></label>'+
     '<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(PREVIEW)h+='<div class="painel noprint">'+previewHtml()+'</div>';
   h+='<section class="doc"><div class="dochead"><div><h1>Coordenação de RF</h1><p>'+T.length+' transmissores'+(SCAN?' · scan "'+esc(SCAN.nome)+'" ('+esc(SCAN.em)+')':'')+'</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
-  h+='<div class="rfbox">'+graficoRf()+'</div>'+(SCAN?'':'<p class="hint noprint">Importe o scan exportado do Wireless Designer (.csv) para ver o espectro por baixo dos transmissores. O scan fica só neste aparelho.</p>');
+  h+='<div class="rfbox">'+graficoRf()+'</div>'+(SCAN?'':'<p class="hint noprint">Importe o scan exportado do Wireless Designer (.csv) para ver o espectro por baixo dos transmissores. O scan fica guardado na planilha e aparece em qualquer aparelho.</p>');
   var s=situacao(UI.ep);
   h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>#</th><th>Freq. MHz</th><th>Transmissor</th><th>Bloco</th><th>Código</th><th>Receptor</th><th>Com quem</th><th>Distância do vizinho</th><th></th></tr></thead><tbody>'+
     T.map(function(t,i){var viz=Math.min(i>0?t.freq-T[i-1].freq:99,i<T.length-1?T[i+1].freq-t.freq:99);var quem=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);}).join(', ');
@@ -1651,8 +1686,9 @@ function linhaMix(R,a,b,v,M){
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     var zl=i===1?'Frente · '+timeNome(R.frente)+' ('+R.F.length+')':i===2?'Trás · '+timeNome(R.frente==='A'?'B':'A')+' ('+R.T.length+') · Clara':z[2];
-    h+='<span class="band zb z'+i+'" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
-  S.forEach(function(s,i){h+='<span style="grid-row:3;grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
+    h+='<span class="band zb z'+i+'" style="grid-row:3;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
+  (function(){var x=Math.max(a,1),y=Math.min(b,REAPER_N);if(x<=y)h+='<span class="band rp" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'" title="Dante '+x+'–'+y+' pré-fader entram nas pistas '+x+'–'+y+' do Reaper">→ Reaper · Dante '+x+'–'+y+' · pré-fader</span>';})();
+  S.forEach(function(s,i){h+='<span style="grid-row:4;grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
   return h+'</div>';
 }
 function aplicarBuscaMix(){
@@ -1730,7 +1766,7 @@ function viewMix(){
   if(CENAOP)h+=cenaOpHtml(L,c);
   h+='<div class="bar">'+
     '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="alfa"'+(c.ordem!=='tx'?' selected':'')+'>Alfabética</option><option value="tx"'+(c.ordem==='tx'?' selected':'')+'>Transmissor</option></select></label>'+
-    '<span class="sp"></span><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button><button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
+    '<span class="sp"></span><button class="btn sm" type="button" data-act="mreaper" title="Arquivo com nome e cor das pistas 1–16 para o script do Reaper">⤓ Exportar para o Reaper</button><a class="btn sm" href="reaper/PericiaLab_Reaper.lua" download title="Instalar uma vez no Reaper: Actions › Load ReaScript">Script do Reaper</a><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button><button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
   h+='<div class="busca noprint"><input type="search" id="mbusca" data-act="mbusca" value="'+esc(MBUSCA)+'" placeholder="Achar no mixer: nome, TX, canal, cápsula…" aria-label="Buscar no mixer" autocomplete="off">'+
     '<button class="btn sm'+(MVARIOS?' pri':'')+'" type="button" data-act="mvarios" title="Tocar em várias pistas para selecionar (no computador: Shift ou Ctrl + clique)">☐ Selecionar vários</button>'+
     '<span class="undo"><button class="btn sm" type="button" data-act="mundo" title="Desfazer (Ctrl+Z)"'+(UNDO.length?'':' disabled')+'>↶ Desfazer</button><button class="btn sm" type="button" data-act="mredo" title="Refazer (Ctrl+Shift+Z)"'+(REDO.length?'':' disabled')+'>↷ Refazer</button></span>'+
@@ -2231,6 +2267,14 @@ function resumoCanais(R,M){
       '<td>'+(ch.trim==null?'':ch.trim+' dB')+'</td><td>'+(ch.hpf==null?'':ch.hpf?ch.hpf+' Hz':'desl.')+'</td><td>'+(ch.ph==null?'':ch.ph?'Ø':'normal')+'</td><td>'+(ch.dly==null?'':ch.dly+' ms')+'</td></tr>';});
   return h+'</tbody></table></div>';
 }
+/* Reaper: pistas 1–16 do Scorpio saem no Dante 1–16 (ISO pré-fader) e entram nas pistas 1–16 do Reaper */
+var REAPER_N=16;
+function corCat(s){var k=(catStrip(s)||'').trim();return {'k-host':'host','k-mentor':'mentor','k-tv':'A','k-tz':'B','k-boom':'boom','k-goose':'goose'}[k]||'';}
+function reaperTxt(c){var R=resolver(c,UI.ep),M=mesaEf(c,R),L=['PERICIALAB-REAPER 1\tcena: '+c.nome+'\tEP '+UI.ep+'\t'+agora()];
+  R.S.slice(0,REAPER_N).forEach(function(sl){var nome=sl.p?nomePista(sl.p):sl.fx?semAcento(nomeFx(sl,M)).toUpperCase():'Ch '+sl.n,k=sl.p?corCat(sl):'';
+    L.push(sl.n+'\t'+String(nome).replace(/[\t\r\n]/g,' ')+'\t'+(k?corFuncao(k):''));});
+  return L.join('\n')+'\n';}
+function baixarTxt(nome,txt){var b=new Blob([txt],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},500);}
 function baixar(nome,txt){
   var b=new Blob([txt],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(u);a.remove();},1500);
@@ -2261,6 +2305,7 @@ function cliqueMesa(a,el){
   if(a==='mscdel'){SC=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
   if(a==='mtrazer'){if(!SC)return true;if(!confirm('Substituir ON, ARM, routing, ajustes, buses e saídas desta cena pelo que está no arquivo?'))return true;
     var c3=cenaAtual(),R3=resolver(c3,UI.ep);trazerDoArquivo(R3,lerArquivo(SC.m));toast('Cena atualizada com o gravador');return true;}
+  if(a==='mreaper'){var cr=cenaAtual();baixarTxt('PericiaLab_Reaper_'+nomeArq(cr.nome)+'_EP'+UI.ep+'.txt',reaperTxt(cr));toast('Arquivo do Reaper baixado. No Reaper, rode a ação "PericiaLab_Reaper" e escolha o arquivo.');return true;}
   if(a==='mexport'){if(!SC)return true;var c4=cenaAtual(),R4=resolver(c4,UI.ep),M4=mesaEf(c4,R4),nm=nomeArq($('#mscnome').value||c4.nome);
     try{baixar(nm+'.json',exportar(c4,R4,M4,nm));toast('Settings gerado: '+nm+'.json');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
   return false;
@@ -2437,6 +2482,7 @@ function render(){
   if(UI.view==='car'&&BUSCA)aplicarBusca();
   ligarArraste(document);
   if(UI.view==='mix'&&(MBUSCA))aplicarBuscaMix();
+  if(UI.view==='inv'&&IBUSCA)aplicarIBusca();
   setStatus();
 }
 function renderSeguro(){
@@ -2488,7 +2534,7 @@ document.addEventListener('click',function(ev){
     var ops=recuperarConfig(v);if(v!=='car:auto')salvarConfig('car:auto','Último estado');escalarVarios(ops);toast('Configuração recuperada');}
   else if(a==='cfgzerar'){if(!confirm('Tirar o transmissor e a cápsula de todo mundo? O estado de agora fica guardado em "Último estado".'))return;salvarConfig('car:auto','Último estado');escalarVarios(zerarTudo());toast('Todos os transmissores e cápsulas foram tirados');}
   else if(a==='fmt'){UI.fmt=v;salvarUi();render();}
-  else if(a==='il32'){UI.il32=!UI.il32;salvarUi();render();}
+  else if(a==='zoom'){abrirZoom(el.dataset.tipo,el.dataset.id);}
   else if(a==='whats'){var tw=textoWhats();if(navigator.share&&/Mobi|Android|iPhone/i.test(navigator.userAgent)){navigator.share({text:tw}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(tw).then(function(){toast('Copiado. Cole no WhatsApp.');},function(){toast('Não consegui copiar.',true);});}}
   else if(a==='ft'){UI.ft=v;salvarUi();render();}
   else if(a==='print')window.print();
@@ -2511,7 +2557,7 @@ document.addEventListener('change',function(ev){
   if(mudancaMix(a,el))return;
   if(a==='ordem'){UI.ordem=el.value;salvarUi();render();}
   else if(a==='elim'){fazer({acao:'eliminar',id:EDIT,ep:el.checked?UI.ep:''});renderModal();}
-  else if(a==='scan'&&el.files[0]){var fsc=el.files[0];var rd=new FileReader();rd.onload=function(){var sc=lerScan(String(rd.result),fsc.name);if(!sc){toast('Não reconheci frequências e níveis nesse arquivo.',true);return;}SCAN=sc;try{localStorage.setItem('plc_scan',JSON.stringify(sc));}catch(e){}toast('Scan importado: '+sc.pts.length+' pontos');render();};rd.readAsText(fsc);}
+  else if(a==='scan'&&el.files[0]){var fsc=el.files[0];var rd=new FileReader();rd.onload=function(){var sc=lerScan(String(rd.result),fsc.name);if(!sc){toast('Não reconheci frequências e níveis nesse arquivo.',true);return;}SCAN=guardarScan(sc);try{localStorage.setItem('plc_scan',JSON.stringify(SCAN));}catch(e){}toast('Scan importado e guardado na planilha: '+SCAN.pts.length+' pontos');render();};rd.readAsText(fsc);}
   else if(a==='fotoeq'&&el.files[0]){var ab=el.dataset.aba,idq=el.dataset.id;reduzirFoto(el.files[0],function(url){fazer({acao:'fotoEquip',aba:ab,id:idq,base64:url.split(',')[1],mime:'image/jpeg',preview:url});renderModal();toast('Foto salva');});}
   else if(a==='foto'&&el.files[0]){var id=EDIT;reduzirFoto(el.files[0],function(url){fazer({acao:'foto',id:id,base64:url.split(',')[1],mime:'image/jpeg',preview:url});renderModal();toast('Foto salva');});}
   else if(a==='report'&&el.files[0]){
@@ -2525,8 +2571,10 @@ document.addEventListener('change',function(ev){
 });
 document.addEventListener('input',function(ev){var a=ev.target.dataset&&ev.target.dataset.act;
   if(a==='busca'){BUSCA=ev.target.value;aplicarBusca();}
-  else if(a==='mbusca'){MBUSCA=ev.target.value;aplicarBuscaMix();}});
+  else if(a==='mbusca'){MBUSCA=ev.target.value;aplicarBuscaMix();}
+  else if(a==='ibusca'){IBUSCA=ev.target.value;aplicarIBusca();}});
 document.addEventListener('keydown',function(ev){
+  if(ev.key==='Escape'&&$('#zoom')){$('#zoom').remove();return;}
   if(ev.key==='Escape'&&EDIT){fechar();return;}
   if(EDIT&&(ev.key==='ArrowLeft'||ev.key==='ArrowRight')&&!/^(INPUT|SELECT|TEXTAREA)$/.test((ev.target&&ev.target.tagName)||'')){ev.preventDefault();navPessoa(ev.key==='ArrowLeft'?-1:1);return;}
   if(UI.view==='mix'&&(ev.key==='Delete'||ev.key==='Backspace')&&!/^(INPUT|SELECT|TEXTAREA)$/.test((ev.target&&ev.target.tagName)||'')&&(MSEL||MSELS.length)){ev.preventDefault();esvaziarSel();return;}
@@ -2536,6 +2584,10 @@ document.addEventListener('keydown',function(ev){
   else if((ev.ctrlKey||ev.metaKey)&&(ev.key==='c'||ev.key==='C')&&(MSEL||MSELS.length)&&!String(window.getSelection&&window.getSelection()||'')){ev.preventDefault();copiarSel();}
   else if((ev.ctrlKey||ev.metaKey)&&(ev.key==='v'||ev.key==='V')&&CLIP){ev.preventDefault();colarSel();}
 });
+document.addEventListener('toggle',function(ev){var d=ev.target;if(!d||!d.dataset||!d.dataset.sec||IMPRIMINDO)return;UI.secs=UI.secs||{};UI.secs[d.dataset.sec]=d.open;salvarUi();},true);
+var IMPRIMINDO=false,FECHADAS=[];
+window.addEventListener('beforeprint',function(){IMPRIMINDO=true;FECHADAS=[].slice.call(document.querySelectorAll('details.sec:not([open])'));FECHADAS.forEach(function(d){d.open=true;});});
+window.addEventListener('afterprint',function(){FECHADAS.forEach(function(d){d.open=false;});FECHADAS=[];setTimeout(function(){IMPRIMINDO=false;},50);});
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&MODO==='api')buscar();});
 
 /* ───────── início ───────── */
