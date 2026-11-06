@@ -556,7 +556,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.61 · 06/11 01:35</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.62 · 06/11 00:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1809,7 +1809,7 @@ function viewMix(){
 /* ───────── simulação da DAW: só as pistas armadas viram faixa, em ordem de canal ───────── */
 function nomeFx(s,M){
   var ch=M&&M.ch&&M.ch[s.n];if(ch&&ch.nome)return ch.nome;
-  var c=s.cn||'';if(/^RTN\s*B\s*1/i.test(c))return 'Mix L-B';if(/^RTN\s*B\s*2/i.test(c))return 'Mix R-B';return c;
+  var c=s.cn||'';if(/^RTN\s*B\s*1/i.test(c))return 'Mix B';if(/^RTN\s*B\s*2/i.test(c))return 'Mix R-B';return c;
 }
 function dawFaixas(R,M){
   var L=[],fora=[];
@@ -2130,7 +2130,9 @@ function fonteCanal(t){
 }
 function fonteTxt(f){var m;if(!f||f==='Nosource')return 'sem fonte';if((m=/^Adc(\d+)/.exec(f)))return 'Input '+m[1];if((m=/^AES3-(\d+)/.exec(f)))return 'AES '+m[1];if((m=/^Dante_(\d+)/.exec(f)))return 'Dante '+m[1];var k=Object.keys(FONTE_COD).filter(function(x){return FONTE_COD[x]===f;})[0];return k||f;}
 /* códigos de settings ainda não vistos num arquivo real: preencher quando o Scorpio gravar um */
-var FONTE_COD={};
+var FONTE_COD={'RTN B1':'Return B1','RTN B2':'Return B2','RTN A1':'Return A1','RTN A2':'Return A2','RTN C1':'Return C1','RTN C2':'Return C2'};
+/* "Return B1" visto no settings real (PL 1104 1, canal 11); os outros retornos seguem o mesmo padrão, ainda não conferidos */
+var FONTE_OK={'Return B1':1};
 
 /* ───────── LEDs do CL-12 em cada pista ───────── */
 /* ordem do CL-12, de cima para baixo: X1 · L · R · X2, depois ON (amarelo) e ARM (vermelho) */
@@ -2206,12 +2208,12 @@ function lerArquivo(m){
     nivel:sjGet(m,p.concat('lineMic'))||'',gain:(sjGet(m,p.concat('dB10thsGain'))||0)/10,dly:sjGet(m,p.concat('msDelay'))||0};});
   return A;
 }
-function nomeArquivoPista(s){return s.p?nomePista(s.p).slice(0,16):'Ch '+s.n;}
+function nomeArquivoPista(s,M){return s.p?nomePista(s.p).slice(0,16):s.fx?semAcento(nomeFx(s,M)).toUpperCase().slice(0,16):'Ch '+s.n;}
 function comparar(R,M,A){
   var L=[];function add(onde,campo,cena,grav){if(String(cena)!==String(grav))L.push([onde,campo,cena,grav]);}
   function rt(v){return ROTA_TXT[v||''];}
-  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');
-    add(on,'Nome',nomeArquivoPista(s),A.nomes[n]);
+  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');if(!s.tok)return; /* pista vazia: fica como no arquivo */
+    add(on,'Nome',nomeArquivoPista(s,M),A.nomes[n]);
     add(on,'Fonte',s.cn?(fonteSlot(s)?fonteTxt(fonteSlot(s)):s.cn+' (código a confirmar)'):'sem fonte',fonteTxt(A.fonte[n]));
     add(on,'ON',c.on?'sim':'não',a.on?'sim':'não');add(on,'ARM',c.arm?'sim':'não',a.arm?'sim':'não');if(a.iso==='post')add(on,'ISO','pré (sempre)','pós');
     BUSES.forEach(function(b){add(on,'→ '+b,rt(c.r[b])+(c.r[b]==='send'?' '+(c.sg[b]||0)+' dB':''),rt(a.r[b])+(a.r[b]==='send'?' '+a.sg[b]+' dB':''));});
@@ -2238,7 +2240,7 @@ function deduzidosUsados(M,R){
   SAIDAS.forEach(function(o){var s=M.out[o].src||'';if(/^ret:(?!B1$)/.test(s)||s==='com:2')d.push(o+' ← '+s.replace(':',' '));});
   BUSES.forEach(function(b){var s=M.bus[b].src;if(s&&['Al','Bl','_1','_2'].indexOf(s)<0)d.push('Bus '+b+' ← '+s);});
   if(R){var fs=R.S.map(function(x){return x.cn?fonteSlot(x):'';});
-    R.S.forEach(function(x,i){if(/^AES3-[34]$/.test(fs[i]))d.push('Ch '+x.n+' ← '+fs[i]+' (entrada AES 3/4 ainda não testada)');});
+    R.S.forEach(function(x,i){if(/^AES3-[34]$/.test(fs[i]))d.push('Ch '+x.n+' ← '+fs[i]+' (entrada AES 3/4 ainda não testada)');if(/^Return /.test(fs[i])&&!FONTE_OK[fs[i]])d.push('Ch '+x.n+' ← '+fs[i]+' (código ainda não conferido)');});
     if(fs.indexOf('Adc1')>=0&&fs.some(function(f){return /^AES3-[12]$/.test(f);}))d.push('XLR 1 usado como analógico (LINE 1) e como AES 1/2 ao mesmo tempo');
     if(fs.indexOf('Adc6')>=0&&fs.some(function(f){return /^AES3-[56]$/.test(f);}))d.push('XLR 6 usado como analógico (LINE 6) e como AES 5/6 ao mesmo tempo');}
   return d;
@@ -2249,7 +2251,7 @@ function exportar(c,R,M,nome){
   R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
     /* pista vazia na cena: o canal fica exatamente como está no arquivo base (nome, fonte, ARM, mute, routing) */
     if(!s.tok)return;
-    sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s));
+    sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s,M));
     sjSet(m,[k,'inputSrcName'],s.cn?(fonteSlot(s)||sjGet(m,[k,'inputSrcName'])):'Nosource');
     sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);sjSet(m,[k,'isoPostFader'],false); /* pistas sempre ISO pré */
     BUSES.forEach(function(b){var v=ch.r[b]||'';

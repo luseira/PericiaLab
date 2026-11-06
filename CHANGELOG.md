@@ -19,6 +19,9 @@
 
 
 
+
+## v1.62 · 06/11
+- Export do Scorpio: pista com retorno (Mix B = RTN B1) agora sai com a fonte "Return B1" e o nome "MIX B". Antes saía "Ch 16"/"Ch 32" mantendo a entrada antiga do arquivo base.
 ## v1.61 · 06/11
 - Export para o Scorpio: liga a entrada AES do XLR 1 (AES 1/2, A10) ou do XLR 6 (AES 5/6) quando a cena usa, como o gravador faz. Avisa se AES 3/4 (não testado) ou se o mesmo XLR é usado como analógico e AES.
 - Botão "Baixar todas as cenas": um settings por cena.
