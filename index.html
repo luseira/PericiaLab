@@ -146,6 +146,7 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .btn.dan{border-color:var(--bad);color:var(--bad)}
 .btn.sm{padding:.25rem .6rem;font-size:.84rem}
 .seg{display:inline-flex;border:1px solid var(--ink2);border-radius:7px;overflow:hidden}
+.cenasel{display:inline-flex;align-items:center;gap:.35rem;font-size:.85rem;margin-left:.5rem}.cenasel select{font:inherit;padding:.25rem .4rem;border:1px solid var(--ink2);border-radius:6px;background:var(--paper,#fff)}
 .seg button{background:var(--paper);border:0;padding:.4rem .85rem;font-weight:600;border-left:1px solid var(--line)}
 .seg{max-width:100%;overflow-x:auto}
 .seg button{white-space:nowrap;flex:none}
@@ -589,7 +590,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.68 · 06/11 12:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.69 · 09/11 01:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1120,9 +1121,12 @@ function txLivres(s){
 function ultimoReport(){var u=D.imp[D.imp.length-1];return u?u.gerado:'';}
 /* cena usada na input list: "Todos juntos" */
 function cenaTodos(){var L=cenasLista();return L.filter(function(c){return c.id==='base';})[0]||L.filter(function(c){return /todos/i.test(c.nome);})[0]||L[0];}
+/* cena mostrada na Input list e nas Conexões (padrão: Todos juntos) */
+function cenaIL(){var L=cenasLista();return (UI.cenaIL&&L.filter(function(c){return c.id===UI.cenaIL;})[0])||cenaTodos();}
+function selCenaIL(){var at=cenaIL();return '<label class="cenasel">Cena <select data-act="cenail">'+cenasLista().filter(function(c){return c.ordem!=='car';}).map(function(c){return '<option value="'+esc(c.id)+'"'+(c.id===at.id?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select></label>';}
 /* linhas da input list: pistas da cena, em ordem de canal, sem cópias */
 function linhasIL(tudo){
-  var c=cenaTodos(),R=resolver(c,UI.ep),M=mesaEf(c,R),L=[],vistos={};
+  var c=cenaIL(),R=resolver(c,UI.ep),M=mesaEf(c,R),L=[],vistos={};
   R.S.forEach(function(sl){
     if(tudo&&(sl.copia||(!sl.p&&!sl.fx))){L.push({n:sl.n,p:sl.p||null,e:sl.e||{},t:sl.p?sl.t:null,cn:sl.cn,copia:sl.copia||0,vazio:!sl.p&&!sl.fx});return;}
     if(sl.copia)return;
@@ -1139,7 +1143,7 @@ function secao(k,tit,sub,padrao,corpo){var ab=UI.secs&&k in UI.secs?UI.secs[k]:p
 function viewDoc(){
   var I=linhasIL(UI.fmt!=='fichas'),fich=UI.fmt==='fichas',s=situacao(UI.ep);
   var h='<div class="bar noprint"><span class="seg" role="group" aria-label="Formato"><button type="button" data-act="fmt" data-v="lista" aria-pressed="'+!fich+'">Lista</button><button type="button" data-act="fmt" data-v="fichas" aria-pressed="'+fich+'">Fichas</button></span>'+
-    '<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+    selCenaIL()+'<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(s.graves)h+='<div class="banner err noprint">A escalação tem '+s.graves+' problema(s). Confira no Carômetro antes de imprimir.</div>';
   if(fich)h+='<style>@page{size:A4 landscape;margin:10mm}</style>';
   h+='<section class="doc il"><div class="dochead"><div><h1>Perícia Lab · Input list</h1><p>Cena "'+esc(I.c.nome)+'" · EP '+UI.ep+' · '+I.L.length+' pistas</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
@@ -1396,7 +1400,12 @@ function lerForm(){
 function cliqueForm(a){
   if(a==='formfechar'){FORM=null;renderModal();render();return true;}
   if(a==='formsalvar'){if(!podeEditar()){toast('Atualize o Apps Script para 1.41 antes.',true);return true;}
-    var c=lerForm(),ch=CHAVES[FORM.aba];if(!String(c[ch]==null?FORM.valor:c[ch]).trim()){toast('Preencha '+ch+'.',true);return true;}
+    var c=lerForm(),ch=CHAVES[FORM.aba];
+    if(FORM.outNome){var on=FORM.outNome,nv=c.__nome;delete c.__nome;
+      if(nv!==undefined&&String(nv).trim().toUpperCase().slice(0,12)!==on.antes){var cc=clone(cenaPorId(on.cena));cc.mesa=cc.mesa||{};cc.mesa.out=cc.mesa.out||{};cc.mesa.out[on.k]=Object.assign({},cc.mesa.out[on.k]||{},{nome:String(nv).trim().toUpperCase().slice(0,12)});salvarCenaMix(cc);}
+      var outros=Object.keys(c).filter(function(q){return q!==ch&&(FORM.valor!==''||String(c[q]==null?'':c[q])!=='');});if(!outros.length&&FORM.valor===''){FORM=null;renderModal();render();toast('Nome salvo na cena');return true;}
+      if(!outros.length){FORM=null;renderModal();render();toast('Salvo');return true;}}
+    if(!String(c[ch]==null?FORM.valor:c[ch]).trim()){toast('Preencha '+ch+'.',true);return true;}
     if(c[ch]===undefined)c[ch]=FORM.valor;
     /* chave igual à atual: não manda (o script antigo comparava "9" com 9 e achava que era outro TX) */
     if(FORM.valor!==''&&FORM.valor!=null&&String(c[ch]).trim()===String(FORM.valor).trim())delete c[ch];
@@ -1410,7 +1419,7 @@ function lapis(act,aba,valor,extra){return '<button class="btn sm lp" type="butt
 var CAMPOS_ENTRADA=[['Receptor','Equipamento (receptor ou fonte)'],['Modelo','Modelo'],['Canal do receptor','Canal do receptor','num'],['Input do Scorpio','Input do Scorpio (número)','num'],['Canal no gravador','Canal no gravador (ex.: AES 1, LINE 2, MIC 15)'],['Conector','Conector no Scorpio (ex.: XLR F, TA3F)'],['Cabo','Cabo (ex.: TA3F → XLR M)'],['Observações','Observações','long']];
 var CAMPOS_SAIDA=[['Saída','Saída do Scorpio (ex.: X1, L, HP, AES OUT)'],['Conector','Conector no Scorpio (ex.: TA3M, XLR M)'],['Cabo','Cabo (ex.: TA3F → XLR M)'],['Destino','Destino (equipamento)'],['Entrada no destino','Entrada no destino (ex.: input 1)'],['Nível','Nível',"select",[['',''],['Line','Line'],['Mic','Mic'],['AES','AES'],['Fone','Fone'],['Dante','Dante']]],['Observações','Observações','long']];
 function viewCon(){
-  var h='<div class="bar noprint"><h2 style="margin:0">Conexões físicas</h2><span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  var h='<div class="bar noprint"><h2 style="margin:0">Conexões físicas</h2>'+selCenaIL()+'<span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(!podeEditar())h+='<div class="banner noprint">Para editar daqui, atualize o Apps Script para a versão 1.41 (Nova versão). Por enquanto só leitura.</div>';
   var rx=(D.raw.rx||[]).filter(function(o){return str(o['Receptor']);}).slice().sort(function(a,b){return (int(a['Input do Scorpio'])||99)-(int(b['Input do Scorpio'])||99)||nat(str(a['Canal no gravador']),str(b['Canal no gravador']));});
   var s=situacao(UI.ep);
@@ -1419,7 +1428,7 @@ function viewCon(){
   h+='<h3>Entradas</h3><div class="tabwrap"><table class="tab il con"><thead><tr><th>Input</th><th>Conector</th><th>Canal</th><th>Equipamento</th><th>Cabo</th><th>Transmissor · quem</th><th>Obs.</th><th class="noprint"></th></tr></thead><tbody>'+
     rx.map(function(o){var id=str(o['Receptor']);return '<tr><td><span class="tag sm">'+esc(str(o['Input do Scorpio'])||'–')+'</span></td><td>'+esc(str(o['Conector']))+'</td><td><b>'+esc(str(o['Canal no gravador']))+'</b></td><td class="n">'+esc(id)+'<small>'+esc(str(o['Modelo']))+(str(o['Canal do receptor'])?' · canal '+esc(str(o['Canal do receptor'])):'')+'</small></td><td>'+esc(str(o['Cabo']))+'</td><td class="w">'+esc(quem(id))+'</td><td class="w">'+esc(str(o['Observações']))+'</td><td class="noprint">'+lapis('conent','rx',id)+'</td></tr>';}).join('')+
     '</tbody></table></div><div class="linha noprint" style="margin:.5rem 0 1rem"><button class="btn sm" type="button" data-act="conent" data-aba="rx" data-v="">＋ Entrada</button></div>';
-  var c=cenaTodos(),R=resolver(c,UI.ep),M=mesaEf(c,R),por={};D.saidas.forEach(function(o){por[str(o['Saída']).toUpperCase()]=o;});
+  var c=cenaIL(),R=resolver(c,UI.ep),M=mesaEf(c,R),por={};D.saidas.forEach(function(o){por[str(o['Saída']).toUpperCase()]=o;});
   var nomes=SAIDAS.slice();D.saidas.forEach(function(o){var k=str(o['Saída']).toUpperCase();if(nomes.indexOf(k)<0)nomes.push(k);});
   h+='<h3>Saídas</h3><div class="tabwrap"><table class="tab il con"><thead><tr><th>Saída</th><th>Nome · source na cena "'+esc(c.nome)+'"</th><th>Conector</th><th>Cabo</th><th>Destino</th><th>Nível</th><th>Obs.</th><th class="noprint"></th></tr></thead><tbody>'+
     nomes.map(function(k){var o=por[k]||{},mo=M.out[k];var mon=D.tx.filter(function(t){return t.mon&&t.saida&&t.saida.toUpperCase()===k;});
@@ -2850,7 +2859,8 @@ document.addEventListener('click',function(ev){
   if(a==='formfora'){if(ev.target===el){FORM=null;renderModal();render();}return;}
   if(a==='fecharfora'){if(ev.target===el)fechar();return;}
   if(a==='conent'){abrirForm('rx',v,v?'Entrada · '+v:'Nova entrada',CAMPOS_ENTRADA,{apagar:false,nota:'Grava na aba Receptores.'});return;}
-  if(a==='consai'){var kk=el.dataset.k||'';abrirForm('saidas',v,kk?'Saída '+kk:'Nova saída',CAMPOS_SAIDA,{apagar:true,padrao:kk?{'Saída':kk}:null,nota:'Grava na aba Saídas físicas.'});return;}
+  if(a==='consai'){var kk=el.dataset.k||'',ci=cenaIL(),Mi=kk&&SAIDAS.indexOf(kk)>=0?mesaEf(ci,resolver(ci,UI.ep)):null,nm=Mi&&Mi.out[kk]?Mi.out[kk].nome||'':'';
+    abrirForm('saidas',v,kk?'Saída '+kk:'Nova saída',Mi?[['__nome','Nome no gravador (cena "'+ci.nome+'", até 12 letras)']].concat(CAMPOS_SAIDA):CAMPOS_SAIDA,{apagar:true,padrao:kk?{'Saída':kk}:null,nota:Mi?'O nome vai para a cena "'+ci.nome+'" (o mesmo campo Name da tela Outputs do Mixer); o resto grava na aba Saídas físicas.':'Grava na aba Saídas físicas.',outNome:Mi?{k:kk,cena:ci.id,antes:nm}:null});if(Mi)FORM.dados.__nome=nm;renderModal();return;}
   if(a==='invedit'){var ab=el.dataset.aba;abrirForm(ab,v,(v?v:'Novo')+' · '+INVT.filter(function(x){return x[0]===ab;})[0][1],colsInv(ab),{apagar:ab==='equip',nota:{tx:'Aba Transmissores',rx:'Aba Receptores',cap:'Aba Cápsulas',equip:'Aba Equipamento'}[ab]+(v&&ab!=='equip'?'. Ao trocar o nome, as referências nas outras abas são trocadas junto.':'')});return;}
   if(a==='invt'){UI.invt=v;salvarUi();render();return;}
   if(a==='view'){UI.view=v;salvarUi();render();window.scrollTo(0,0);}
@@ -2902,6 +2912,7 @@ document.addEventListener('change',function(ev){
   var el=ev.target,a=el.dataset.act;
   if(mudancaMix(a,el))return;
   if(a==='ordem'){UI.ordem=el.value;salvarUi();render();}
+  else if(a==='cenail'){UI.cenaIL=el.value;salvarUi();render();}
   else if(a==='elim'){fazer({acao:'eliminar',id:EDIT,ep:el.checked?UI.ep:''});renderModal();}
   else if(a==='scan'&&el.files[0]){var fsc=el.files[0];var rd=new FileReader();rd.onload=function(){var sc=lerScan(String(rd.result),fsc.name);if(!sc){toast('Não reconheci frequências e níveis nesse arquivo.',true);return;}SCAN=guardarScan(sc);try{localStorage.setItem('plc_scan',JSON.stringify(SCAN));}catch(e){}toast('Scan importado e guardado na planilha: '+SCAN.pts.length+' pontos');render();};rd.readAsText(fsc);}
   else if(a==='fotoeq'&&el.files[0]){var ab=el.dataset.aba,idq=el.dataset.id;reduzirFoto(el.files[0],function(url){fazer({acao:'fotoEquip',aba:ab,id:idq,base64:url.split(',')[1],mime:'image/jpeg',preview:url});renderModal();toast('Foto salva');});}

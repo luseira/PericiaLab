@@ -26,6 +26,10 @@
 
 
 
+## v1.69 · 09/11/2026
+- Input list e Conexões ganharam um seletor de cena (padrão: Todos juntos). Antes mostravam sempre a cena Todos juntos, então nomes de saída mudados em outra cena (ex.: QG) não apareciam.
+- No lápis de uma saída (Conexões) há o campo "Nome no gravador", que grava o Name da saída na cena escolhida, o mesmo campo da tela Outputs do Mixer.
+
 ## v1.68 · 06/11
 - Scorpio e Menu voltaram para o fim da barra (depois de Routing), em amarelo.
 - Menu: Dante Outputs (fonte de cada Dante 1–32: ISO pre/post ou bus) e Headphones (presets 1–12: ISO, Bus, Com, Return por lado, Name, Mono, MS, Na lista). Limiters e Timecode saíram.
