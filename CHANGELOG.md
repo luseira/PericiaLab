@@ -26,6 +26,11 @@
 
 
 
+## v1.72 · 09/11/2026
+- Saídas L e R em Level AES abrem a tela "AES Out 1,2" / "AES Out 3,4", como no gravador (manual 6.6.3): um bus [L, R, 1–10] para cada canal AES, mais Record, Stop e Play Mute.
+- O export grava AESOutputs.AESn (source/chan) e o auto-mute. Código deduzido (*), igual ao das saídas analógicas; testar no gravador.
+- Tabelas de saídas (Mixer, Input list, Conexões) mostram os buses AES quando a saída está em AES.
+
 ## v1.71 · 09/11/2026
 - Conexões: no lápis de uma saída, "Copiar ajustes" e "Colar de X…" para levar conector, cabo, destino, entrada, nível e observações de uma saída para outra. Colar só preenche o formulário (o nome não é copiado); salvar continua manual.
 

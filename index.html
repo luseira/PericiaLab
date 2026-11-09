@@ -147,6 +147,7 @@ h3{font:700 1.1rem/1.1 var(--fc);margin:1.3rem 0 .45rem;letter-spacing:.01em}
 .btn.sm{padding:.25rem .6rem;font-size:.84rem}
 .seg{display:inline-flex;border:1px solid var(--ink2);border-radius:7px;overflow:hidden}
 .aviso{color:#b45309}
+.aes-cols{display:flex;gap:2.5rem;justify-content:center;padding:.6rem 0 .2rem}.aes-col{display:flex;flex-direction:column;align-items:center;gap:.35rem}.aes-col>b{color:#ddd;font-size:.9rem}.aes-col small{color:#9aa;font-size:.7rem;max-width:7rem;text-align:center}.sd-grid.g2{display:grid;grid-template-columns:repeat(2,2.4rem);gap:.3rem}
 .cenasel{display:inline-flex;align-items:center;gap:.35rem;font-size:.85rem;margin-left:.5rem}.cenasel select{font:inherit;padding:.25rem .4rem;border:1px solid var(--ink2);border-radius:6px;background:var(--paper,#fff)}
 .seg button{background:var(--paper);border:0;padding:.4rem .85rem;font-weight:600;border-left:1px solid var(--line)}
 .seg{max-width:100%;overflow-x:auto}
@@ -591,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.71 · 09/11 01:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.72 · 09/11 01:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1176,7 +1177,7 @@ function busSaidasHtml(I){
   var usados={};
   var tb='<div class="tabwrap"><table class="tab il"><thead><tr><th>Output</th><th>Nome</th><th>Source</th><th>Nível</th><th>Transmissor</th><th>Receptor</th></tr></thead><tbody>'+
     SAIDAS.map(function(k){var o=M.out[k],tx=D.tx.filter(function(t){return t.mon&&t.saida&&t.saida.toUpperCase()===k;});tx.forEach(function(t){usados[t.num]=1;});
-      return '<tr><td><span class="tag sm">'+k+'</span></td><td class="n">'+esc(o.nome)+'</td><td>'+esc(saidaTxt(o.src,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(o.nivel||'');})[0]||['',''])[1])+'</td><td>'+esc(tx.map(function(t){return t.nome+(isNaN(t.freq)?'':' '+mhz(t.freq));}).join(', '))+'</td><td>'+esc(tx.map(function(t){return t.rx;}).filter(Boolean).join(', '))+'</td></tr>';}).join('')+'</tbody></table></div>';
+      return '<tr><td><span class="tag sm">'+k+'</span></td><td class="n">'+esc(o.nome)+'</td><td>'+esc(fonteOutTxt(k,o,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(o.nivel||'');})[0]||['',''])[1])+'</td><td>'+esc(tx.map(function(t){return t.nome+(isNaN(t.freq)?'':' '+mhz(t.freq));}).join(', '))+'</td><td>'+esc(tx.map(function(t){return t.rx;}).filter(Boolean).join(', '))+'</td></tr>';}).join('')+'</tbody></table></div>';
   var resto=D.tx.filter(function(t){return t.mon&&!usados[t.num];});
   if(resto.length)tb+='<p class="livres"><b>Monitoração sem saída definida:</b> '+esc(resto.map(function(t){return t.nome+(isNaN(t.freq)?'':' '+mhz(t.freq));}).join(', '))+'</p>';
   h+=secao('ilout','Outputs',SAIDAS.length+' saídas',true,tb);
@@ -1450,7 +1451,7 @@ function viewCon(){
     nomes.map(function(k){var o=por[k]||{},mo=M.out[k];var mon=D.tx.filter(function(t){return t.mon&&t.saida&&t.saida.toUpperCase()===k;});
       var dest=[str(o['Destino']),str(o['Entrada no destino'])].filter(Boolean).join(' · ');if(!dest&&mon.length)dest=mon.map(function(t){return t.nome;}).join(', ');
       var dif=mo?nomesSaida(k).filter(function(x){return x.nome!==(mo.nome||'');}):[];
-      return '<tr><td><span class="tag sm">'+esc(k)+'</span></td><td>'+(mo?'<b>'+esc(mo.nome||'')+'</b> <small>'+esc(saidaTxt(mo.src,M,R))+'</small>'+(dif.length?'<br><small class="aviso">≠ '+dif.map(function(x){return esc(x.c.nome)+': '+esc(x.nome||'—');}).join(' · ')+'</small>':''):'')+'</td><td>'+esc(str(o['Conector']))+'</td><td>'+esc(str(o['Cabo']))+'</td><td class="n">'+esc(dest)+'</td><td>'+esc(str(o['Nível'])||(mo?(NIVEIS.filter(function(nv){return nv[0]===(mo.nivel||'');})[0]||['',''])[1]:''))+'</td><td class="w">'+esc(str(o['Observações']))+'</td><td class="noprint">'+lapis('consai','saidas',por[k]?str(o['Saída']):'',' data-k="'+esc(k)+'"')+'</td></tr>';}).join('')+
+      return '<tr><td><span class="tag sm">'+esc(k)+'</span></td><td>'+(mo?'<b>'+esc(mo.nome||'')+'</b> <small>'+esc(fonteOutTxt(k,mo,M,R))+'</small>'+(dif.length?'<br><small class="aviso">≠ '+dif.map(function(x){return esc(x.c.nome)+': '+esc(x.nome||'—');}).join(' · ')+'</small>':''):'')+'</td><td>'+esc(str(o['Conector']))+'</td><td>'+esc(str(o['Cabo']))+'</td><td class="n">'+esc(dest)+'</td><td>'+esc(str(o['Nível'])||(mo?(NIVEIS.filter(function(nv){return nv[0]===(mo.nivel||'');})[0]||['',''])[1]:''))+'</td><td class="w">'+esc(str(o['Observações']))+'</td><td class="noprint">'+lapis('consai','saidas',por[k]?str(o['Saída']):'',' data-k="'+esc(k)+'"')+'</td></tr>';}).join('')+
     '</tbody></table></div><div class="linha noprint" style="margin:.5rem 0 0"><button class="btn sm" type="button" data-act="consai" data-aba="saidas" data-v="" data-k="">＋ Saída (Dante, timecode, fone…)</button></div>';
   h+='<p class="livres">As entradas vêm da aba Receptores (os transmissores puxam input e canal de lá). Nome, source e nível das saídas na cena ficam no Mixer; aqui fica o que está ligado fisicamente.</p></section>';
   return h;
@@ -2172,6 +2173,17 @@ function srcDoArquivo(source,chan){
   if(source==='Comms'&&(chan===3||chan===4))return 'com:'+(chan-2);
   return 'raw:'+source+':'+chan;
 }
+/* ───── saídas AES (manual 6.6.3): L = AES 1,2 · R = AES 3,4; cada canal AES recebe um bus [L, R, 1–10] ─────
+   códigos inferidos (*): AESOutputs.AESn.source/chan na mesma codificação das saídas analógicas (MixBusPostLim, L=5, R=6, bus n=n+6) */
+var AES_PAR={L:[1,2],R:[3,4]};
+function aesArq(n){var sc=scCarregar();if(!sc)return null;var p=['AESOutputs','AES'+n],so=sjGet(sc.m,p.concat('source'));if(so===undefined)return null;
+  var v=srcDoArquivo(so,+sjGet(sc.m,p.concat('chan')));return {bus:/^bus:/.test(v)?v.slice(4):'',am:+sjGet(sc.m,p.concat('autoMutOptions'))||0};}
+function nivelEf(k,o){if(o&&o.nivel)return o.nivel;var sc=scCarregar();if(!sc)return '';var A=sc._A||(sc._A=lerArquivo(sc.m));return (A.out[k]&&A.out[k].nivel)||'';}
+function modoAes(k,o){return !!AES_PAR[k]&&nivelEf(k,o)==='AES';}
+function aesEf(k,o,i){var a=o.aes||{},n=AES_PAR[k][i-1];if(a['c'+i]!=null)return {v:a['c'+i],set:true};var f=aesArq(n);return {v:f?f.bus:null,set:false};}
+function aesAmEf(k,o){var a=o.aes||{};if(a.am!=null)return {v:a.am,set:true};var f=aesArq(AES_PAR[k][0]);return {v:f?f.am:0,set:false};}
+function aesTxt(k,o){if(!modoAes(k,o))return null;return 'AES '+AES_PAR[k].map(function(n,i){var e=aesEf(k,o,i+1);return n+': '+(e.v==null?'—':e.v?'Bus '+e.v:'silêncio');}).join(' · ');}
+function fonteOutTxt(k,o,M,R){return aesTxt(k,o)||saidaTxt(o.src,M,R);}
 var NIVEIS=[['','não mexer'],['LinePlus4dBu','Line +4 dBu'],['LineMinus10dBV','−10 dBV'],['Mic','Mic'],['AES','AES (só L e R)']];
 /* ───────── fonte do canal a partir do transmissor ───────── */
 function fonteSlot(s){return s&&s.cn?fonteDeCanal(s.cn,s.t):'';}
@@ -2289,7 +2301,8 @@ function comparar(R,M,A){
   Object.keys(M.hp||{}).forEach(function(pp){Object.keys(M.hp[pp]).forEach(function(f){add('HP '+pp,f,String(M.hp[pp][f]),String(hpArq(pp,f)));});});
   BUSES.forEach(function(b){add('Bus '+b,'Nome',M.bus[b].nome||'(mantém)',M.bus[b].nome?A.bus[b].nome:'(mantém)');if(b!=='L'&&b!=='R')add('Bus '+b,'Retorno',M.bus[b].src||'—',A.bus[b].src||'—');});
   SAIDAS.forEach(function(o){var c=M.out[o],a=A.out[o];add('Saída '+o,'Nome',c.nome,a.nome);add('Saída '+o,'Fonte',saidaTxt(c.src,M,R),saidaTxt(a.src,M,R));
-    if(c.nivel)add('Saída '+o,'Nível',c.nivel,a.nivel);if(c.gain!=null)add('Saída '+o,'Ganho',c.gain+' dB',a.gain+' dB');if(c.dly!=null)add('Saída '+o,'Delay',c.dly+' ms',a.dly+' ms');});
+    if(c.nivel)add('Saída '+o,'Nível',c.nivel,a.nivel);if(c.gain!=null)add('Saída '+o,'Ganho',c.gain+' dB',a.gain+' dB');if(c.dly!=null)add('Saída '+o,'Delay',c.dly+' ms',a.dly+' ms');
+    if(AES_PAR[o]&&c.aes)AES_PAR[o].forEach(function(n,i){var v=c.aes['c'+(i+1)],f=aesArq(n);if(v!=null)add('Saída '+o,'AES '+n+' *',v?'Bus '+v:'silêncio',f?(f.bus?'Bus '+f.bus:'silêncio'):'—');});});
   return L;
 }
 function trazerDoArquivo(R,A){
@@ -2335,7 +2348,10 @@ function exportar(c,R,M,nome){
   SAIDAS.forEach(function(o){var x=M.out[o],p=['AnalogOutputs',o],f=srcParaArquivo(x.src);
     sjSet(m,p.concat('userName'),x.nome||'');if(f){sjSet(m,p.concat('source'),f[0]);sjSet(m,p.concat('chan'),f[1]);}
     if(x.nivel==='AES'&&(o==='L'||o==='R'))sjSet(m,p.concat('isAes'),true);
-    else if(x.nivel&&x.nivel!=='AES'){sjSet(m,p.concat('lineMic'),x.nivel);if(sjGet(m,p.concat('isAes'))!==undefined)sjSet(m,p.concat('isAes'),false);}if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));});
+    else if(x.nivel&&x.nivel!=='AES'){sjSet(m,p.concat('lineMic'),x.nivel);if(sjGet(m,p.concat('isAes'))!==undefined)sjSet(m,p.concat('isAes'),false);}if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));
+    if(AES_PAR[o]&&x.aes){AES_PAR[o].forEach(function(n,i){var pa=['AESOutputs','AES'+n];if(sjGet(m,pa.concat('source'))===undefined)return;var v=x.aes['c'+(i+1)];
+      if(v!=null){var fa=srcParaArquivo(v?'bus:'+v:'');sjSet(m,pa.concat('source'),fa[0]);sjSet(m,pa.concat('chan'),fa[1]);}
+      if(x.aes.am!=null){sjSet(m,pa.concat('autoMutOptions'),x.aes.am);sjSet(m,pa.concat('autoMute'),!!(x.aes.am&1));}});}});
   /* saídas em par (link) com fontes diferentes no plano: desfaz o link */
   for(var i=1;i<=9;i+=2){var a1='X'+i,a2='X'+(i+1),la=sjGet(m,['AnalogOutputs',a1,'linkedToOutput']),lb=sjGet(m,['AnalogOutputs',a2,'linkedToOutput']);
     var igual=(M.out[a1].src||'')===(srcAntes[a1]||'')&&(M.out[a2].src||'')===(srcAntes[a2]||'');
@@ -2403,6 +2419,8 @@ function cliqueMesa(a,el){
   if(a==='mbussel'){UI.mbus=el.dataset.v;salvarUi();render();return true;}
   if(a==='moutsel'){UI.mout=el.dataset.v;salvarUi();render();return true;}
   if(a==='mbussrcb'){var bb=el.dataset.b,cv=el.dataset.v,cM=mesaEf(cenaAtual(),resolver(cenaAtual(),UI.ep));mudarMesa(function(m){m.bus[bb]=Object.assign({},m.bus[bb]||{},{src:cM.bus[bb].src===cv?'':cv});});return true;}
+  if(a==='maes'){var oa=el.dataset.o,ia=el.dataset.i,va=el.dataset.v;mudarMesa(function(m){var x=m.out[oa]=Object.assign({},m.out[oa]||{});x.aes=Object.assign({},x.aes||{});x.aes['c'+ia]=va;});return true;}
+  if(a==='maesm'){var ob=el.dataset.o,bb=+el.dataset.b,cb=cenaAtual(),Mb=mesaEf(cb,resolver(cb,UI.ep)),cur=aesAmEf(ob,Mb.out[ob]).v;mudarMesa(function(m){var x=m.out[ob]=Object.assign({},m.out[ob]||{});x.aes=Object.assign({},x.aes||{});x.aes.am=cur^bb;});return true;}
   if(a==='moutsrc'){var oo=el.dataset.o,ov=el.dataset.v;mudarMesa(function(m){m.out[oo]=Object.assign({},m.out[oo]||{},{src:ov});});return true;}
   if(a==='mxs'){var al=el.dataset.alvo,id=el.dataset.id,kx=el.dataset.k,cX=cenaAtual(),MX=mesaEf(cX,resolver(cX,UI.ep)),ob=al==='ch'?MX.ch[+id]:al==='bus'?MX.bus[id]:MX.out[id],cv=ob?ob['x_'+kx]:null;
     setX(al,al==='ch'?+id:id,kx,cv==null?true:cv===true?false:null);return true;}
@@ -2807,8 +2825,31 @@ function viewSlate(M){
   return h;
 }
 /* outputs: uma saída por vez, fonte única à direita */
+function viewOutResto(R,M){var h='';
+  h+='<!--NAV--><h3>Todas as saídas</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th><th>Ganho</th><th>Delay</th></tr></thead><tbody>'+
+    SAIDAS.map(function(x){var q=M.out[x];return '<tr><td><span class="tag sm">'+x+'</span></td><td class="n">'+esc(q.nome)+'</td><td>'+esc(fonteOutTxt(x,q,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(q.nivel||'');})[0]||['',''])[1])+'</td><td>'+(q.gain==null?'—':q.gain+' dB')+'</td><td>'+(q.dly==null?'—':q.dly+' ms')+'</td></tr>';}).join('')+'</tbody></table></div>';
+  h+='<p class="hint">* = código ainda não conferido no aparelho. Dante fica como está no gravador.</p>'+tabelaBuses(R,M,'');
+  h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
+  return h;
+}
+function viewAes(k,o,M,R){
+  var P=AES_PAR[k],am=aesAmEf(k,o);
+  var h='<div class="sdr sdscr"><div class="sd-bar"><b>AES Out '+P.join(',')+'</b><span>'+esc(k+' Out'+(o.nome?' · '+o.nome:''))+' · Level AES</span></div>';
+  h+='<div class="aes-cols">'+[1,2].map(function(i){var e=aesEf(k,o,i);
+    return '<div class="aes-col"><b>AES'+P[i-1]+'</b><div class="sd-grid g2">'+BUSES.map(function(b){var on=e.v===b;return sdK(b,(on?'sel':'')+(on&&e.set?' mod':''),'data-act="maes" data-o="'+k+'" data-i="'+i+'" data-v="'+(on?'':b)+'" title="'+esc(busNome(b,M))+'"');}).join('')+'</div>'+
+      '<small>'+(e.v==null?'carregue o settings':e.v?esc(busNome(e.v,M)):'silêncio')+'</small></div>';}).join('')+'</div>';
+  h+='<div class="sd-src"><span class="sd-l"></span><div class="sd-mutes">'+[[4,'Record Mute'],[1,'Stop Mute'],[2,'Play Mute']].map(function(q){var on=!!(am.v&q[0]);
+    return '<button type="button" class="cxb'+(am.set?' mod':'')+'" data-act="maesm" data-o="'+k+'" data-b="'+q[0]+'"><i class="cx'+(on?' on':'')+'"></i>'+q[1]+'</button>';}).join('')+'</div></div>';
+  h+='<div class="sd-soft">'+
+    '<label class="sd-sk num'+(o.nivel?' mod':'')+'">Level<span><select data-act="moutv" data-o="'+k+'" data-k="nivel">'+NIVEIS.map(function(nv){return '<option value="'+nv[0]+'"'+(nv[0]===(o.nivel||'')?' selected':'')+'>'+(nv[0]?nv[1]:'— (do gravador)')+'</option>';}).join('')+'</select></span></label>'+
+    xSk('out',k,'mute',o,'Mute',XOUT)+'</div>';
+  h+='<p class="sd-nota">Em AES, a saída '+k+' leva dois canais digitais (AES '+P.join(' e ')+'), cada um com o seu bus. Toque de novo num bus para deixar o canal em silêncio. Mudar o Level para Line, −10 ou Mic volta à tela normal da saída. * Códigos das saídas AES deduzidos (mesma codificação das saídas analógicas): teste no gravador antes de usar no set.</p>';
+  h+='<div class="sd-tabs">'+SAIDAS.map(function(x){return '<button type="button" class="sd-tab'+(x===k?' sel':'')+'" data-act="moutsel" data-v="'+x+'">'+(x==='L'||x==='R'?x+' Out':x)+(M.out[x].nome?'<small>'+esc(M.out[x].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
+  return h;
+}
 function viewOut(R,M){
   var k=UI.mout&&M.out[UI.mout]?UI.mout:'L',o=M.out[k],src=o.src||'',a=src.split(':');
+  if(modoAes(k,o))return viewAes(k,o,M,R)+viewOutResto(R,M);
   var scO=scCarregar(),AO=scO?(scO._A||(scO._A=lerArquivo(scO.m))).out[k]:null,pr=parOut(k);
   var h='<div class="sdr sdscr"><div class="sd-bar"><b>'+(k==='L'||k==='R'?k+' Out':k+' Out')+(o.nome?': '+esc(o.nome):'')+'</b><span>'+esc(saidaTxt(src,M,R))+'</span></div>';
   h+='<div class="sd-src"><span class="sd-l">Iso<small>Pre <i class="lg r-pre"></i><br>Post <i class="lg r-post"></i></small></span><div class="sd-grid g8">';
@@ -2831,10 +2872,7 @@ function viewOut(R,M){
     xSk('out',k,'mute',o,'Mute',XOUT)+'</div>';
   h+='<p class="sd-nota">Contorno amarelo = mudado no site; o resto fica como está no gravador.</p>';
   h+='<div class="sd-tabs">'+SAIDAS.map(function(x){return '<button type="button" class="sd-tab'+(x===k?' sel':'')+'" data-act="moutsel" data-v="'+x+'">'+(x==='L'||x==='R'?x+' Out':x)+(M.out[x].nome?'<small>'+esc(M.out[x].nome)+'</small>':'')+'</button>';}).join('')+'</div></div>';
-  h+='<!--NAV--><h3>Todas as saídas</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Saída</th><th>Nome</th><th>Fonte</th><th>Nível</th><th>Ganho</th><th>Delay</th></tr></thead><tbody>'+
-    SAIDAS.map(function(x){var q=M.out[x];return '<tr><td><span class="tag sm">'+x+'</span></td><td class="n">'+esc(q.nome)+'</td><td>'+esc(saidaTxt(q.src,M,R))+'</td><td>'+esc((NIVEIS.filter(function(nv){return nv[0]===(q.nivel||'');})[0]||['',''])[1])+'</td><td>'+(q.gain==null?'—':q.gain+' dB')+'</td><td>'+(q.dly==null?'—':q.dly+' ms')+'</td></tr>';}).join('')+'</tbody></table></div>';
-  h+='<p class="hint">* = código ainda não conferido no aparelho. Dante e AES ficam como estão no gravador.</p>'+tabelaBuses(R,M,'');
-  h+='<div class="linha noprint"><button class="btn" type="button" data-act="mbusall">Usar estes buses e saídas em todas as cenas</button></div>';
+  h+=viewOutResto(R,M);
   return h;
 }
 
@@ -2971,7 +3009,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&MOD
 /* ───────── início ───────── */
 aplicarCores();recalcular();render();
 if(MODO==='api'){buscar();setInterval(function(){if(!document.hidden&&!EDIT)buscar();else if(FILA.length)enviar();},30000);}
-window.__plc={lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir};
+window.__plc={exportar:exportar,cenaPorId:cenaPorId,resolver:resolver,mesaEf:mesaEf,scCarregar:scCarregar,lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir};
 })();
 </script>
 </body>
