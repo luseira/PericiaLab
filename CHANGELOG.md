@@ -26,6 +26,14 @@
 
 
 
+## v1.78 · 09/11/2026
+- Função interna renumerarBuses (usada uma vez, a pedido, para a nova ordem de buses de 09/11). Leva junto:
+  - envios dos canais;
+  - todos os ajustes do bus, materializados do settings carregado;
+  - saídas e AES;
+  - Dante;
+  - roteamento de Slate/Coms.
+
 ## v1.77 · 09/11/2026
 - Fontes com entrada fixa: nova coluna "Entrada" na aba Elenco (ex.: RTN B1, IN 16). Uma linha com Papel FONTE e Entrada vira uma fonte com nome, sem TX nem cápsula.
   - No Mixer, a pista que usa aquela entrada (ou a fonte escolhida na lista "Fontes") mostra o nome dela.
