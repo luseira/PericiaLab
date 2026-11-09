@@ -26,6 +26,13 @@
 
 
 
+## v1.74 · 09/11/2026
+- Etiqueta rosa "633·n" nas pistas: agora segue o caminho de verdade.
+  - O caminho pode ser ISO direto numa saída, ou um bus que só aquele canal alimenta (inclusive nos dois canais AES da saída R).
+  - A entrada do 633 vem do destino escrito em Conexões › Saídas físicas (ex.: "633 IN 3", "633 AES 1/2").
+  - Antes o app supunha X1 → 633·1 … X5 → 633·5.
+- O aviso "A Clara não recebe" vale para o time de trás (pistas 1–16), por esse mesmo caminho.
+
 ## v1.73 · 09/11/2026
 - Telas Bus e Outputs: botão "⧉ Copiar … para outras cenas…". Escolhe as cenas de destino e copia aquele bus ou aquela saída como está na cena atual. Se estiver linkado, o par vai junto.
 - No bus há a opção de levar também os envios dos canais para ele (pelo número do canal).

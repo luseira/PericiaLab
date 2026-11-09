@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.73 · 09/11 02:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.74 · 09/11 02:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1741,8 +1741,8 @@ function avisosMix(R,ep){
   var foraCL=S.filter(function(s){return s.n>=13&&s.n<=16&&s.p&&!s.copia;});
   if(foraCL.length)W.push(['warn','Fora do CL-12, só no iPad: '+foraCL.map(function(s){return 'Ch '+s.n+' '+nomePista(s.p);}).join(', ')+'.']);
   var Mw=mesaEf(cenaAtual(),R);
-  var faltam=S.filter(function(s){return s.n>=9&&s.n<=13&&s.p&&!s.copia&&!xDaClara(Mw,s.n);});
-  if(faltam.length)W.push(['warn','A Clara não recebe (nenhuma saída X1–X5 sai destes canais): '+faltam.map(function(s){return 'Ch '+s.n+' '+nomePista(s.p);}).join(', ')+'.']);
+  var faltam=S.filter(function(s){return s.p&&!s.copia&&s.n<=16&&(R.T||[]).indexOf(s.p)>=0&&!xDaClara(Mw,s.n);});
+  if(faltam.length)W.push(['warn','A Clara não recebe no 633 (nenhuma saída com destino 633 em Conexões leva estes canais): '+faltam.map(function(s){return 'Ch '+s.n+' '+nomePista(s.p);}).join(', ')+'.']);
   var noMix={};S.forEach(function(s){if(s.n<=16&&s.p)noMix[s.p.id]=1;});
   var fora=R.A.concat(R.B).filter(function(p){return !noMix[p.id];});
   if(fora.length)W.push(['bad','Não estão em nenhuma pista de 1 a 16: '+fora.map(function(p){return p.nome;}).join(', ')+'.']);
@@ -1757,7 +1757,22 @@ function avisosMix(R,ep){
 function zonaDe(n){for(var i=0;i<ZONAS.length;i++)if(n>=ZONAS[i][0]&&n<=ZONAS[i][1])return i;return 0;}
 /* cor de fundo do fader pela função: host, mentor, time, boom, gooseneck */
 /* qual saída X1–X5 (para o 633 da Clara) sai do ISO deste canal; 0 se nenhuma */
-function xDaClara(M,n){if(!M||!M.out)return 0;for(var i=1;i<=5;i++){var o=M.out['X'+i];if(o&&String(o.src).indexOf('iso:'+n+':')===0)return i;}return 0;}
+/* o que deste canal chega ao 633 da Clara: segue a saída (ISO direto, ou bus que só este canal alimenta, inclusive nos canais AES)
+   e o destino escrito em Conexões › Saídas físicas (ex.: "633 IN 3", "633 AES 1/2"). Devolve [{via,inp}] */
+function dest633(k){var o=(D.saidas||[]).filter(function(x){return str(x['Saída']).toUpperCase()===k;})[0];if(!o)return null;
+  var t=[str(o['Destino']),str(o['Entrada no destino'])].join(' ');if(!/633/.test(t))return null;
+  var m=/633\D*?(\d+)(?:\s*[\/\-–]\s*(\d+))?/.exec(t);var a=m?[m[1],m[2]||'']:['',''];return a;}
+function canalDoBus(M,b){var L=[];for(var c=1;c<=32;c++){var x=M.ch[c];if(x&&x.r&&x.r[b])L.push(c);}return L.length===1?L[0]:0;}
+function clara633(M,n){if(!M||!M.out)return [];var R=[],temDest=(D.saidas||[]).some(function(x){return /633/.test(str(x['Destino'])+str(x['Entrada no destino']));});
+  function alcanca(src){if(!src)return false;if(String(src).indexOf('iso:'+n+':')===0)return true;var b=/^bus:(.+)$/.exec(src);return !!(b&&canalDoBus(M,b[1])===n);}
+  SAIDAS.forEach(function(k){var o=M.out[k];if(!o)return;
+    if(AES_PAR[k]&&modoAes(k,o)){var d=temDest?dest633(k):null;if(temDest&&!d)return;[1,2].forEach(function(i){var e=aesEf(k,o,i);if(e.v&&canalDoBus(M,e.v)===n)R.push({via:k+' AES'+AES_PAR[k][i-1],inp:d?d[i-1]:''});});return;}
+    if(!alcanca(o.src))return;
+    if(temDest){var d2=dest633(k);if(d2)R.push({via:k,inp:d2[0]});}
+    else{var xm=/^X([1-5])$/.exec(k);if(xm)R.push({via:k,inp:xm[1]});}});
+  return R;}
+function txt633(L){return L.map(function(x){return x.via+' → 633'+(x.inp?'·'+x.inp:'');}).join(' · ');}
+function xDaClara(M,n){return clara633(M,n).length;}
 function catStrip(s){
   var p=s.p;if(!p)return s.fx?' k-fonte':'';
   if(p.papel==='HOST')return ' k-host';if(p.papel==='MENTOR')return ' k-mentor';
@@ -1769,7 +1784,7 @@ function stripHtml(s,v,M){
   var cap=s.n<=12?CAPS[s.n-1]:'';
   var cls='strip z'+zonaDe(s.n)+catStrip(s)+(M&&(p||fx)&&!M.ch[s.n].on?' off':'')+(M&&M.ch[s.n].arm?' armado':'')+(MSEL===s.n||MSELS.indexOf(s.n)>=0?' sel':'')+(COPIA&&COPIA.de!==s.n?(COPIA.para.indexOf(s.n)>=0?' destino':' colavel'):'')+(p||fx?'':' vazio')+(s.copia?' copia':'')+(MTROCA&&MSEL&&MSEL!==s.n?' alvo':'');
   var sub=p?null:fx?(fonteSlot(s)?fonteTxt(fonteSlot(s)):'fonte do gravador'):(s.cn?s.cn+' · ninguém':(s.motivo||''));
-  var xk=xDaClara(M,s.n),out=xk?'<span class="xout">X'+xk+' → 633·'+xk+'</span>':'';
+  var c6=clara633(M,s.n),out=c6.length?'<span class="xout">'+esc(c6.map(function(x){return '633'+(x.inp?'·'+x.inp:'');}).join(' '))+'</span>':'';
   var inv=p&&s.e&&s.e.cap&&capInv(s.e.cap);
   var tc=p&&s.e?timeCls(s.e.time):'';
   var busca=fx?semAcento(s.cn+' '+fonteTxt(fonteSlot(s)||'')+' ch '+s.n).toLowerCase():p?semAcento([p.nome,nome,s.t?'tx '+s.t.num+' tx'+s.t.num:'',s.t?s.t.modelo:'',s.t?s.t.nome:'',s.t?s.t.canal:'',s.t&&s.t.input?'input '+s.t.input:'',s.e?s.e.cap:'',s.e?timeNome(s.e.time):'','ch '+s.n].join(' ')).toLowerCase():'ch '+s.n;
@@ -2634,7 +2649,7 @@ function painelSlot(R,M){
       '<span>'+(e.cap?bolinha(e.cap)+esc(e.cap)+' ':'')+(capInv(e.cap)?invIcon(e.cap,1)+' inverter no TX ':'')+timeChip(e.time)+(s.copia?' <i>cópia do Ch '+s.copia+'</i>':'')+(outras.length?' <i>também em '+outras.map(function(x){return 'Ch '+x;}).join(', ')+'</i>':'')+'</span></div>';}
   else if(s.fx)h+='<div class="sd-who"><b>'+esc(s.cn)+'</b><span>Fonte do gravador, sem pessoa'+(fonteSlot(s)?' · '+esc(fonteTxt(fonteSlot(s))):' · código no settings ainda a confirmar')+(s.copia?' · <i>cópia do Ch '+s.copia+'</i>':'')+'</span></div>';
   else h+='<div class="sd-who"><b>—</b><span>'+esc(s.motivo||'pista vazia')+'</span></div>';
-  h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(function(){var k=xDaClara(M,n);return k?'<span class="sd-tag">X'+k+' → 633·'+k+'</span>':'';})()+
+  h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(function(){var c6=clara633(M,n);return c6.length?'<span class="sd-tag">'+esc(txt633(c6))+'</span>':'';})()+
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sd-cols"><div class="sd-col">';
   h+=sdRow('Name:',p?'<span class="sd-in nome"><input type="text" id="mpista" data-act="mpistac" maxlength="14" value="'+esc(nomePista(p))+'"></span>':(s.fx?'<span class="sd-in nome"><input type="text" data-act="mfxnome" maxlength="14" value="'+esc(nomeFx(s,M))+'"></span>':'<span class="sd-dim">Ch '+n+'</span>'));
