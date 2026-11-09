@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.75 · 09/11 02:40</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.76 · 09/11 03:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1658,9 +1658,12 @@ function cenasLista(){
 /* colinha de 06/11 (17–32, com todo mundo) → colinha nova (23–32, só participantes, 09/11).
    Converte quando ainda há colinha automática (C:) entre 17 e 22: libera 17–22 e põe a colinha em 23–32. */
 function migrarColinha(c){
-  if(!c.pistas.slice(16,22).some(function(t){return /^C:/.test(t||'');}))return c;
+  var velho=c.pistas.slice(16,22).some(function(t){return /^C:/.test(t||'');});
+  /* colinha automática fora de lugar em 23–32 (ex.: C:4…C:13 que sobraram da colinha 17–32) */
+  var fora=c.pistas.slice(COL_INI-1,COL_INI-1+COL_N).some(function(t,i){var m=/^C:(\d+)$/.exec(t||'');return m&&+m[1]!==i+1;});
+  if(!velho&&!fora)return c;
   c=clone(c);for(var i=16;i<22;i++)if(/^C:/.test(c.pistas[i]||''))c.pistas[i]='';
-  for(i=0;i<COL_N;i++)c.pistas[COL_INI-1+i]='C:'+(i+1);return c;
+  for(i=0;i<COL_N;i++){var t=c.pistas[COL_INI-1+i]||'';if(velho||!t||/^C:/.test(t))c.pistas[COL_INI-1+i]='C:'+(i+1);}return c;
 }
 function cenaAtual(){var L=cenasLista();return L.filter(function(c){return c.id===UI.cena;})[0]||L[0];}
 function gravarCena(c,apagar){

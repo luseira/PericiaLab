@@ -26,6 +26,9 @@
 
 
 
+## v1.76 · 09/11/2026
+- Colinha: também corrige 23–32 quando a colinha automática ficou fora de lugar (ex.: "Todos juntos" estava com C:4…C:13, sobra da colinha 17–32, e as pistas 30–32 ficavam vazias).
+
 ## v1.75 · 09/11/2026
 - Colinha volta a ser 23–32: 10 pistas, só participantes, do transmissor mais baixo ao mais alto (sem host, mentores, boom, gooseneck nem Mix B).
 - As pistas 17–22 ficam livres.
