@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.79 · 09/11 14:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.80 · 09/11 14:50</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1599,13 +1599,20 @@ function viewRf(){SCAN=scanDaPlanilha()||SCAN;
     '<label class="btn">Importar scan (.csv)<input type="file" accept=".csv,.txt,text/csv" data-act="scan" class="sr"></label>'+
     '<label class="btn">Importar report (.html)<input type="file" accept=".html,.htm,text/html" data-act="report" class="sr"></label>'+
     '<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  /* ordem da tabela: frequência (padrão), número do transmissor ou pista do gravador (cena Todos juntos) */
+  var ord=UI.rford||'freq',ct=cenaTodos(),Rp=ct?resolver(ct,UI.ep):null,pis={};
+  if(Rp)Rp.S.forEach(function(x){if(x.t&&!x.copia&&pis[x.t.num]==null)pis[x.t.num]=x.n;});
+  h+='<div class="bar noprint"><span class="seg" role="group" aria-label="Ordenar">'+[['freq','Frequência'],['tx','Transmissor'],['pista','Pista do gravador']].map(function(o){return '<button type="button" data-act="rford" data-v="'+o[0]+'" aria-pressed="'+(ord===o[0])+'">'+o[1]+'</button>';}).join('')+'</span></div>';
   if(PREVIEW)h+='<div class="painel noprint">'+previewHtml()+'</div>';
   h+='<section class="doc"><div class="dochead"><div><h1>Coordenação de RF</h1><p>'+T.length+' transmissores'+(SCAN?' · scan "'+esc(SCAN.nome)+'" ('+esc(SCAN.em)+')':'')+'</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
   h+='<div class="rfbox">'+graficoRf()+'</div>'+(SCAN?'':'<p class="hint noprint">Importe o scan exportado do Wireless Designer (.csv) para ver o espectro por baixo dos transmissores. O scan fica guardado na planilha e aparece em qualquer aparelho.</p>');
   var s=situacao(UI.ep);
-  h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>#</th><th>Freq. MHz</th><th>Transmissor</th><th>Bloco</th><th>Código</th><th>Receptor</th><th>Com quem</th><th>Distância do vizinho</th><th></th></tr></thead><tbody>'+
-    T.map(function(t,i){var viz=Math.min(i>0?t.freq-T[i-1].freq:99,i<T.length-1?T[i+1].freq-t.freq:99);var quem=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);}).join(', ');
-      return '<tr><td><span class="tag sm">'+(i+1)+'</span></td><td><b>'+mhz(t.freq)+'</b></td><td class="n">'+esc(t.nome)+(t.mon?' <small>monitoração</small>':'')+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(t.cod)+'</td><td>'+esc(t.rx||'')+'</td><td>'+esc(quem)+'</td><td'+(viz<0.3?' class="alarme"':'')+'>'+(viz<99?Math.round(viz*1000)+' kHz':'')+'</td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':t.ajustado?'<span class="chip ok">ajustado</span>':'<span class="chip warn">conferir</span>')+'</td></tr>';}).join('')+'</tbody></table></div>';
+  h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>#</th><th>Pista</th><th>Freq. MHz</th><th>Transmissor</th><th>Bloco</th><th>Código</th><th>Receptor</th><th>Com quem</th><th>Distância do vizinho</th><th></th></tr></thead><tbody>'+
+    (function(){var L=T.map(function(t,i){return {t:t,i:i};});
+      if(ord==='tx')L.sort(function(a,b){return (int(a.t.num)||999)-(int(b.t.num)||999)||a.t.freq-b.t.freq;});
+      else if(ord==='pista')L.sort(function(a,b){var x=pis[a.t.num],y=pis[b.t.num];return (x==null?999:x)-(y==null?999:y)||(int(a.t.num)||999)-(int(b.t.num)||999);});
+      return L;})().map(function(o,j){var t=o.t,i=o.i;var viz=Math.min(i>0?t.freq-T[i-1].freq:99,i<T.length-1?T[i+1].freq-t.freq:99);var quem=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);}).join(', ');
+      return '<tr><td><span class="tag sm">'+(i+1)+'</span></td><td>'+(pis[t.num]!=null?'<b>'+pis[t.num]+'</b>':'—')+'</td><td><b>'+mhz(t.freq)+'</b></td><td class="n">'+esc(t.nome)+(t.mon?' <small>monitoração</small>':'')+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(t.cod)+'</td><td>'+esc(t.rx||'')+'</td><td>'+esc(quem)+'</td><td'+(viz<0.3?' class="alarme"':'')+'>'+(viz<99?Math.round(viz*1000)+' kHz':'')+'</td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':t.ajustado?'<span class="chip ok">ajustado</span>':'<span class="chip warn">conferir</span>')+'</td></tr>';}).join('')+'</tbody></table></div>';
   var I=imd(T.filter(function(t){return !t.mon;}));
   h+='<h3>Intermodulação de 3ª ordem (2·f1 − f2)</h3>'+(I.length?'<p class="hint">Produtos a menos de 100 kHz de outro transmissor. É uma conferência simples; a coordenação vale a do Wireless Designer.</p><ul class="imd">'+I.slice(0,30).map(function(x){return '<li><b>'+esc(x.c.nome)+'</b> ('+mhz(x.c.freq)+') ← 2·'+esc(x.a.nome)+' − '+esc(x.b.nome)+' = '+mhz(2*x.a.freq-x.b.freq)+' ('+Math.round(x.d*1000)+' kHz)</li>';}).join('')+'</ul>':'<p class="hint">Nenhum produto de 3ª ordem a menos de 100 kHz de um transmissor de personagem.</p>');
   return h+'</section>';
@@ -3039,6 +3046,7 @@ document.addEventListener('click',function(ev){
   else if(a==='zoom'){abrirZoom(el.dataset.tipo,el.dataset.id);}
   else if(a==='whats'){var tw=textoWhats();if(navigator.share&&/Mobi|Android|iPhone/i.test(navigator.userAgent)){navigator.share({text:tw}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(tw).then(function(){toast('Copiado. Cole no WhatsApp.');},function(){toast('Não consegui copiar.',true);});}}
   else if(a==='ft'){UI.ft=v;salvarUi();render();}
+  else if(a==='rford'){UI.rford=el.dataset.v;salvarUi();render();}
   else if(a==='print')window.print();
   else if(a==='quem'){QUEM=$('#quem').value.trim();jset(K.quem,QUEM);toast('Nome salvo');}
   else if(a==='api'){var u=$('#api').value.trim();if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){toast('O endereço precisa começar com https://script.google.com e terminar em /exec.',true);return;}

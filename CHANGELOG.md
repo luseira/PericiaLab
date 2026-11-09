@@ -26,6 +26,11 @@
 
 
 
+## v1.80 · 09/11/2026
+- RF: a tabela pode ser ordenada por frequência (padrão), por número do transmissor ou por pista do gravador.
+  - A pista vem da cena Todos juntos, numa coluna nova "Pista".
+  - A distância do vizinho continua medida em frequência.
+
 ## v1.79 · 09/11/2026
 - Export: pistas vazias na cena continuam com o nome e a fonte do arquivo base, mas ARM, mute e envios passam a seguir a cena.
   - Antes, um canal vazio que estava armado e aberto no gravador (ex.: 18–20 e 22 no settings de 09/11) continuava gravando e somando na mix L/R.
