@@ -26,6 +26,11 @@
 
 
 
+## v1.73 · 09/11/2026
+- Telas Bus e Outputs: botão "⧉ Copiar … para outras cenas…". Escolhe as cenas de destino e copia aquele bus ou aquela saída como está na cena atual. Se estiver linkado, o par vai junto.
+- No bus há a opção de levar também os envios dos canais para ele (pelo número do canal).
+- Na saída, o nome é mantido (já é o mesmo em todas as cenas).
+
 ## v1.72 · 09/11/2026
 - Saídas L e R em Level AES abrem a tela "AES Out 1,2" / "AES Out 3,4", como no gravador (manual 6.6.3): um bus [L, R, 1–10] para cada canal AES, mais Record, Stop e Play Mute.
 - O export grava AESOutputs.AESn (source/chan) e o auto-mute. Código deduzido (*), igual ao das saídas analógicas; testar no gravador.
