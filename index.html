@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.76 · 09/11 03:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.77 · 09/11 10:40</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -705,7 +705,7 @@ function normalizar(R){
       serial:/^(true|false)$/i.test(str(o['Serial']))?'':str(o['Serial']),term:str(campo(o,['Terminação','Conector'])),qtd:int(o['Qtd']),para:/^(true|false)$/i.test(str(o['Converte para']))?'':str(o['Converte para']),
       foto:str(o['Foto']),soAna:dig!==undefined&&str(dig)!==''&&!simNao(dig),manut:simNao(campo(o,['Manutenção','Manut.','Manutenção?'])),inv:inv!==undefined&&str(inv)!==''?simNao(inv):/sanken|shure|twinplex|cos-?11/i.test(str(o['Modelo']))};}).filter(function(c){return c.id;});
   d.capPor={};d.cap.forEach(function(c){d.capPor[c.id]=c;});
-  d.elenco=linhas(R,'elenco').map(function(o,ix){return {ix:ix,id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),papel:str(o['Papel']).toUpperCase()||'PARTICIPANTE',colinha:str(o['Colinha (pista)']),foto:str(o['Foto']),elim:int(o['Eliminado após EP']),obs:str(o['Observações']),pista:str(o['Nome de pista'])};}).filter(function(p){return p.id;});
+  d.elenco=linhas(R,'elenco').map(function(o,ix){return {ix:ix,id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),papel:str(o['Papel']).toUpperCase()||'PARTICIPANTE',colinha:str(o['Colinha (pista)']),foto:str(o['Foto']),elim:int(o['Eliminado após EP']),obs:str(o['Observações']),pista:str(o['Nome de pista']),entrada:str(campo(o,['Entrada','Entrada fixa'])||'').toUpperCase().replace(/\s+/g,' ').trim()};}).filter(function(p){return p.id;});
   d.elenco.sort(function(a,b){return (ORDEM_PAPEL[a.papel]==null?9:ORDEM_PAPEL[a.papel])-(ORDEM_PAPEL[b.papel]==null?9:ORDEM_PAPEL[b.papel])||nat(a.colinha||'99',b.colinha||'99')||a.ix-b.ix;});
   d.pPor={};d.elenco.forEach(function(p){d.pPor[p.id]=p;});
   d.esc=linhas(R,'esc').map(function(o){return {ep:int(o['EP']),id:str(o['ID']),tx:str(o['TX']),cap:str(o['Cápsula']),ad:str(o['Adaptador']),time:normTime(o['Time']),obs:str(o['Observações']),em:str(o['Atualizado em']),por:str(o['Por'])};}).filter(function(r){return r.ep&&r.id;});
@@ -817,7 +817,8 @@ function situacao(ep){
   D.elenco.forEach(function(p){
     var e=EF[p.id]||null,t=e&&e.tx?D.txPor[e.tx]||null:null,av=[],at=ativo(p,ep);
     if(at){
-      if(!e||!e.tx)av.push({k:'pend',t:'sem transmissor'});
+      if(p.entrada){}
+      else if(!e||!e.tx)av.push({k:'pend',t:'sem transmissor'});
       else if(!t)av.push({k:'bad',t:'TX '+e.tx+' não existe na planilha'});
       if(t&&t.dev&&ep>t.dev)av.push({k:'bad',t:'TX '+t.num+' foi devolvido após o EP '+t.dev,trocar:true});
       if(e&&e.tx&&uso.tx[e.tx]&&uso.tx[e.tx].length>1)av.push({k:'bad',t:'TX '+e.tx+' repetido'});
@@ -1037,7 +1038,7 @@ function viewCar(){
   function passaTime(x){if(!ft)return true;if(x.p.papel!=='PARTICIPANTE'&&x.p.papel!=='CONVIDADO')return false;var t=(x.e||{}).time||'';return ft==='-'?!t:t===ft;}
   var grupos=[['Host e mentores',function(x){return x.ativo&&(x.p.papel==='HOST'||x.p.papel==='MENTOR');}],
     ['Participantes',function(x){return x.ativo&&(x.p.papel==='PARTICIPANTE'||x.p.papel==='CONVIDADO');}],
-    ['Boom e gooseneck',function(x){return x.ativo&&x.p.papel==='FONTE';}],
+    ['Boom e gooseneck',function(x){return x.ativo&&x.p.papel==='FONTE'&&!x.p.entrada;}],
     ['Eliminados',function(x){return !x.ativo;}]];
   grupos.forEach(function(g){
     var L=s.pessoas.filter(g[1]).filter(passaTime);if(!L.length)return;
@@ -1697,7 +1698,9 @@ function timeDe(ep,t,ordem){
 /* quem está em cada entrada (canal do gravador) neste episódio, pelo Carômetro */
 function mapaCanais(ep,EF){
   var m={};EF=EF||efetivo(ep);
-  D.elenco.forEach(function(p){if(!ativo(p,ep))return;var e=EF[p.id];var t=e&&e.tx?D.txPor[e.tx]:null;if(!t)return;
+  /* fontes com entrada fixa (aba Elenco › Entrada), ex.: MIX B = RTN B1, B sem Salada = IN 16 */
+  D.elenco.forEach(function(p){if(p.entrada&&ativo(p,ep)&&!m[p.entrada])m[p.entrada]=p;});
+  D.elenco.forEach(function(p){if(!ativo(p,ep)||p.entrada)return;var e=EF[p.id];var t=e&&e.tx?D.txPor[e.tx]:null;if(!t)return;
     if(t.canal&&!m[t.canal])m[t.canal]=p;if(t.canalM&&!m[t.canalM])m[t.canalM]=p;});
   return m;
 }
@@ -1719,7 +1722,7 @@ function resolver(cena,ep){
       return s;}
     if(m[1]==='P'){var p=D.pPor[m[2]];if(!p)s.motivo='não está no elenco';else if(!ativo(p,ep))s.motivo=p.nome+' saiu após o EP '+p.elim;else s.p=p;}
     else{var L=m[1]==='F'?F:m[1]==='T'?T:m[1]==='A'?A:B,k=int(m[2]);s.p=L[k-1]||null;if(!s.p)s.motivo=(m[1]==='F'?'time da frente':m[1]==='T'?'time de trás':timeNome(m[1]))+' '+k+': ninguém';}
-    if(s.p){var e=EF[s.p.id]||{};s.e=e;s.t=e.tx?D.txPor[e.tx]:null;s.cn=s.t?s.t.canal:'';
+    if(s.p){var e=EF[s.p.id]||{};s.e=e;s.t=e.tx?D.txPor[e.tx]:null;s.cn=s.t?s.t.canal:(s.p.entrada||'');
       var kc=s.cn?'c:'+s.cn:'p:'+s.p.id;if(primeira[kc])s.copia=primeira[kc];else primeira[kc]=s.n;
       (onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
     return s;
@@ -1792,7 +1795,7 @@ function stripHtml(s,v,M){
   return (M?ledsHtml(s,M.ch[s.n]):'')+'<button type="button" class="'+cls+'" data-act="mslot" data-n="'+s.n+'" data-busca="'+esc(busca)+'"'+' title="'+esc(p?p.nome+(s.t?' · TX '+s.t.num:''):rotuloTok(s.tok))+'">'+
     '<span class="slab">'+(p||fx?esc(estreito?corta16(nome):nome):'—')+'</span>'+
     '<span class="sph">'+(p?avatar(p):'')+'</span>'+
-    '<span class="ssub">'+(p?'<span class="sl1">'+esc(s.t?txNome(s.t):'sem TX')+'</span><span class="sl2">'+esc(s.cn||'')+'</span>':esc(sub))+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
+    '<span class="ssub">'+(p?'<span class="sl1">'+esc(s.t?txNome(s.t):(p.entrada?'fixa':'sem TX'))+'</span><span class="sl2">'+esc(s.cn||'')+'</span>':esc(sub))+(s.copia?'<span class="scopia">= Ch '+s.copia+'</span>':'')+'</span>'+
     '<span class="strk"><span class="scap'+(cap?'':' sd')+'" style="'+(cap?'background:'+cap:'')+'"></span></span>'+out+
     '<span class="sfoot">Ch '+s.n+'</span></button>';
 }
@@ -2064,11 +2067,11 @@ var CLIP=null,COPIA=null,MSELS=[],MANC=0,MVARIOS=false,CENAOP=null,PICK=null;
 /* escolher quem está na pista: pelo nome (a fonte vem do Carômetro) */
 function pickNome(R,s){
   var EF=R.EF,grupos=[['Host e mentores',function(p){return p.papel==='HOST'||p.papel==='MENTOR';}],['Time A',function(p){return (EF[p.id]||{}).time==='A';}],['Time B',function(p){return (EF[p.id]||{}).time==='B';}],
-    ['Sem time',function(p){return (p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')&&!(EF[p.id]||{}).time;}],['Boom e gooseneck',function(p){return p.papel==='FONTE';}]];
+    ['Sem time',function(p){return (p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')&&!(EF[p.id]||{}).time;}],['Fontes',function(p){return p.papel==='FONTE';}]];
   var h='<div class="sd-pick">';
   grupos.forEach(function(g){var L=D.elenco.filter(function(p){return ativo(p,UI.ep)&&g[1](p);});if(!L.length)return;
     h+='<span class="sd-l">'+g[0]+'</span><div class="sd-grid w4">'+L.map(function(p){var t=(EF[p.id]||{}).tx?D.txPor[EF[p.id].tx]:null;
-      return '<button type="button" class="sd-k'+(s.p&&s.p.id===p.id?' sel':'')+'" data-act="mpnome" data-v="'+esc(p.id)+'">'+esc(nomePista(p))+'<small>'+esc(t&&t.canal?t.canal:'sem TX')+'</small></button>';}).join('')+'</div>';});
+      return '<button type="button" class="sd-k'+(s.p&&s.p.id===p.id?' sel':'')+'" data-act="mpnome" data-v="'+esc(p.id)+'">'+esc(nomePista(p))+'<small>'+esc(p.entrada||(t&&t.canal?t.canal:'sem TX'))+'</small></button>';}).join('')+'</div>';});
   h+='<span class="sd-l"></span><div><button type="button" class="sd-k" data-act="mpnome" data-v="">Nenhum (limpar canal)</button></div></div>';
   return h;
 }

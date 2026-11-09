@@ -26,6 +26,13 @@
 
 
 
+## v1.77 · 09/11/2026
+- Fontes com entrada fixa: nova coluna "Entrada" na aba Elenco (ex.: RTN B1, IN 16). Uma linha com Papel FONTE e Entrada vira uma fonte com nome, sem TX nem cápsula.
+  - No Mixer, a pista que usa aquela entrada (ou a fonte escolhida na lista "Fontes") mostra o nome dela.
+  - No export, vale a entrada fixa.
+  - Não aparece no Carômetro, porque não tem TX para escalar.
+- Criadas na planilha: MIX B (RTN B1, mix completa do 633) e B - SLD (IN 16, time B sem o Salada).
+
 ## v1.76 · 09/11/2026
 - Colinha: também corrige 23–32 quando a colinha automática ficou fora de lugar (ex.: "Todos juntos" estava com C:4…C:13, sobra da colinha 17–32, e as pistas 30–32 ficavam vazias).
 
