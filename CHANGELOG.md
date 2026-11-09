@@ -26,6 +26,11 @@
 
 
 
+## v1.75 · 09/11/2026
+- Colinha volta a ser 23–32: 10 pistas, só participantes, do transmissor mais baixo ao mais alto (sem host, mentores, boom, gooseneck nem Mix B).
+- As pistas 17–22 ficam livres.
+- Cenas com a colinha de 06/11 (17–32) são convertidas sozinhas: o que era colinha em 17–22 é liberado e 23–32 recebe a colinha nova. O que você pôs à mão em 17–22 fica.
+
 ## v1.74 · 09/11/2026
 - Etiqueta rosa "633·n" nas pistas: agora segue o caminho de verdade.
   - O caminho pode ser ISO direto numa saída, ou um bus que só aquele canal alimenta (inclusive nos dois canais AES da saída R).
