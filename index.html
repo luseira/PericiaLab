@@ -1411,7 +1411,7 @@ function renumerarBuses(mp,opt){opt=opt||{};var sc=scCarregar();if(!sc)return {e
   var NUM=['1','2','3','4','5','6','7','8','9','10'],inv={},rel=[];Object.keys(mp).forEach(function(o){inv[String(mp[o])]=String(o);});
   function nb(o){o=String(o);if(o==='L'||o==='R')return o;return mp[o]!=null?String(mp[o]):null;}
   var livres=NUM.filter(function(k){return inv[k]==null;});
-  cenasMix().forEach(function(c){var R=resolver(c,UI.ep),M=mesaEf(c,R),y=clone(c);y.mesa=y.mesa||{};var m=y.mesa,log=[];
+  cenasMix().forEach(function(c){if(opt.so&&opt.so.indexOf(c.nome)<0)return;var R=resolver(c,UI.ep),M=mesaEf(c,R),y=clone(c);y.mesa=y.mesa||{};var m=y.mesa,log=[];
     /* buses */
     var bus={};['L','R'].forEach(function(k){if(m.bus&&m.bus[k])bus[k]=m.bus[k];});
     NUM.forEach(function(k){var o=inv[k];
