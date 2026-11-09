@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.78 · 09/11 11:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.79 · 09/11 14:50</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2409,11 +2409,14 @@ function exportar(c,R,M,nome){
   var srcAntes={};SAIDAS.forEach(function(o){srcAntes[o]=srcDoArquivo(sjGet(m,['AnalogOutputs',o,'source']),+sjGet(m,['AnalogOutputs',o,'chan']));});
   R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
     xExport(m,'ch',n,ch,XCH.concat(n<=16?XEQ:[]));
-    /* pista vazia na cena: o canal fica exatamente como está no arquivo base (nome, fonte, ARM, mute, routing) */
-    if(!s.tok)return;
-    sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s,M));
-    sjSet(m,[k,'inputSrcName'],s.cn?(fonteSlot(s)||sjGet(m,[k,'inputSrcName'])):'Nosource');
-    sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);sjSet(m,[k,'isoPostFader'],false); /* pistas sempre ISO pré */
+    /* pista vazia na cena: nome e fonte ficam como no arquivo base, mas ARM, mute e envios seguem a cena
+       (antes ficavam do arquivo: um canal armado e aberto no gravador continuava gravando e somando na mix) */
+    if(s.tok){
+      sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s,M));
+      sjSet(m,[k,'inputSrcName'],s.cn?(fonteSlot(s)||sjGet(m,[k,'inputSrcName'])):'Nosource');
+      sjSet(m,[k,'isoPostFader'],false); /* pistas sempre ISO pré */
+    }
+    sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);
     BUSES.forEach(function(b){var v=ch.r[b]||'';
       /* send em −∞ já é "desligado": não mexe para não sujar o arquivo */
       if(!v&&rotaArq({routeState:sjGet(m,[k,'bus'+b,'routeState']),gain:sjGet(m,[k,'bus'+b,'dB10thsSendGain'])})==='')return;
