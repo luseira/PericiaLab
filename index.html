@@ -591,7 +591,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.70 · 09/11 01:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.71 · 09/11 01:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1390,6 +1390,7 @@ function formHtml(){
     if(tipo==='check')h+='<label class="fcheck"><input type="checkbox" id="'+id+'"'+(v===true||simNao(v)?' checked':'')+'> '+esc(c[1])+'</label>';
     else if(tipo==='select')h+='<label class="campo">'+esc(c[1])+'<select id="'+id+'">'+c[3].map(function(op){var val=Array.isArray(op)?op[0]:op,lb=Array.isArray(op)?op[1]:op;return '<option value="'+esc(val)+'"'+(String(v==null?'':v)===String(val)?' selected':'')+'>'+esc(lb||'—')+'</option>';}).join('')+(v!=null&&v!==''&&!c[3].some(function(op){return String(Array.isArray(op)?op[0]:op)===String(v);})?'<option value="'+esc(v)+'" selected>'+esc(v)+'</option>':'')+'</select></label>';
     else h+='<label class="campo'+(tipo==='long'?' longo':'')+'">'+esc(c[1])+'<input type="'+(tipo==='num'?'text" inputmode="decimal':'text')+'" id="'+id+'" value="'+esc(v==null?'':v)+'"'+(c[0]===CHAVES[F.aba]&&F.valor!==''&&F.travaChave?' readonly':'')+'></label>';});
+  if(F.aba==='saidas'){var cl=clipSai();h+='</div><div class="linha" style="margin-top:.8rem"><button class="btn sm" type="button" data-act="formcopiar">⧉ Copiar ajustes</button><button class="btn sm" type="button" data-act="formcolar"'+(cl?'':' disabled')+'>📋 Colar'+(cl?' de '+esc(cl._de||''):'')+'</button><span class="hint" style="margin:0">Colar preenche conector, cabo, destino, nível e obs. (o nome não); confira e salve.</span>';}
   h+='</div><div class="linha" style="margin-top:1rem"><button class="btn pri" type="button" data-act="formsalvar">Salvar na planilha</button><button class="btn" type="button" data-act="formfechar">Cancelar</button><span class="sp"></span>'+
     (F.apagar&&F.valor!==''?'<button class="btn dan" type="button" data-act="formapagar">Apagar</button>':'')+'</div>'+
     (podeEditar()?'':'<p class="banner err" style="margin-top:.8rem">Para gravar daqui, atualize o Apps Script para a versão 1.41 (Nova versão).</p>')+'</div></div></div>';
@@ -1401,7 +1402,16 @@ function lerForm(){
     var antes=F.dados[x[0]];if(F.valor!==''&&String(antes==null?'':antes)===String(v)&&x[0]!==CHAVES[F.aba])return;c[x[0]]=v;});
   return c;
 }
+var CLIP_SAI=null;
+function clipSai(){if(!CLIP_SAI){try{CLIP_SAI=JSON.parse(localStorage.getItem('plc_clipsai')||'null');}catch(e){}}return CLIP_SAI;}
 function cliqueForm(a){
+  if(a==='formcopiar'){var F=FORM,ch=CHAVES[F.aba],cp={};F.campos.forEach(function(x,i){if(x[0]===ch||x[0]==='__nome')return;var el=$('#ff'+i);if(el)cp[x[0]]=(x[2]||'text')==='check'?el.checked:el.value;});
+    var kel=F.campos.map(function(x,i){return x[0]===ch?$('#ff'+i):null;}).filter(Boolean)[0];cp._de=(kel&&kel.value)||F.valor||'';
+    CLIP_SAI=cp;try{localStorage.setItem('plc_clipsai',JSON.stringify(cp));}catch(e){}toast('Ajustes de '+(cp._de||'saída')+' copiados');
+    var bt=document.querySelector('[data-act=formcolar]');if(bt){bt.disabled=false;bt.textContent='📋 Colar de '+cp._de;}return true;}
+  if(a==='formcolar'){var cl=clipSai();if(!cl)return true;var n=0;FORM.campos.forEach(function(x,i){if(!(x[0] in cl))return;var el=$('#ff'+i);if(!el)return;
+      if((x[2]||'text')==='check')el.checked=!!cl[x[0]];else{if(el.tagName==='SELECT'&&cl[x[0]]!==''&&![].some.call(el.options,function(o){return o.value===cl[x[0]];})){var op=document.createElement('option');op.value=op.textContent=cl[x[0]];el.appendChild(op);}el.value=cl[x[0]];}n++;});
+    toast('Colado de '+(cl._de||'outra saída')+'. Edite e salve.');return true;}
   if(a==='formfechar'){FORM=null;renderModal();render();return true;}
   if(a==='formsalvar'){if(!podeEditar()){toast('Atualize o Apps Script para 1.41 antes.',true);return true;}
     var c=lerForm(),ch=CHAVES[FORM.aba];

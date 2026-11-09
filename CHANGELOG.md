@@ -26,6 +26,9 @@
 
 
 
+## v1.71 · 09/11/2026
+- Conexões: no lápis de uma saída, "Copiar ajustes" e "Colar de X…" para levar conector, cabo, destino, entrada, nível e observações de uma saída para outra. Colar só preenche o formulário (o nome não é copiado); salvar continua manual.
+
 ## v1.70 · 09/11/2026
 - Conexões voltam a ser únicas (sem seletor de cena). O nome de uma saída editado pelo lápis das Conexões ou pelo campo Name da tela Outputs do Mixer vale para todas as cenas.
 - Se uma saída tiver nomes diferentes entre as cenas, as Conexões avisam (≠ cena: nome).
