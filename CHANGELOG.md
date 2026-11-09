@@ -26,6 +26,11 @@
 
 
 
+## v1.70 · 09/11/2026
+- Conexões voltam a ser únicas (sem seletor de cena). O nome de uma saída editado pelo lápis das Conexões ou pelo campo Name da tela Outputs do Mixer vale para todas as cenas.
+- Se uma saída tiver nomes diferentes entre as cenas, as Conexões avisam (≠ cena: nome).
+- A Input list mantém o seletor de cena.
+
 ## v1.69 · 09/11/2026
 - Input list e Conexões ganharam um seletor de cena (padrão: Todos juntos). Antes mostravam sempre a cena Todos juntos, então nomes de saída mudados em outra cena (ex.: QG) não apareciam.
 - No lápis de uma saída (Conexões) há o campo "Nome no gravador", que grava o Name da saída na cena escolhida, o mesmo campo da tela Outputs do Mixer.
