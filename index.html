@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.80 · 09/11 14:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.81 · 11/11 00:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1576,7 +1576,8 @@ function lerScan(texto,nome){
 }
 function txsRf(){return D.tx.filter(function(t){return !isNaN(t.freq)&&t.num!=='GN';}).sort(function(a,b){return a.freq-b.freq;});}
 function graficoRf(){
-  var T=txsRf(),P=SCAN&&SCAN.pts||[];if(!T.length&&!P.length)return '';
+  /* gráfico só até 700 MHz (o scan pode ir além; os Sony 900 MHz ficam só na tabela) */
+  var FMAX=700,T=txsRf().filter(function(t){return t.freq<=FMAX;}),P=(SCAN&&SCAN.pts||[]).filter(function(p){return p[0]<=FMAX;});if(!T.length&&!P.length)return '';
   var fs=T.map(function(t){return t.freq;}).concat(P.map(function(p){return p[0];}));
   var lo=Math.floor(Math.min.apply(null,fs)-2),hi=Math.ceil(Math.max.apply(null,fs)+2);
   var W=1000,H=270,top=12,bot=H-52,x=function(f){return (f-lo)/(hi-lo)*W;};

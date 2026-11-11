@@ -26,6 +26,9 @@
 
 
 
+## v1.81 · 11/11/2026
+- RF: o gráfico mostra o scan e os transmissores só até 700 MHz. A tabela continua com todos.
+
 ## v1.80 · 09/11/2026
 - RF: a tabela pode ser ordenada por frequência (padrão), por número do transmissor ou por pista do gravador.
   - A pista vem da cena Todos juntos, numa coluna nova "Pista".
