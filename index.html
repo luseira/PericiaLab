@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.82 · 11/11 11:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.83 · 11/11 13:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2988,7 +2988,13 @@ function render(){
   UI.ep=epAtual();if(!UI.devEp)UI.devEp=UI.ep;
   var pre=senhaBanner()+(MODO==='demo'&&UI.view!=='tec'?'<div class="banner">Modo demonstração com dados de exemplo. Para ligar na planilha, abra a aba Técnico.</div>':'');
   if(MODO==='api'&&NET==='off'&&!PRECISA_SENHA)pre='<div class="banner err">Sem conexão. Mostrando os dados de '+esc(D.lidoEm||'—')+(FILA.length?'; '+FILA.length+' alteração(ões) serão enviadas quando a conexão voltar':'')+'.</div>';
+  /* guarda a rolagem horizontal (e vertical interna) dos painéis, para o toque num bus ou numa saída não jogar a tela para a esquerda */
+  var rol=[],wx=window.scrollX,wy=window.scrollY,mesmaVista=render._v===UI.view;render._v=UI.view;
+  function sig(e){return e.tagName+'|'+(typeof e.className==='string'?e.className:'');}
+  if(mesmaVista){var AL=$('#app').querySelectorAll('*');for(var q=0;q<AL.length;q++){var e0=AL[q];if(e0.scrollLeft>0||(e0.scrollTop>0&&e0.scrollHeight>e0.clientHeight+2))rol.push([q,sig(e0),e0.scrollLeft,e0.scrollTop]);}}
   $('#app').innerHTML=pre+({car:viewCar,doc:viewDoc,mix:viewMix,con:viewCon,inv:viewInv,rf:viewRf,dev:viewInv,tec:viewTec}[UI.view]||viewCar)();
+  if(mesmaVista&&rol.length){var AN=$('#app').querySelectorAll('*'),SG={};rol.forEach(function(r){var e=AN[r[0]];if(!e||sig(e)!==r[1]){if(!SG[r[1]]){SG[r[1]]=[].filter.call(AN,function(x){return sig(x)===r[1];});}e=SG[r[1]][0];}if(e){e.scrollLeft=r[2];e.scrollTop=r[3];}});}
+  if(mesmaVista){if(window.scrollX!==wx)window.scrollTo(wx,window.scrollY);}
   if(EDIT)renderModal();
   if(UI.view==='car'&&BUSCA)aplicarBusca();
   ligarArraste(document);

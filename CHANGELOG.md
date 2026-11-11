@@ -26,6 +26,9 @@
 
 
 
+## v1.83 · 11/11/2026
+- Ao tocar num bus, numa saída ou em qualquer botão, os painéis que rolam para o lado não voltam mais para o começo, o que era mais visível no celular e no iPad. Vale para abas de buses e saídas, barra do Mixer e tabelas.
+
 ## v1.82 · 11/11/2026
 - Mixer: Time A em azul (Thelma) e Time B em vermelho (Salada). As cores de time escolhidas antes no aparelho são descartadas uma vez.
 - Sem lógica de frente/trás: o Time A fica sempre em 4–8 e o Time B sempre em 9–13 (Clara/633), mesmo quando o B tiver mais gente.
