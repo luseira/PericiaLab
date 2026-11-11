@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.81 · 11/11 00:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.82 · 11/11 11:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1677,7 +1677,7 @@ function reduzirFoto(file,cb){
 var CAPS=['#4a1f26','#1f2b5c','#b9bcc0','#6b2fa0','#e2401c','#f2d01a','#1f9a54','#1e4fc4','#f07a1e','#ea6f95','#f2f0ea','#15181d'];
 var CAPNOME=['vinho','marinho','cinza','roxo','vermelho','amarelo','verde','azul','laranja','rosa','branco','preto'];
 var MIXV=[['cl','CL-12',1,12],['b1','1–8',1,8],['b2','9–16',9,16],['b3','17–24',17,24],['b4','25–32',25,32],['s1','1–16',1,16],['s2','17–32',17,32],['all','Tudo',1,32]];
-var ZONAS=[[1,3,'Principais'],[4,8,'Time da frente'],[9,14,'Time de trás · Clara'],[15,22,'Livres'],[23,32,'Colinha']];
+var ZONAS=[[1,3,'Principais'],[4,8,'Time A · Thelma'],[9,14,'Time B · Salada · Clara'],[15,22,'Livres'],[23,32,'Colinha']];
 var MSEL=0,MTROCA=false;
 
 function cenaBase(){
@@ -1753,7 +1753,7 @@ function listaCanais(){
   return Object.keys(v).sort(function(a,b){return v[a]-v[b]||nat(a,b);});
 }
 function resolver(cena,ep){
-  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),fr=A.length>=B.length?'A':'B',F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
+  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),fr='A' /* desde 11/11: Time A (azul, Thelma) sempre na frente, 4–8; Time B (vermelho, Salada) sempre atrás, 9–13 (Clara) */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
   var S=cena.pistas.map(function(tok,i){
     var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
@@ -1847,7 +1847,7 @@ function linhaMix(R,a,b,v,M){
   [[1,12,'CL-12'],[13,32,'só iPad']].forEach(function(z){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
-    var zl=i===1?'Frente · '+timeNome(R.frente)+' ('+R.F.length+')':i===2?'Trás · '+timeNome(R.frente==='A'?'B':'A')+' ('+R.T.length+') · Clara':z[2];
+    var zl=i===1?timeNome('A')+' · Thelma ('+R.F.length+')':i===2?timeNome('B')+' · Salada ('+R.T.length+') · Clara':z[2];
     h+='<span class="band zb z'+i+'" style="grid-row:'+(FAIXA_REAPER?3:2)+';grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
   (function(){var x=Math.max(a,1),y=Math.min(b,REAPER_N);if(FAIXA_REAPER&&x<=y)h+='<span class="band rp" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'" title="Dante '+x+'–'+y+' pré-fader entram nas pistas '+x+'–'+y+' do Reaper">→ Reaper · Dante '+x+'–'+y+' · pré-fader</span>';})();
   S.forEach(function(s,i){h+='<span style="grid-row:'+(FAIXA_REAPER?4:3)+';grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
@@ -1861,10 +1861,13 @@ function aplicarBuscaMix(){
   var c=$('#nmbusca');if(c)c.textContent=ativo?n+' pista(s)':'';
 }
 /* cores das funções no mixer (por aparelho) */
-var CORES_PAD={host:'#c9a227',mentor:'#8e5cc4',A:'#d0362b',B:'#2e6fd6',boom:'#2aa198',goose:'#8a9a2e'};
+var CORES_PAD={host:'#c9a227',mentor:'#8e5cc4',A:'#2e6fd6',B:'#d0362b',boom:'#2aa198',goose:'#8a9a2e'};
 var CORES_ROT=[['host','Host'],['mentor','Mentores'],['A','Time A'],['B','Time B'],['boom','Boom'],['goose','Gooseneck']];
 function corFuncao(k){return (UI.cores&&UI.cores[k])||CORES_PAD[k];}
-function aplicarCores(){var r=document.documentElement.style;CORES_ROT.forEach(function(x){r.setProperty('--c-'+x[0],corFuncao(x[0]));});}
+function aplicarCores(){var r=document.documentElement.style;
+  /* 11/11: Time A passou a azul e B a vermelho; descarta uma vez as cores de time escolhidas antes neste aparelho */
+  if(!UI.coresAB2){UI.coresAB2=1;if(UI.cores){delete UI.cores.A;delete UI.cores.B;}try{salvarUi();}catch(e){}}
+  CORES_ROT.forEach(function(x){r.setProperty('--c-'+x[0],corFuncao(x[0]));});}
 /* histórico de mudanças do mixer (por aparelho, últimas 150) */
 var KLOG='plc_mixlog',MLOG=jget(KLOG,[]);
 function logMix(msgs){if(!msgs.length)return;var hh=agora().slice(11),c=cenaAtual();msgs.forEach(function(m){MLOG.unshift({h:hh,ep:UI.ep,cena:c?c.nome:'',m:m});});MLOG=MLOG.slice(0,150);jset(KLOG,MLOG);}
@@ -2686,8 +2689,8 @@ function painelSlot(R,M){
   var s=R.S[MSEL-1],n=MSEL,ch=M.ch[n],o='<option value="">Vazio</option>';
   ['A','B'].forEach(function(t){var L=R[t];
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
-  [['F','Time da frente'],['T','Time de trás']].forEach(function(g){var L=R[g[0]];
-    o+='<optgroup label="'+g[1]+' (o '+(g[0]==='F'?'maior':'menor')+') · '+timeNome(g[0]==='F'?R.frente:(R.frente==='A'?'B':'A'))+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
+  [['F','Time A (Thelma)'],['T','Time B (Salada)']].forEach(function(g){var L=R[g[0]];
+    o+='<optgroup label="'+g[1]+' · '+timeNome(g[0]==='F'?R.frente:(R.frente==='A'?'B':'A'))+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   o+='<optgroup label="Colinha (ordem de transmissor)">'+Array.apply(null,{length:COL_N}).map(function(_,i){return i+1;}).map(function(k){var tk=R.C[k-1]||'',mm=/^P:(.+)$/.exec(tk),nm=mm&&D.pPor[mm[1]]?D.pPor[mm[1]].nome:tk.replace(/^S:/,'');return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(nm?' ('+esc(nm)+')':'')+'</option>';}).join('')+'</optgroup>';
   o+='<optgroup label="Pessoa ou fonte fixa">'+D.elenco.map(function(p){return '<option value="P:'+esc(p.id)+'"'+(s.tok==='P:'+p.id?' selected':'')+'>'+esc(p.nome)+'</option>';}).join('')+'</optgroup>';
   var p=s.p,e=s.e||{},t=s.t,fonte=s.cn?fonteSlot(s):'';

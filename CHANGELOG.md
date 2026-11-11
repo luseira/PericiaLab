@@ -26,6 +26,11 @@
 
 
 
+## v1.82 · 11/11/2026
+- Mixer: Time A em azul (Thelma) e Time B em vermelho (Salada). As cores de time escolhidas antes no aparelho são descartadas uma vez.
+- Sem lógica de frente/trás: o Time A fica sempre em 4–8 e o Time B sempre em 9–13 (Clara/633), mesmo quando o B tiver mais gente.
+- Faixas do mixer renomeadas para "Time A · Thelma" e "Time B · Salada · Clara".
+
 ## v1.81 · 11/11/2026
 - RF: o gráfico mostra o scan e os transmissores só até 700 MHz. A tabela continua com todos.
 
