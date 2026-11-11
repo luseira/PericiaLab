@@ -592,7 +592,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.83 · 11/11 13:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.84 · 11/11 14:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1575,9 +1575,15 @@ function lerScan(texto,nome){
   return {nome:nome,em:agora(),pts:pts};
 }
 function txsRf(){return D.tx.filter(function(t){return !isNaN(t.freq)&&t.num!=='GN';}).sort(function(a,b){return a.freq-b.freq;});}
+/* número (etiqueta amarela) de cada transmissor na RF: posição na ordem escolhida (frequência, TX ou pista do gravador) */
+function pistasRf(){var ct=cenaTodos(),Rp=ct?resolver(ct,UI.ep):null,pis={};if(Rp)Rp.S.forEach(function(x){if(x.t&&!x.copia&&pis[x.t.num]==null)pis[x.t.num]=x.n;});return pis;}
+function ordemRf(T,pis){var ord=UI.rford||'freq',L=T.map(function(t,i){return {t:t,i:i};});
+  if(ord==='tx')L.sort(function(a,b){return (int(a.t.num)||999)-(int(b.t.num)||999)||String(a.t.num).localeCompare(String(b.t.num))||a.t.freq-b.t.freq;});
+  else if(ord==='pista')L.sort(function(a,b){var x=pis[a.t.num],y=pis[b.t.num];return (x==null?999:x)-(y==null?999:y)||(int(a.t.num)||999)-(int(b.t.num)||999);});
+  var num={};L.forEach(function(o,j){num[o.t.num]=j+1;});return {L:L,num:num};}
 function graficoRf(){
   /* gráfico só até 700 MHz (o scan pode ir além; os Sony 900 MHz ficam só na tabela) */
-  var FMAX=700,T=txsRf().filter(function(t){return t.freq<=FMAX;}),P=(SCAN&&SCAN.pts||[]).filter(function(p){return p[0]<=FMAX;});if(!T.length&&!P.length)return '';
+  var FMAX=700,NUM=ordemRf(txsRf(),pistasRf()).num,T=txsRf().filter(function(t){return t.freq<=FMAX;}),P=(SCAN&&SCAN.pts||[]).filter(function(p){return p[0]<=FMAX;});if(!T.length&&!P.length)return '';
   var fs=T.map(function(t){return t.freq;}).concat(P.map(function(p){return p[0];}));
   var lo=Math.floor(Math.min.apply(null,fs)-2),hi=Math.ceil(Math.max.apply(null,fs)+2);
   var W=1000,H=270,top=12,bot=H-52,x=function(f){return (f-lo)/(hi-lo)*W;};
@@ -1586,7 +1592,7 @@ function graficoRf(){
   var g='<svg class="rfg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="Espectro e transmissores">';
   for(var f=Math.ceil(lo/10)*10;f<=hi;f+=10)g+='<line x1="'+x(f)+'" x2="'+x(f)+'" y1="'+top+'" y2="'+bot+'" class="gd"/><text x="'+x(f)+'" y="'+(bot+12)+'" class="tk">'+f+'</text>';
   if(P.length)g+='<polyline class="sc" points="'+P.map(function(p){return x(p[0]).toFixed(1)+','+y(p[1]).toFixed(1);}).join(' ')+'"/>';
-  T.forEach(function(t,i){var xx=x(t.freq);g+='<line x1="'+xx+'" x2="'+xx+'" y1="'+top+'" y2="'+bot+'" class="'+(t.mon?'tm':'tl')+(t.grade&&!t.grade.ok?' bad':'')+'"/><text x="'+xx+'" y="'+(H-22+(i%3)*9)+'" class="tn">'+(i+1)+'</text>';});
+  T.forEach(function(t,i){var xx=x(t.freq);g+='<line x1="'+xx+'" x2="'+xx+'" y1="'+top+'" y2="'+bot+'" class="'+(t.mon?'tm':'tl')+(t.grade&&!t.grade.ok?' bad':'')+'"/><text x="'+xx+'" y="'+(H-22+(i%3)*9)+'" class="tn">'+(NUM[t.num]||'')+'</text>';});
   return g+'</svg>';
 }
 function imd(T){
@@ -1601,19 +1607,15 @@ function viewRf(){SCAN=scanDaPlanilha()||SCAN;
     '<label class="btn">Importar report (.html)<input type="file" accept=".html,.htm,text/html" data-act="report" class="sr"></label>'+
     '<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   /* ordem da tabela: frequência (padrão), número do transmissor ou pista do gravador (cena Todos juntos) */
-  var ord=UI.rford||'freq',ct=cenaTodos(),Rp=ct?resolver(ct,UI.ep):null,pis={};
-  if(Rp)Rp.S.forEach(function(x){if(x.t&&!x.copia&&pis[x.t.num]==null)pis[x.t.num]=x.n;});
+  var ord=UI.rford||'freq',pis=pistasRf();
   h+='<div class="bar noprint"><span class="seg" role="group" aria-label="Ordenar">'+[['freq','Frequência'],['tx','Transmissor'],['pista','Pista do gravador']].map(function(o){return '<button type="button" data-act="rford" data-v="'+o[0]+'" aria-pressed="'+(ord===o[0])+'">'+o[1]+'</button>';}).join('')+'</span></div>';
   if(PREVIEW)h+='<div class="painel noprint">'+previewHtml()+'</div>';
   h+='<section class="doc"><div class="dochead"><div><h1>Coordenação de RF</h1><p>'+T.length+' transmissores'+(SCAN?' · scan "'+esc(SCAN.nome)+'" ('+esc(SCAN.em)+')':'')+'</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
   h+='<div class="rfbox">'+graficoRf()+'</div>'+(SCAN?'':'<p class="hint noprint">Importe o scan exportado do Wireless Designer (.csv) para ver o espectro por baixo dos transmissores. O scan fica guardado na planilha e aparece em qualquer aparelho.</p>');
   var s=situacao(UI.ep);
   h+='<div class="tabwrap"><table class="tab il"><thead><tr><th>#</th><th>Pista</th><th>Freq. MHz</th><th>Transmissor</th><th>Bloco</th><th>Código</th><th>Receptor</th><th>Com quem</th><th>Distância do vizinho</th><th></th></tr></thead><tbody>'+
-    (function(){var L=T.map(function(t,i){return {t:t,i:i};});
-      if(ord==='tx')L.sort(function(a,b){return (int(a.t.num)||999)-(int(b.t.num)||999)||a.t.freq-b.t.freq;});
-      else if(ord==='pista')L.sort(function(a,b){var x=pis[a.t.num],y=pis[b.t.num];return (x==null?999:x)-(y==null?999:y)||(int(a.t.num)||999)-(int(b.t.num)||999);});
-      return L;})().map(function(o,j){var t=o.t,i=o.i;var viz=Math.min(i>0?t.freq-T[i-1].freq:99,i<T.length-1?T[i+1].freq-t.freq:99);var quem=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);}).join(', ');
-      return '<tr><td><span class="tag sm">'+(i+1)+'</span></td><td>'+(pis[t.num]!=null?'<b>'+pis[t.num]+'</b>':'—')+'</td><td><b>'+mhz(t.freq)+'</b></td><td class="n">'+esc(t.nome)+(t.mon?' <small>monitoração</small>':'')+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(t.cod)+'</td><td>'+esc(t.rx||'')+'</td><td>'+esc(quem)+'</td><td'+(viz<0.3?' class="alarme"':'')+'>'+(viz<99?Math.round(viz*1000)+' kHz':'')+'</td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':t.ajustado?'<span class="chip ok">ajustado</span>':'<span class="chip warn">conferir</span>')+'</td></tr>';}).join('')+'</tbody></table></div>';
+    ordemRf(T,pis).L.map(function(o,j){var t=o.t,i=o.i;var viz=Math.min(i>0?t.freq-T[i-1].freq:99,i<T.length-1?T[i+1].freq-t.freq:99);var quem=(s.uso.tx[t.num]||[]).map(function(id){return primeiroNome(D.pPor[id]);}).join(', ');
+      return '<tr><td><span class="tag sm">'+(j+1)+'</span></td><td>'+(pis[t.num]!=null?'<b>'+pis[t.num]+'</b>':'—')+'</td><td><b>'+mhz(t.freq)+'</b></td><td class="n">'+esc(t.nome)+(t.mon?' <small>monitoração</small>':'')+'</td><td>'+esc(t.bloco)+'</td><td>'+esc(t.cod)+'</td><td>'+esc(t.rx||'')+'</td><td>'+esc(quem)+'</td><td'+(viz<0.3?' class="alarme"':'')+'>'+(viz<99?Math.round(viz*1000)+' kHz':'')+'</td><td>'+(t.grade&&!t.grade.ok?'<span class="chip bad">fora da grade</span>':t.ajustado?'<span class="chip ok">ajustado</span>':'<span class="chip warn">conferir</span>')+'</td></tr>';}).join('')+'</tbody></table></div>';
   var I=imd(T.filter(function(t){return !t.mon;}));
   h+='<h3>Intermodulação de 3ª ordem (2·f1 − f2)</h3>'+(I.length?'<p class="hint">Produtos a menos de 100 kHz de outro transmissor. É uma conferência simples; a coordenação vale a do Wireless Designer.</p><ul class="imd">'+I.slice(0,30).map(function(x){return '<li><b>'+esc(x.c.nome)+'</b> ('+mhz(x.c.freq)+') ← 2·'+esc(x.a.nome)+' − '+esc(x.b.nome)+' = '+mhz(2*x.a.freq-x.b.freq)+' ('+Math.round(x.d*1000)+' kHz)</li>';}).join('')+'</ul>':'<p class="hint">Nenhum produto de 3ª ordem a menos de 100 kHz de um transmissor de personagem.</p>');
   return h+'</section>';
