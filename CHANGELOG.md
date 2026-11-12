@@ -26,6 +26,9 @@
 
 
 
+## v1.87 · 12/11/2026
+- Input list em lista: colunas na ordem Pista, Nome, Source, Receptor, Transmissor, Cápsula, Freq., Bloco. Na linha da sala dos mentores, o input do gravador vai para a coluna Source.
+
 ## v1.86 · 12/11/2026
 - Fichas: a caixa amarela do TX fica na mesma linha do nome. Saem papel (host, mentor, participante) e time; a colinha vai para o rodapé, junto da modulação e do código.
 
