@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.91 · 12/11 16:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.92 · 12/11 17:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -738,7 +738,8 @@ function normalizar(R){
   d.imp=linhas(R,'imp').map(function(o){return {gerado:str(o['Report gerado em']),em:str(o['Importado em']),por:str(o['Por']),n:str(o['Transmissores atualizados']),mud:str(o['Mudanças']),nao:str(o['Nomes sem correspondência'])};});
   d.cenas=Array.isArray(R&&R.cenas)?R.cenas.map(function(o){var pp=[],mm=null;try{pp=JSON.parse(str(o['Pistas'])||'[]');}catch(e){}var pos=null;if(pp&&!Array.isArray(pp)){mm=pp.m||null;pos=pp.pos!=null?+pp.pos:null;pp=Array.isArray(pp.p)?pp.p:[];}if(!Array.isArray(pp))pp=[];while(pp.length<32)pp.push('');var c={id:str(o['ID']),nome:str(o['Nome'])||str(o['ID']),ordem:str(o['Ordem'])||'tx',pistas:pp.slice(0,32)};if(mm)c.mesa=mm;if(pos==null&&str(o['Posição'])!=='')pos=num(o['Posição']);if(pos!=null&&!isNaN(pos))c.pos=pos;return c;}).filter(function(c){return c.id;}):null;
   d.configs=(Array.isArray(R&&R.cenas)?R.cenas:[]).filter(function(o){return /^car:/.test(str(o['ID']));}).map(function(o){var x={};try{x=JSON.parse(str(o['Pistas'])||'{}');}catch(e){}return {id:str(o['ID']),nome:str(o['Nome']),em:str(o['Atualizado em']),por:str(o['Por']),car:x.car||{}};});
-  if(Array.isArray(d.cenas))d.cenas=d.cenas.filter(function(c){return !/^(car|rf):/.test(c.id);});
+  if(Array.isArray(d.cenas))d.cenas=d.cenas.filter(function(c){return !/^(car|rf|sc):/.test(c.id);});
+  d.scarq=null;(Array.isArray(R&&R.cenas)?R.cenas:[]).forEach(function(o){if(str(o['ID'])==='sc:arquivo'){try{var x=JSON.parse(str(o['Pistas'])||'{}');if(x.gz)d.scarq=x;}catch(e){}}});
   d.rfscan=null;(Array.isArray(R&&R.cenas)?R.cenas:[]).forEach(function(o){if(str(o['ID'])==='rf:scan'){try{var x=JSON.parse(str(o['Pistas'])||'{}');if(x.scan)d.rfscan=x.scan;}catch(e){}}});
   d.script=str(R&&R.script);
   d.saidas=linhas(R,'saidas').filter(function(o){return str(o['Saída']);});
@@ -814,7 +815,7 @@ function recalcular(){
   var R=RAW?clone(RAW):{tx:[],rx:[],cap:[],elenco:[],esc:[],eps:[],imp:[]};
   ['tx','rx','cap','elenco','esc','eps','imp','saidas','equip'].forEach(function(k){if(!R[k])R[k]=[];});
   FILA.forEach(function(op){try{aplicar(R,op);}catch(e){}});
-  D=normalizar(R);D.raw=R;
+  D=normalizar(R);D.raw=R;try{scNuvemLer();}catch(e){}
 }
 
 /* ───────── lógica do episódio ───────── */
@@ -2405,9 +2406,23 @@ function aplicarCopia(){
 /* ───────── Scorpio: importar, comparar, exportar ───────── */
 var KSC='plc_scorpio';
 var SC=null; /* {nome, em, txt, m} */
-function scCarregar(){if(SC)return SC;var x=jget(KSC,null);if(x&&x.txt){try{SC={nome:x.nome,em:x.em,txt:x.txt,m:sjParse(x.txt)};}catch(e){SC=null;}}return SC;}
+function scCarregar(){if(SC)return SC;var x=jget(KSC,null);if(!(x&&x.txt)&&SC_NUVEM)x=SC_NUVEM;if(x&&x.txt){try{SC={nome:x.nome,em:x.em,txt:x.txt,m:sjParse(x.txt),nuvem:x===SC_NUVEM};}catch(e){SC=null;}}return SC;}
+/* cópia do settings na planilha (aba Cenas, linha sc:arquivo), comprimida (gzip + base64), para o Claude e outros aparelhos lerem.
+   A planilha é privada (fora do repositório público). */
+function gzB64(txt){if(typeof CompressionStream==='undefined')return Promise.reject(new Error('sem CompressionStream'));
+  var st=new Blob([txt]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Response(st).arrayBuffer().then(function(b){var u=new Uint8Array(b),s='',i;for(i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(s);});}
+function b64Gz(b64){var bin=atob(b64),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text();}
+function scNuvemSalvar(nome,em,txt){if(!(MODO==='api'||MODO==='demo'))return;
+  gzB64(txt).then(function(g){fazer({acao:'cena',id:'sc:arquivo',nome:'Settings do Scorpio: '+nome,ordem:'sc',pistas:JSON.stringify({nome:nome,em:em,n:txt.length,gz:g})});})
+  .catch(function(e){toast('O settings ficou só neste aparelho (não consegui mandar para a planilha: '+e.message+')',true);});}
+var SC_NUVEM=null;
+function scNuvemLer(){var x=D&&D.scarq;if(!x||!x.gz||typeof DecompressionStream==='undefined')return;if(SC_NUVEM&&SC_NUVEM.gz===x.gz)return;
+  b64Gz(x.gz).then(function(t){SC_NUVEM={nome:x.nome,em:x.em,txt:t,gz:x.gz};if(!SC){var m0=jget(KSC,null);if(!m0){render();}}}).catch(function(){});}
 function scGuardar(nome,txt){var m=sjParse(txt);if(!(m instanceof Map)||!m.has('InputChannel1')||!m.has('AnalogOutputs'))throw new Error('Esse arquivo não parece um settings do Scorpio.');
-  SC={nome:nome,em:agora(),txt:txt,m:m};if(!jset(KSC,{nome:nome,em:SC.em,txt:txt}))toast('O arquivo ficou só nesta sessão (o navegador não deixou guardar).',true);}
+  SC={nome:nome,em:agora(),txt:txt,m:m};if(!jset(KSC,{nome:nome,em:SC.em,txt:txt}))toast('O arquivo ficou só nesta sessão (o navegador não deixou guardar).',true);
+  scNuvemSalvar(nome,SC.em,txt);}
 function rotaArq(o){var st=o&&o.routeState,g=o?+o.gain:-1275;if(st==='Prefader')return 'pre';if(st==='Postfader')return 'post';if(st==='PostSend'&&g>-1270)return 'send';return '';}
 function lerArquivo(m){
   var A={ch:[],nomes:[],fonte:[],bus:{},out:{}};
@@ -2646,7 +2661,7 @@ function cliqueMesa(a,el){
   if(a==='mbusall'){if(!confirm('Copiar os buses, as saídas e o Slate/Coms/Returns desta cena para todas as outras?'))return true;
     var cur=cenaAtual(),mb=(cur.mesa&&cur.mesa.bus)||{},mo=(cur.mesa&&cur.mesa.out)||{};
     cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);y.mesa.sl=clone((cur.mesa&&cur.mesa.sl)||{});y.mesa.dante=clone((cur.mesa&&cur.mesa.dante)||{});y.mesa.hp=clone((cur.mesa&&cur.mesa.hp)||{});salvarCena(y);});toast('Buses, saídas e Slate/Coms copiados para as outras cenas');return true;}
-  if(a==='mscdel'){SC=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
+  if(a==='mscdel'){SC=null;SC_NUVEM=null;if(D)D.scarq=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
   if(a==='mtrazer'){if(!SC)return true;if(!confirm('Substituir ON, ARM, routing, ajustes, buses e saídas desta cena pelo que está no arquivo?'))return true;
     var c3=cenaAtual(),R3=resolver(c3,UI.ep);trazerDoArquivo(R3,lerArquivo(SC.m));toast('Cena atualizada com o gravador');return true;}
   if(a==='mreaper'){var cr=cenaAtual();baixarTxt('PericiaLab_Reaper_'+nomeArq(cr.nome)+'_EP'+UI.ep+'.txt',reaperTxt(cr));toast('Arquivo do Reaper baixado. No Reaper, rode a ação "PericiaLab_Reaper" e escolha o arquivo.');return true;}

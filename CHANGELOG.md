@@ -26,6 +26,9 @@
 
 
 
+## v1.92 · 12/11/2026
+- Settings do Scorpio também vai para a planilha: ao carregar um .json na aba Scorpio, uma cópia comprimida (gzip + base64, ~10 KB) é salva na aba Cenas, linha `sc:arquivo`. Assim o Claude consegue ler o arquivo carregado, e outro aparelho sem arquivo local usa essa cópia. "Esquecer arquivo" vale só para esta sessão/aparelho.
+
 ## v1.91 · 12/11/2026
 - Scorpio: botão "Baixar só com os participantes trocados". Usa o arquivo carregado como verdade para tudo (routing, buses, saídas, slate, fader, mute, ARM, automix) e muda só os canais de participantes: source, nome da pista e os ajustes que acompanham o input (trim, HPF, EQ, comp, fase, delay, copiados do canal que tinha aquele input). Mostra a lista de mudanças antes de baixar. Sem mudanças, o arquivo sai idêntico byte a byte.
 
