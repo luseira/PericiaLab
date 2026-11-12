@@ -601,7 +601,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.87 · 12/11 14:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.88 · 12/11 14:05</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1175,7 +1175,7 @@ function viewDoc(){
     var cab='<div class="tabwrap"><table class="tab il"><thead><tr><th>Pista</th><th>Nome</th><th>Source</th><th>Receptor</th><th>Transmissor</th><th>Cápsula</th><th>Freq.</th><th>Bloco</th></tr></thead><tbody>';
     function linhaIL(x){var t=x.t;
         var r='<tr'+(x.fx||x.copia||x.vazio?' class="fx"':'')+'><td><span class="tag sm">'+x.n+'</span></td><td class="n">'+esc(ilNome(x))+(x.copia?'<small>colinha · = Ch '+x.copia+'</small>':'')+'</td><td><b>'+esc(x.cn||'')+'</b></td><td>'+esc(t?rxTxt(t):'')+'</td><td>'+esc(t?txNome(t):'')+'</td><td>'+ilMic(x)+'</td><td>'+(t&&!isNaN(t.freq)?mhz(t.freq):'')+'</td><td>'+esc(t?t.bloco:'')+'</td></tr>';
-        if(x.p&&x.p.papel==='MENTOR'&&t&&t.rxM)r+='<tr class="sub"><td></td><td>↳ sala dos mentores</td><td><b>'+esc(t.canalM)+'</b></td><td>'+esc(t.rxM)+'</td><td colspan="4"></td></tr>';
+        if(x.p&&x.p.papel==='MENTOR'&&t&&t.rxM)r+='<tr class="sub"><td></td><td title="Sala dos mentores">↳ Alt In</td><td><b>'+esc(t.canalM)+'</b></td><td>'+esc(t.rxM)+'</td><td colspan="4"></td></tr>';
         return r;}
     [[1,16],[17,32]].forEach(function(b){var Lb=I.L.filter(function(x){return x.n>=b[0]&&x.n<=b[1];}),usadas=Lb.filter(function(x){return !x.vazio;}).length;
       h+=secao('il'+b[0],'Canais '+b[0]+'–'+b[1],usadas+' de 16 em uso'+(b[0]===17?' · colinha 23–32':''),b[0]===1,cab+Lb.map(linhaIL).join('')+'</tbody></table></div>');});

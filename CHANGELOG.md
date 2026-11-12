@@ -26,6 +26,9 @@
 
 
 
+## v1.88 · 12/11/2026
+- Input list em lista: a linha da sala dos mentores agora diz "↳ Alt In", para não alargar a coluna Nome.
+
 ## v1.87 · 12/11/2026
 - Input list em lista: colunas na ordem Pista, Nome, Source, Receptor, Transmissor, Cápsula, Freq., Bloco. Na linha da sala dos mentores, o input do gravador vai para a coluna Source.
 
