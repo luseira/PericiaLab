@@ -26,6 +26,9 @@
 
 
 
+## v1.91 · 12/11/2026
+- Scorpio: botão "Baixar só com os participantes trocados". Usa o arquivo carregado como verdade para tudo (routing, buses, saídas, slate, fader, mute, ARM, automix) e muda só os canais de participantes: source, nome da pista e os ajustes que acompanham o input (trim, HPF, EQ, comp, fase, delay, copiados do canal que tinha aquele input). Mostra a lista de mudanças antes de baixar. Sem mudanças, o arquivo sai idêntico byte a byte.
+
 ## v1.90 · 12/11/2026
 - Gooseneck com entrada fixa MIC 15 (aba Elenco › Entrada; Transmissores/Receptores: canal "MIC 15" no lugar de "MIC PH48"). Escolher o Gooseneck na pista 15 já põe o input; escolher IN 15 mantém o nome GOOSE.
 - Canal: botões Mic e 48V ao lado do Source, para entradas analógicas (Adc). Gravam InputPreamps.isMicN e phantomOnN do input físico. Ligar 48V liga Mic; passar para Line desliga 48V. isMicN confirmado; phantomOnN marcado com *, a confirmar num arquivo real.

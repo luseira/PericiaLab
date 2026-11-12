@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.90 · 12/11 16:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.91 · 12/11 16:45</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2516,6 +2516,38 @@ function exportar(c,R,M,nome){
   sjSet(m,['system','name'],nome);
   return sjDump(m)+'\n';
 }
+/* ───────── Export "só participantes": o arquivo carregado vale para tudo; muda só quem está em cada canal ─────────
+   Mesmo método do PL_1111_v2 (11/11): por canal de participante, troca inputSrcName e o nome da pista,
+   e leva junto os ajustes que pertencem ao input (copiados do canal que tinha esse input no arquivo). */
+var CAMPOS_INPUT=['trimGaindB10ths','lowcutEnabled','lowcutHz','isPolarityInverted','msInputDelay',
+  'eqEnabled','eqPreFader','lowEqBypassed','lowEqCutoffHz','lowEqGaindB10ths','lowEqQ','lowEqType','midEqBypassed','midEqCutoffHz','midEqGaindB10ths','midEqQ','midEqType',
+  'hiEqBypassed','hiEqCutoffHz','hiEqGaindB10ths','hiEqQ','hiEqType',
+  'compressorEnabled','compressorPreFader','compressorThreshold10ths','compressorRatio10ths','compressorAttackMs','compressorReleaseMs','compressorKnee'];
+function exportarPart(c,R,nome){
+  var m=sjParse(SC.txt),orig=sjParse(SC.txt),L=[],avisos=[];
+  var srcOrig={};for(var n=1;n<=32;n++)srcOrig[n]=sjGet(orig,['InputChannel'+n,'inputSrcName'])||'';
+  function deOnde(f){var j;for(j=1;j<=16;j++)if(srcOrig[j]===f)return j;for(j=17;j<=32;j++)if(srcOrig[j]===f)return j;return 0;}
+  R.S.forEach(function(s){
+    if(!s.tok||!s.p||!(s.p.papel==='PARTICIPANTE'||s.p.papel==='CONVIDADO'))return;
+    var n=s.n,k='InputChannel'+n,f=s.cn?fonteSlot(s):'';
+    if(!f){avisos.push('Ch '+n+' '+nomePista(s.p)+': sem input definido, ficou como no arquivo');return;}
+    var nm=nomeArquivoPista(s),nmA=sjGet(orig,['MetaData','TrackName'+n])||'';
+    if(nm!==nmA){sjSet(m,['MetaData','TrackName'+n],nm);}
+    if(f!==srcOrig[n]){
+      var lk=sjGet(orig,[k,'linkType']);if(lk&&lk!=='Unlinked')avisos.push('Ch '+n+' está linkado no arquivo ('+lk+'): conferir no gravador');
+      sjSet(m,[k,'inputSrcName'],f);
+      var j=deOnde(f),lev='';
+      if(j&&j!==n){CAMPOS_INPUT.forEach(function(q){var v=sjGet(orig,['InputChannel'+j,q]);if(v!==undefined&&sjGet(orig,[k,q])!==undefined)sjSet(m,[k,q],v);});lev=' · ajustes do input vêm do ch '+j;}
+      else if(!j)lev=' · input não estava em nenhum canal do arquivo: ajustes do canal ficaram';
+      L.push('Ch '+n+': '+(nmA||'—')+' → '+nm+' · '+fonteTxt(srcOrig[n])+' → '+fonteTxt(f)+lev);
+    }else if(nm!==nmA)L.push('Ch '+n+': nome '+(nmA||'—')+' → '+nm+' (input igual)');
+  });
+  var fs=R.S.map(function(x){return x.cn?fonteSlot(x):'';});
+  if(fs.some(function(f){return f==='AES3-1'||f==='AES3-2';})&&!sjGet(m,['GlobalChannelSettings','xlr1Aes']))avisos.push('AES 1/2 em uso mas o XLR 1 não está em AES no arquivo: conferir');
+  if(fs.some(function(f){return f==='AES3-5'||f==='AES3-6';})&&!sjGet(m,['GlobalChannelSettings','xlr6Aes']))avisos.push('AES 5/6 em uso mas o XLR 6 não está em AES no arquivo: conferir');
+  sjSet(m,['system','name'],nome);
+  return {txt:sjDump(m)+'\n',mudou:L,avisos:avisos};
+}
 function nomeArq(s){return semAcento(s).replace(/[^A-Za-z0-9 _-]/g,'').trim().replace(/\s+/g,'_').slice(0,24)||'cena';}
 function viewScorpio(c,R,M){
   var sc=scCarregar(),h='';
@@ -2532,7 +2564,8 @@ function viewScorpio(c,R,M){
   var ded=deduzidosUsados(M,R);
   h+='<div class="painel"><h3>Exportar a cena para o Scorpio</h3><p class="hint">Gera um settings novo a partir do arquivo acima, mudando só nomes de pista, fontes, ON, ARM, routing, buses, saídas e os ajustes que você preencheu. Pistas vazias na cena ficam como estão no arquivo base. Saídas em par (link) só são separadas se a cena mudar a fonte delas. Teste em casa, com backup dos settings atuais, antes de usar no set.</p>'+
     (ded.length?'<div class="alerta warn">Usa códigos ainda não conferidos no aparelho: '+esc(ded.join(', '))+'. Confira essas saídas depois de carregar.</div>':'')+
-    '<div class="linha"><label class="campo">Nome do arquivo<input type="text" id="mscnome" value="'+esc(nomeArq(c.nome)+'_EP'+UI.ep)+'" maxlength="24"></label><button class="btn pri" type="button" data-act="mexport" style="align-self:flex-end">Baixar settings desta cena</button><button class="btn" type="button" data-act="mexptodas" style="align-self:flex-end">Baixar todas as cenas</button></div></div>';
+    '<div class="linha"><label class="campo">Nome do arquivo<input type="text" id="mscnome" value="'+esc(nomeArq(c.nome)+'_EP'+UI.ep)+'" maxlength="24"></label><button class="btn pri" type="button" data-act="mexport" style="align-self:flex-end">Baixar settings desta cena</button><button class="btn" type="button" data-act="mexptodas" style="align-self:flex-end">Baixar todas as cenas</button></div>'+
+    '<div class="linha" style="margin-top:.6rem"><button class="btn pri" type="button" data-act="mexppart">Baixar só com os participantes trocados</button><span class="hint" style="margin:0">Mantém <b>tudo</b> do arquivo carregado (routing, buses, saídas, slate, fader, mute, ARM…). Muda só os canais dos participantes: source, nome da pista e os ajustes que acompanham o input (trim, HPF, EQ, comp, fase, delay). Mostra a lista antes de baixar.</span></div></div>';
   return h+resumoCanais(R,M);
 }
 function resumoCanais(R,M){
@@ -2619,6 +2652,10 @@ function cliqueMesa(a,el){
   if(a==='mreaper'){var cr=cenaAtual();baixarTxt('PericiaLab_Reaper_'+nomeArq(cr.nome)+'_EP'+UI.ep+'.txt',reaperTxt(cr));toast('Arquivo do Reaper baixado. No Reaper, rode a ação "PericiaLab_Reaper" e escolha o arquivo.');return true;}
   if(a==='mexport'){if(!SC)return true;var c4=cenaAtual(),R4=resolver(c4,UI.ep),M4=mesaEf(c4,R4),nm=nomeArq($('#mscnome').value||c4.nome);
     try{baixar(nm+'.json',exportar(c4,R4,M4,nm));toast('Settings gerado: '+nm+'.json');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
+  if(a==='mexppart'){if(!SC)return true;var c6=cenaAtual(),R6=resolver(c6,UI.ep),nm6=nomeArq($('#mscnome').value||c6.nome);
+    try{var X6=exportarPart(c6,R6,nm6);
+      var msg='Arquivo base: '+SC.nome+'\nCena: '+c6.nome+' · EP '+UI.ep+'\n\nMudanças ('+X6.mudou.length+'):\n'+(X6.mudou.join('\n')||'nenhuma')+(X6.avisos.length?'\n\nATENÇÃO:\n'+X6.avisos.join('\n'):'')+'\n\nTodo o resto fica igual ao arquivo. Baixar '+nm6+'.json?';
+      if(!confirm(msg))return true;baixar(nm6+'.json',X6.txt);toast('Settings gerado: '+nm6+'.json ('+X6.mudou.length+' canais)');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
   if(a==='mexptodas'){if(!SC)return true;var LL=cenasLista(),k5=0;
     if(!confirm('Baixar '+LL.length+' arquivos de settings, um por cena (EP '+UI.ep+')? O navegador pode pedir permissão para vários downloads.'))return true;
     LL.forEach(function(c5,i){setTimeout(function(){try{var R5=resolver(c5,UI.ep),M5=mesaEf(c5,R5),n5=nomeArq(c5.nome+'_EP'+UI.ep);baixar(n5+'.json',exportar(c5,R5,M5,n5));k5++;if(k5===LL.length)toast(k5+' settings gerados');}catch(e){toast('Cena "'+c5.nome+'": '+e.message,true);}},i*700);});return true;}
@@ -3178,7 +3215,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&MOD
 /* ───────── início ───────── */
 aplicarCores();recalcular();render();
 if(MODO==='api'){buscar();setInterval(function(){if(!document.hidden&&!EDIT)buscar();else if(FILA.length)enviar();},30000);}
-window.__plc={renumerarBuses:renumerarBuses,exportar:exportar,cenaPorId:cenaPorId,resolver:resolver,mesaEf:mesaEf,scCarregar:scCarregar,lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir};
+window.__plc={renumerarBuses:renumerarBuses,exportar:exportar,exportarPart:exportarPart,cenaPorId:cenaPorId,resolver:resolver,mesaEf:mesaEf,scCarregar:scCarregar,lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir};
 })();
 </script>
 </body>
