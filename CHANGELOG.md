@@ -26,6 +26,9 @@
 
 
 
+## v1.86 · 12/11/2026
+- Fichas: a caixa amarela do TX fica na mesma linha do nome. Saem papel (host, mentor, participante) e time; a colinha vai para o rodapé, junto da modulação e do código.
+
 ## v1.85 · 12/11/2026
 - Input list em fichas: o input do gravador e o receptor (com o canal do receptor) ganham destaque, em caixas no topo de cada ficha. Modulação (compatibilidade) e código vão para uma linha pequena no rodapé. A cor da cápsula fica só na bolinha, e a polaridade só no ícone Ø.
 

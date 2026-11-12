@@ -188,7 +188,9 @@ details.sec>summary small{font-weight:400;color:var(--ink2);font-size:.8rem}
 #zoom img{width:100%;height:auto;max-height:78vh;object-fit:contain;display:block;background:#eceef1;border-radius:8px}
 #zoom figcaption{font:700 1.1rem/1.3 var(--f);margin-top:.5rem}#zoom figcaption small{display:block;font-weight:400;font-size:.8rem;color:var(--ink2)}
 .band.rp{background:#2a6f4f;color:#e9fff3}
-.ficha .hd{display:flex;gap:.45rem;align-items:center;margin-bottom:.3rem;min-width:0}
+.ficha .hd{display:flex;gap:.45rem;align-items:center;margin-bottom:.4rem;min-width:0}
+.ficha .hd h4{flex:1;min-width:0}
+.ficha .tec b{color:var(--ink);font-weight:700}
 .ficha .hd .tag{flex:none}
 .ficha .hd>div{min-width:0}
 .ficha h4{margin:0;font:700 1.25rem/1 var(--fc);text-transform:uppercase;overflow-wrap:anywhere}
@@ -599,7 +601,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.85 · 12/11 13:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.86 · 12/11 14:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1118,8 +1120,8 @@ function ordenar(L,ordem,col){
 function fichaHtml(x,col,n){
   var p=x.p,e=x.e||{},t=x.t,ch=col&&col.map[p.id];
   function d(k,v){return '<dt>'+k+'</dt><dd>'+(v?esc(v):'—')+'</dd>';}
-  return '<article class="ficha'+(e.time&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?' '+timeCls(e.time):'')+'">'+(n?'<div class="ftw">'+fotoGrande(p)+'<span class="pnum" title="pista '+n+'">'+n+'</span></div>':fotoGrande(p))+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><div><h4>'+esc(p.nome)+'</h4><div class="sub">'+esc(papelTxt(p))+(e.time?' · '+timeNome(e.time):'')+(ch?' · colinha '+ch:'')+'</div></div></div>'+
-    (t?'<div class="io"><div><small>Gravador</small><b>'+(t.canal?esc(t.canal):'—')+'</b></div><div><small>Receptor</small><b>'+rxIoTxt(t)+'</b></div></div>':'')+'<dl>'+'<dt>Cápsula</dt><dd>'+(e.cap?bolinha(e.cap)+esc(e.cap)+(capInv(e.cap)?' '+invIcon(e.cap,1):'')+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?' + adaptador → '+esc(k.ad):'';})():'—')+'</dd>'+d('Freq. MHz',t?mhz(t.freq):'')+d('Bloco',t?t.bloco:'')+(t&&(t.mod||t.cod)?'<div class="tec">'+[t.mod?esc(t.mod):'',t.cod?'código '+esc(t.cod):''].filter(Boolean).join(' · ')+'</div>':'')+
+  return '<article class="ficha'+(e.time&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?' '+timeCls(e.time):'')+'">'+(n?'<div class="ftw">'+fotoGrande(p)+'<span class="pnum" title="pista '+n+'">'+n+'</span></div>':fotoGrande(p))+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><h4>'+esc(p.nome)+'</h4></div>'+
+    (t?'<div class="io"><div><small>Gravador</small><b>'+(t.canal?esc(t.canal):'—')+'</b></div><div><small>Receptor</small><b>'+rxIoTxt(t)+'</b></div></div>':'')+'<dl>'+'<dt>Cápsula</dt><dd>'+(e.cap?bolinha(e.cap)+esc(e.cap)+(capInv(e.cap)?' '+invIcon(e.cap,1):'')+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?' + adaptador → '+esc(k.ad):'';})():'—')+'</dd>'+d('Freq. MHz',t?mhz(t.freq):'')+d('Bloco',t?t.bloco:'')+(ch||(t&&(t.mod||t.cod))?'<div class="tec">'+[ch?'<b>colinha '+esc(ch)+'</b>':'',t&&t.mod?esc(t.mod):'',t&&t.cod?'código '+esc(t.cod):''].filter(Boolean).join(' · ')+'</div>':'')+
     (p.papel==='MENTOR'&&t&&t.rxM?'<div class="nota">Sala dos mentores: '+esc(t.rxM)+' · '+esc(t.canalM)+'</div>':'')+
     (e.obs?'<div class="nota">'+esc(e.obs)+'</div>':'')+'</dl></div></article>';
 }
