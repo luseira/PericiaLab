@@ -7,7 +7,7 @@
 <title>Perícia Lab · Carômetro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=Permanent+Marker&family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#15181d; --ink2:#50565f; --ink3:#878d96; --line:#d3d7dd; --bg:#e9ebee; --paper:#fff;
@@ -485,6 +485,20 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 .strip.colavel{outline:2px dashed var(--accent);outline-offset:1px}
 .armtxt{color:var(--bad)}
 .mresumo{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0 0;font-size:.86rem}
+
+/* PDF em estilo dossiê (só na impressão/exportação) */
+@media print{
+  @page{margin-top:20mm;@top-left{content:'PERÍCIA LAB · SOM DIRETO';font:9px 'Courier Prime',monospace;color:#555;letter-spacing:.08em;vertical-align:middle}@top-center{content:'CONFIDENCIAL';font:22px 'Special Elite',monospace;letter-spacing:.35em;color:#b3141b;border:3px double #b3141b;padding:3px 6px 1px 14px;margin:5mm 0 3mm;vertical-align:middle}@top-right{content:'USO RESTRITO DA EQUIPE · NÃO DISTRIBUIR';font:9px 'Courier Prime',monospace;color:#555;letter-spacing:.08em;vertical-align:middle;text-align:right}}
+  @page paisagem{margin-top:20mm;@top-left{content:'PERÍCIA LAB · SOM DIRETO';font:9px 'Courier Prime',monospace;color:#555;letter-spacing:.08em;vertical-align:middle}@top-center{content:'CONFIDENCIAL';font:22px 'Special Elite',monospace;letter-spacing:.35em;color:#b3141b;border:3px double #b3141b;padding:3px 6px 1px 14px;margin:5mm 0 3mm;vertical-align:middle}@top-right{content:'USO RESTRITO DA EQUIPE · NÃO DISTRIBUIR';font:9px 'Courier Prime',monospace;color:#555;letter-spacing:.08em;vertical-align:middle;text-align:right}}
+  .doc{--fc:'Special Elite','Courier Prime',monospace;--f:'Courier Prime',monospace;font-family:'Courier Prime',monospace}
+  .doc table.tab,.doc .ficha dl,.doc .ficha .tec,.doc .ficha .nota,.doc .dochead p,.doc .dochead .r{font-family:'Courier Prime',monospace}
+  .doc .dochead{border-bottom:2px dashed #1a1a1a}
+  .doc .dochead h1{font-family:'Special Elite',monospace;font-weight:400;text-transform:uppercase;line-height:1.25}
+  .doc .dochead h1::before{content:'DOSSIÊ Nº 0412 · ';color:#8a1c1c}
+  .doc .ficha h4,.doc table.tab td.n,.doc .ficha .io b,.doc .tag{font-family:'Special Elite',monospace;font-weight:400}
+  .doc .ficha{border-style:solid;box-shadow:2px 2px 0 rgba(0,0,0,.15)}
+  .doc .ficha .ft{filter:grayscale(.35) contrast(1.05)}
+}
 @media print{
   .fita span.tv,.fita span.tz,.inv,.chip{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
@@ -601,7 +615,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.88 · 12/11 14:05</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.89 · 12/11 16:15</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -997,6 +1011,15 @@ function rxIoTxt(t){
   if(multi&&c){var base=r.id.replace(new RegExp('\\s+'+c+'$'),'');return esc(base)+' <i>ch</i> '+esc(c);}
   return esc(r.id);
 }
+/* garante as fontes do dossiê carregadas antes de imprimir (só são usadas no PDF) */
+function imprimir(){
+  var ok=function(){window.print();};
+  try{
+    if(!document.fonts||!document.fonts.load)return ok();
+    var fs=['16px "Special Elite"','16px "Courier Prime"','bold 16px "Courier Prime"'];
+    Promise.race([Promise.all(fs.map(function(f){return document.fonts.load(f,'AÊ');})),new Promise(function(r){setTimeout(r,2500);})]).then(ok,ok);
+  }catch(e){ok();}
+}
 function cardHtml(x,col){
   var p=x.p,e=x.e,t=x.t,bad=x.av.some(function(a){return a.k==='bad';});
   var ch=col&&col.map[p.id],tc=x.ativo&&e?timeCls(e.time):'';
@@ -1166,7 +1189,7 @@ function viewDoc(){
   var h='<div class="bar noprint"><span class="seg" role="group" aria-label="Formato"><button type="button" data-act="fmt" data-v="lista" aria-pressed="'+!fich+'">Lista</button><button type="button" data-act="fmt" data-v="fichas" aria-pressed="'+fich+'">Fichas</button></span>'+
     selCenaIL()+'<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(s.graves)h+='<div class="banner err noprint">A escalação tem '+s.graves+' problema(s). Confira no Carômetro antes de imprimir.</div>';
-  if(fich)h+='<style>@page{size:A4 landscape;margin:10mm}</style>';
+  if(fich)h+='<style>@page{size:A4 landscape;margin:20mm 10mm 10mm}</style>';
   h+='<section class="doc il"><div class="dochead"><div><h1>Perícia Lab · Input list</h1><p>Cena "'+esc(I.c.nome)+'" · EP '+UI.ep+' · '+I.L.length+' pistas</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
   if(fich){
     var col=colinhaMap(UI.ep),pp=I.L.filter(function(x){return x.p;}).map(function(x){var y=s.pessoas.filter(function(z){return z.p.id===x.p.id;})[0];return y?{x:y,n:x.n}:null;}).filter(Boolean);
@@ -3075,7 +3098,7 @@ document.addEventListener('click',function(ev){
   else if(a==='whats'){var tw=textoWhats();if(navigator.share&&/Mobi|Android|iPhone/i.test(navigator.userAgent)){navigator.share({text:tw}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(tw).then(function(){toast('Copiado. Cole no WhatsApp.');},function(){toast('Não consegui copiar.',true);});}}
   else if(a==='ft'){UI.ft=v;salvarUi();render();}
   else if(a==='rford'){UI.rford=el.dataset.v;salvarUi();render();}
-  else if(a==='print')window.print();
+  else if(a==='print')imprimir();
   else if(a==='quem'){QUEM=$('#quem').value.trim();jset(K.quem,QUEM);toast('Nome salvo');}
   else if(a==='api'){var u=$('#api').value.trim();if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){toast('O endereço precisa começar com https://script.google.com e terminar em /exec.',true);return;}
     API=u;jset(K.api,API);MODO='api';RAW=null;FILA=[];jset(K.fila,FILA);recalcular();render();buscar();}

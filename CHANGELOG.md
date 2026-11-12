@@ -26,6 +26,9 @@
 
 
 
+## v1.89 · 12/11/2026
+- PDF/impressão em estilo dossiê: fontes Special Elite e Courier Prime, carimbo CONFIDENCIAL no topo de cada página, título "DOSSIÊ Nº 0412" e linha tracejada. A tela não muda. O botão de imprimir espera as fontes carregarem (até 2,5 s).
+
 ## v1.88 · 12/11/2026
 - Input list em lista: a linha da sala dos mentores agora diz "↳ Alt In", para não alargar a coluna Nome.
 
