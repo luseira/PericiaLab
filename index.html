@@ -196,6 +196,13 @@ details.sec>summary small{font-weight:400;color:var(--ink2);font-size:.8rem}
 .ficha dl{display:grid;grid-template-columns:auto 1fr;gap:.05rem .55rem;margin:0;font-size:.8rem}
 .ficha dt{color:var(--ink2)}
 .ficha dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.ficha .io{display:grid;grid-template-columns:auto 1fr;gap:.3rem;margin:.1rem 0 .35rem}
+.ficha .io>div{border:1.5px solid var(--ink);border-radius:5px;background:#fff;padding:.15rem .4rem;min-width:0}
+.ficha .io small{display:block;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);line-height:1.2}
+.ficha .io b{display:block;font:700 1.12rem/1.1 var(--fc);overflow-wrap:anywhere}
+.ficha .io b i{font-style:normal;font-weight:600;font-size:.85rem;color:var(--ink2)}
+.ficha .tec{grid-column:1/-1;margin-top:.15rem;font-size:.66rem;color:var(--ink2)}
+.ficha .io>div,.ficha .io{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ficha .nota{grid-column:1/-1;margin-top:.25rem;font-size:.72rem;color:var(--ink2);border-top:1px solid var(--line);padding-top:.2rem}
 table.tab{border-collapse:collapse;width:100%;font-size:.84rem}
 table.tab th{background:var(--ink);color:#fff;font-weight:600;text-align:left;padding:.35rem .45rem;font-size:.74rem;white-space:nowrap}
@@ -592,7 +599,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.84 · 11/11 14:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.85 · 12/11 13:50</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -981,6 +988,13 @@ function rxTxt(t){
   if(multi&&c){var base=r.id.replace(new RegExp('\\s+'+c+'$'),'');return base+' · canal '+c;}
   return r.id;
 }
+/* receptor para a ficha: id do aparelho + canal do receptor em destaque */
+function rxIoTxt(t){
+  if(!t||!t.rx)return '—';var r=D.rxPor[t.rx];if(!r)return esc(t.rx);
+  var multi=/DSR4|822|SRB|A10|dual/i.test(r.modelo),c=r.rxch;
+  if(multi&&c){var base=r.id.replace(new RegExp('\\s+'+c+'$'),'');return esc(base)+' <i>ch</i> '+esc(c);}
+  return esc(r.id);
+}
 function cardHtml(x,col){
   var p=x.p,e=x.e,t=x.t,bad=x.av.some(function(a){return a.k==='bad';});
   var ch=col&&col.map[p.id],tc=x.ativo&&e?timeCls(e.time):'';
@@ -1105,7 +1119,7 @@ function fichaHtml(x,col,n){
   var p=x.p,e=x.e||{},t=x.t,ch=col&&col.map[p.id];
   function d(k,v){return '<dt>'+k+'</dt><dd>'+(v?esc(v):'—')+'</dd>';}
   return '<article class="ficha'+(e.time&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')?' '+timeCls(e.time):'')+'">'+(n?'<div class="ftw">'+fotoGrande(p)+'<span class="pnum" title="pista '+n+'">'+n+'</span></div>':fotoGrande(p))+'<div class="bd"><div class="hd"><span class="tag">'+(e.tx?esc(txNome(t,e.tx)):'–')+'</span><div><h4>'+esc(p.nome)+'</h4><div class="sub">'+esc(papelTxt(p))+(e.time?' · '+timeNome(e.time):'')+(ch?' · colinha '+ch:'')+'</div></div></div>'+
-    '<dl>'+'<dt>Cápsula</dt><dd>'+(e.cap?bolinha(e.cap)+esc(e.cap)+(corDe(e.cap)?' ('+corDe(e.cap)+')':'')+(capInv(e.cap)?' '+invIcon(e.cap,1)+' inverter no TX':'')+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?' + adaptador → '+esc(k.ad):'';})():'—')+'</dd>'+d('Receptor',t?rxTxt(t):'')+d('Canal',t?t.canal:'')+d('Freq. MHz',t?mhz(t.freq):'')+d('Bloco',t?t.bloco:'')+d('Modulação',t?t.mod:'')+(t&&t.cod?d('Código',t.cod):'')+
+    (t?'<div class="io"><div><small>Gravador</small><b>'+(t.canal?esc(t.canal):'—')+'</b></div><div><small>Receptor</small><b>'+rxIoTxt(t)+'</b></div></div>':'')+'<dl>'+'<dt>Cápsula</dt><dd>'+(e.cap?bolinha(e.cap)+esc(e.cap)+(capInv(e.cap)?' '+invIcon(e.cap,1):'')+(function(){var k=compatCap(D.capPor[e.cap],t);return k.ok&&k.ad?' + adaptador → '+esc(k.ad):'';})():'—')+'</dd>'+d('Freq. MHz',t?mhz(t.freq):'')+d('Bloco',t?t.bloco:'')+(t&&(t.mod||t.cod)?'<div class="tec">'+[t.mod?esc(t.mod):'',t.cod?'código '+esc(t.cod):''].filter(Boolean).join(' · ')+'</div>':'')+
     (p.papel==='MENTOR'&&t&&t.rxM?'<div class="nota">Sala dos mentores: '+esc(t.rxM)+' · '+esc(t.canalM)+'</div>':'')+
     (e.obs?'<div class="nota">'+esc(e.obs)+'</div>':'')+'</dl></div></article>';
 }

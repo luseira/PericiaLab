@@ -26,6 +26,9 @@
 
 
 
+## v1.85 · 12/11/2026
+- Input list em fichas: o input do gravador e o receptor (com o canal do receptor) ganham destaque, em caixas no topo de cada ficha. Modulação (compatibilidade) e código vão para uma linha pequena no rodapé. A cor da cápsula fica só na bolinha, e a polaridade só no ícone Ø.
+
 ## v1.84 · 11/11/2026
 - RF: a numeração amarela segue a ordem escolhida (frequência, transmissor ou pista do gravador), e o gráfico usa os mesmos números da tabela.
 
