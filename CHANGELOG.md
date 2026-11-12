@@ -26,6 +26,11 @@
 
 
 
+## v1.90 · 12/11/2026
+- Gooseneck com entrada fixa MIC 15 (aba Elenco › Entrada; Transmissores/Receptores: canal "MIC 15" no lugar de "MIC PH48"). Escolher o Gooseneck na pista 15 já põe o input; escolher IN 15 mantém o nome GOOSE.
+- Canal: botões Mic e 48V ao lado do Source, para entradas analógicas (Adc). Gravam InputPreamps.isMicN e phantomOnN do input físico. Ligar 48V liga Mic; passar para Line desliga 48V. isMicN confirmado; phantomOnN marcado com *, a confirmar num arquivo real.
+- PDF em dossiê: o número 0412 virou a data, escolhida em "Data do PDF" ao lado do botão de imprimir (padrão: hoje).
+
 ## v1.89 · 12/11/2026
 - PDF/impressão em estilo dossiê: fontes Special Elite e Courier Prime, carimbo CONFIDENCIAL no topo de cada página, título "DOSSIÊ Nº 0412" e linha tracejada. A tela não muda. O botão de imprimir espera as fontes carregarem (até 2,5 s).
 

@@ -485,6 +485,8 @@ table.rota td,table.rota th{padding:.22rem .3rem}
 .strip.colavel{outline:2px dashed var(--accent);outline-offset:1px}
 .armtxt{color:var(--bad)}
 .mresumo{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0 0;font-size:.86rem}
+.dosdata{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;color:var(--ink2);margin-right:.4rem}
+.dosdata input{font:inherit;padding:.15rem .3rem;border:1px solid var(--line);border-radius:6px}
 
 /* PDF em estilo dossiê (só na impressão/exportação) */
 @media print{
@@ -494,7 +496,6 @@ table.rota td,table.rota th{padding:.22rem .3rem}
   .doc table.tab,.doc .ficha dl,.doc .ficha .tec,.doc .ficha .nota,.doc .dochead p,.doc .dochead .r{font-family:'Courier Prime',monospace}
   .doc .dochead{border-bottom:2px dashed #1a1a1a}
   .doc .dochead h1{font-family:'Special Elite',monospace;font-weight:400;text-transform:uppercase;line-height:1.25}
-  .doc .dochead h1::before{content:'DOSSIÊ Nº 0412 · ';color:#8a1c1c}
   .doc .ficha h4,.doc table.tab td.n,.doc .ficha .io b,.doc .tag{font-family:'Special Elite',monospace;font-weight:400}
   .doc .ficha{border-style:solid;box-shadow:2px 2px 0 rgba(0,0,0,.15)}
   .doc .ficha .ft{filter:grayscale(.35) contrast(1.05)}
@@ -615,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.89 · 12/11 16:15</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.90 · 12/11 16:50</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1012,7 +1013,15 @@ function rxIoTxt(t){
   return esc(r.id);
 }
 /* garante as fontes do dossiê carregadas antes de imprimir (só são usadas no PDF) */
+/* data do dossiê: escolhida na barra (padrão: hoje), vai no título do PDF */
+function hojeIso(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dataDos(){return UI.dataDos||hojeIso();}
+function dataDosTxt(){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(dataDos());return m?m[3]+'/'+m[2]+'/'+m[1]:dataDos();}
+function dataDosHtml(){return '<label class="dosdata noprint" title="Data que aparece no título do PDF (dossiê)">Data do PDF <input type="date" data-act="dosdata" value="'+esc(dataDos())+'"></label>';}
+function dosEstilo(){var st=document.getElementById('dosdata-css');if(!st){st=document.createElement('style');st.id='dosdata-css';document.head.appendChild(st);}
+  st.textContent="@media print{.doc .dochead h1::before{content:'DOSSIÊ · "+dataDosTxt()+" · ';color:#8a1c1c}}";}
 function imprimir(){
+  dosEstilo();
   var ok=function(){window.print();};
   try{
     if(!document.fonts||!document.fonts.load)return ok();
@@ -1187,7 +1196,7 @@ function secao(k,tit,sub,padrao,corpo){var ab=UI.secs&&k in UI.secs?UI.secs[k]:p
 function viewDoc(){
   var I=linhasIL(UI.fmt!=='fichas'),fich=UI.fmt==='fichas',s=situacao(UI.ep);
   var h='<div class="bar noprint"><span class="seg" role="group" aria-label="Formato"><button type="button" data-act="fmt" data-v="lista" aria-pressed="'+!fich+'">Lista</button><button type="button" data-act="fmt" data-v="fichas" aria-pressed="'+fich+'">Fichas</button></span>'+
-    selCenaIL()+'<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+    selCenaIL()+'<span class="sp"></span><button class="btn" type="button" data-act="whats">Copiar para WhatsApp</button>'+dataDosHtml()+'<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(s.graves)h+='<div class="banner err noprint">A escalação tem '+s.graves+' problema(s). Confira no Carômetro antes de imprimir.</div>';
   if(fich)h+='<style>@page{size:A4 landscape;margin:20mm 10mm 10mm}</style>';
   h+='<section class="doc il"><div class="dochead"><div><h1>Perícia Lab · Input list</h1><p>Cena "'+esc(I.c.nome)+'" · EP '+UI.ep+' · '+I.L.length+' pistas</p></div><div class="r">Frequências do report de '+esc(ultimoReport()||'—')+'<br>Gerado em '+agora()+'</div></div>';
@@ -1235,7 +1244,7 @@ function viewDev(){
   var txs=D.tx.filter(function(t){return t.dev===ep;});
   var rxs=D.rx.filter(function(r){return r.dev===ep;});
   var caps=D.cap.filter(function(c){return c.dev===ep;});
-  h+='<div class="bar"><span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir</button></div>';
+  h+='<div class="bar"><span class="sp"></span>'+dataDosHtml()+'<button class="btn pri" type="button" data-act="print">Imprimir</button></div>';
   h+='<section class="doc"><div class="dochead"><div><h1>Separar ao final do EP '+ep+'</h1><p>Equipamento que volta para o dono depois deste episódio</p></div><div class="r">Gerado em '+agora()+'</div></div>';
   if(!txs.length&&!rxs.length&&!caps.length)h+='<p>Nada para devolver depois do EP '+ep+'.</p>';
   else{
@@ -1537,7 +1546,7 @@ function lapis(act,aba,valor,extra){return '<button class="btn sm lp" type="butt
 var CAMPOS_ENTRADA=[['Receptor','Equipamento (receptor ou fonte)'],['Modelo','Modelo'],['Canal do receptor','Canal do receptor','num'],['Input do Scorpio','Input do Scorpio (número)','num'],['Canal no gravador','Canal no gravador (ex.: AES 1, LINE 2, MIC 15)'],['Conector','Conector no Scorpio (ex.: XLR F, TA3F)'],['Cabo','Cabo (ex.: TA3F → XLR M)'],['Observações','Observações','long']];
 var CAMPOS_SAIDA=[['Saída','Saída do Scorpio (ex.: X1, L, HP, AES OUT)'],['Conector','Conector no Scorpio (ex.: TA3M, XLR M)'],['Cabo','Cabo (ex.: TA3F → XLR M)'],['Destino','Destino (equipamento)'],['Entrada no destino','Entrada no destino (ex.: input 1)'],['Nível','Nível',"select",[['',''],['Line','Line'],['Mic','Mic'],['AES','AES'],['Fone','Fone'],['Dante','Dante']]],['Observações','Observações','long']];
 function viewCon(){
-  var h='<div class="bar noprint"><h2 style="margin:0">Conexões físicas</h2><span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  var h='<div class="bar noprint"><h2 style="margin:0">Conexões físicas</h2><span class="sp"></span>'+dataDosHtml()+'<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(!podeEditar())h+='<div class="banner noprint">Para editar daqui, atualize o Apps Script para a versão 1.41 (Nova versão). Por enquanto só leitura.</div>';
   var rx=(D.raw.rx||[]).filter(function(o){return str(o['Receptor']);}).slice().sort(function(a,b){return (int(a['Input do Scorpio'])||99)-(int(b['Input do Scorpio'])||99)||nat(str(a['Canal no gravador']),str(b['Canal no gravador']));});
   var s=situacao(UI.ep);
@@ -1569,7 +1578,7 @@ function colsInv(aba){
   return [['Item','Item'],['Categoria','Categoria'],['Modelo','Modelo'],['Serial','Serial'],['Qtd','Qtd','num'],['Dono','Dono'],['Devolve após EP','Devolve','select',eps],['Observações','Observações','long']];
 }
 function viewInv(){
-  var t=UI.invt||'tx',h='<div class="bar noprint"><span class="seg" role="group" aria-label="Inventário">'+INVT.map(function(x){return '<button type="button" data-act="invt" data-v="'+x[0]+'" aria-pressed="'+(t===x[0])+'">'+x[1]+'</button>';}).join('')+'</span><span class="sp"></span><button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+  var t=UI.invt||'tx',h='<div class="bar noprint"><span class="seg" role="group" aria-label="Inventário">'+INVT.map(function(x){return '<button type="button" data-act="invt" data-v="'+x[0]+'" aria-pressed="'+(t===x[0])+'">'+x[1]+'</button>';}).join('')+'</span><span class="sp"></span>'+dataDosHtml()+'<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   if(t==='dev')return h+viewDev();
   if(!podeEditar())h+='<div class="banner noprint">Para editar daqui, atualize o Apps Script para a versão 1.41 (Nova versão). Por enquanto só leitura.</div>';
   var ch=CHAVES[t],L=((D.raw&&D.raw[t])||[]).filter(function(o){return str(o[ch]);});
@@ -1644,7 +1653,7 @@ function viewRf(){SCAN=scanDaPlanilha()||SCAN;
   var T=txsRf(),h='<div class="bar noprint"><h2 style="margin:0">RF</h2><span class="sp"></span>'+
     '<label class="btn">Importar scan (.csv)<input type="file" accept=".csv,.txt,text/csv" data-act="scan" class="sr"></label>'+
     '<label class="btn">Importar report (.html)<input type="file" accept=".html,.htm,text/html" data-act="report" class="sr"></label>'+
-    '<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
+    ''+dataDosHtml()+'<button class="btn pri" type="button" data-act="print">Imprimir / PDF</button></div>';
   /* ordem da tabela: frequência (padrão), número do transmissor ou pista do gravador (cena Todos juntos) */
   var ord=UI.rford||'freq',pis=pistasRf();
   h+='<div class="bar noprint"><span class="seg" role="group" aria-label="Ordenar">'+[['freq','Frequência'],['tx','Transmissor'],['pista','Pista do gravador']].map(function(o){return '<button type="button" data-act="rford" data-v="'+o[0]+'" aria-pressed="'+(ord===o[0])+'">'+o[1]+'</button>';}).join('')+'</span></div>';
@@ -1972,7 +1981,7 @@ function viewMix(){
   if(CENAOP)h+=cenaOpHtml(L,c);
   h+='<div class="bar">'+
     '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="tx"'+(c.ordem!=='alfa'?' selected':'')+'>Transmissor</option><option value="alfa"'+(c.ordem==='alfa'?' selected':'')+'>Alfabética</option></select></label>'+
-    '<span class="sp"></span><button class="btn sm" type="button" data-act="mreaper" title="Arquivo com nome e cor das pistas 1–16 para o script do Reaper">⤓ Exportar para o Reaper</button><a class="btn sm" href="reaper/PericiaLab_Reaper.lua" download title="Instalar uma vez no Reaper: Actions › Load ReaScript">Script do Reaper</a><button class="btn sm" type="button" data-act="mcolauto" title="Volta as pistas 17–32 para a ordem automática (por transmissor)">↺ Refazer colinha</button><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button><button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
+    '<span class="sp"></span><button class="btn sm" type="button" data-act="mreaper" title="Arquivo com nome e cor das pistas 1–16 para o script do Reaper">⤓ Exportar para o Reaper</button><a class="btn sm" href="reaper/PericiaLab_Reaper.lua" download title="Instalar uma vez no Reaper: Actions › Load ReaScript">Script do Reaper</a><button class="btn sm" type="button" data-act="mcolauto" title="Volta as pistas 17–32 para a ordem automática (por transmissor)">↺ Refazer colinha</button><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button>'+dataDosHtml()+'<button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
   h+='<div class="busca noprint"><input type="search" id="mbusca" data-act="mbusca" value="'+esc(MBUSCA)+'" placeholder="Achar no mixer: nome, TX, canal, cápsula…" aria-label="Buscar no mixer" autocomplete="off">'+
     '<button class="btn sm'+(MVARIOS?' pri':'')+'" type="button" data-act="mvarios" title="Tocar em várias pistas para selecionar (no computador: Shift ou Ctrl + clique)">☐ Selecionar vários</button>'+
     '<span class="undo"><button class="btn sm" type="button" data-act="mundo" title="Desfazer (Ctrl+Z)"'+(UNDO.length?'':' disabled')+'>↶ Desfazer</button><button class="btn sm" type="button" data-act="mredo" title="Refazer (Ctrl+Shift+Z)"'+(REDO.length?'':' disabled')+'>↷ Refazer</button></span>'+
@@ -2417,7 +2426,7 @@ function nomeArquivoPista(s,M){return s.p?nomePista(s.p).slice(0,16):s.fx?semAce
 function comparar(R,M,A){
   var L=[];function add(onde,campo,cena,grav){if(String(cena)!==String(grav))L.push([onde,campo,cena,grav]);}
   function rt(v){return ROTA_TXT[v||''];}
-  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');xComparar(add,on,'ch',n,c,XCH.concat(n<=16?XEQ:[]));if(!s.tok)return; /* pista vazia: fica como no arquivo */
+  R.S.forEach(function(s){var n=s.n,c=M.ch[n],a=A.ch[n],on='Ch '+n+(s.p?' '+nomePista(s.p):'');PRE_ADC[n]=s.tok&&s.cn?(fonteSlot(s)||undefined):undefined;xComparar(add,on,'ch',n,c,XCH.concat(n<=16?XEQ:[]));if(!s.tok)return; /* pista vazia: fica como no arquivo */
     add(on,'Nome',nomeArquivoPista(s,M),A.nomes[n]);
     add(on,'Fonte',s.cn?(fonteSlot(s)?fonteTxt(fonteSlot(s)):s.cn+' (código a confirmar)'):'sem fonte',fonteTxt(A.fonte[n]));
     add(on,'ON',c.on?'sim':'não',a.on?'sim':'não');add(on,'ARM',c.arm?'sim':'não',a.arm?'sim':'não');if(a.iso==='post')add(on,'ISO','pré (sempre)','pós');
@@ -2460,6 +2469,7 @@ function exportar(c,R,M,nome){
   var m=sjParse(SC.txt),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
   var srcAntes={};SAIDAS.forEach(function(o){srcAntes[o]=srcDoArquivo(sjGet(m,['AnalogOutputs',o,'source']),+sjGet(m,['AnalogOutputs',o,'chan']));});
   R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
+    PRE_ADC[n]=s.tok&&s.cn?(fonteSlot(s)||undefined):undefined;
     xExport(m,'ch',n,ch,XCH.concat(n<=16?XEQ:[]));
     /* pista vazia na cena: nome e fonte ficam como no arquivo base, mas ARM, mute e envios seguem a cena
        (antes ficavam do arquivo: um canal armado e aberto no gravador continuava gravando e somando na mix) */
@@ -2562,7 +2572,10 @@ function cliqueMesa(a,el){
     setX(al,al==='ch'?+id:id,kx,cv==null?true:cv===true?false:null);return true;}
   if(a==='mxt'){var al3=el.dataset.alvo,id3=el.dataset.id,k3=el.dataset.k,c3=cenaAtual(),M3=mesaEf(c3,resolver(c3,UI.ep)),ob3=al3==='ch'?M3.ch[+id3]:al3==='bus'?M3.bus[id3]:M3.out[id3];
     var f3=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k3;})[0],e3=xEf(al3,al3==='ch'?+id3:id3,f3,ob3),nv=!e3.v;
-    setX(al3,al3==='ch'?+id3:id3,k3,e3.arq!==null&&nv===e3.arq?null:nv);return true;}
+    setX(al3,al3==='ch'?+id3:id3,k3,e3.arq!==null&&nv===e3.arq?null:nv);
+    /* phantom só existe no modo Mic: ligar o 48V liga o Mic; passar para Line desliga o 48V */
+    if(al3==='ch'&&(k3==='p48'&&nv||k3==='mic'&&!nv)){var k5=k3==='p48'?'mic':'p48',f5=XCH.filter(function(f){return f[0]===k5;})[0],e5=xEf('ch',+id3,f5,ob3),v5=k3==='p48';if(e5.v!==v5)setX('ch',+id3,k5,e5.arq!==null&&v5===e5.arq?null:v5);}
+    return true;}
   if(a==='mxc'){var al4=el.dataset.alvo,id4=el.dataset.id,k4=el.dataset.k,c4=cenaAtual(),M4=mesaEf(c4,resolver(c4,UI.ep)),ob4=al4==='ch'?M4.ch[+id4]:al4==='bus'?M4.bus[id4]:M4.out[id4];
     var f4=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k4;})[0],e4=xEf(al4,al4==='ch'?+id4:id4,f4,ob4),op4=(f4[3]==='m3'?[['off'],['pre'],['post']]:f4[7]).map(function(o){return o[0];});
     var nx=op4[(op4.indexOf(e4.v)+1)%op4.length];setX(al4,al4==='ch'?+id4:id4,k4,e4.arq!==null&&nx===e4.arq?null:nx);return true;}
@@ -2658,7 +2671,7 @@ function sdNav(solo){
 /* ───── ajustes extras do gravador (manual do Scorpio, cap. 4, 6.5 e 6.6.1) ─────
    Cada campo: [chave, rótulo, campo no settings, tipo, mín, máx, unidade, opções]. Tipos: n (número), n10 (décimos no arquivo),
    b (liga/desliga), bi (liga = campo falso), e (lista), m3 (Off/Pre/Post, composto). Valor vazio = não mexer no gravador. */
-var XCH=[['lim','Limiter','*lim','b'],['link','Link','*chlink','e',0,0,'',[['Unlinked','Off'],['Stereo','Stereo'],['MS','MS']]],['fad','Fader','faderdB10ths','n10',-127.5,16,'dB'],['pan','Pan (L −100 · C 0 · R +100)','lrPanPercentage','n',-100,100,'%'],['mix','Automix','duganEnabled','b'],
+var XCH=[['lim','Limiter','*lim','b'],['link','Link','*chlink','e',0,0,'',[['Unlinked','Off'],['Stereo','Stereo'],['MS','MS']]],['fad','Fader','faderdB10ths','n10',-127.5,16,'dB'],['pan','Pan (L −100 · C 0 · R +100)','lrPanPercentage','n',-100,100,'%'],['mix','Automix','duganEnabled','b'],['mic','Mic (preamp)','*mic','b'],['p48','Phantom 48V','*p48','b'],
   ['cmode','Compressor','*comp','m3'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
 var XEQ=[['emode','EQ','*eq','m3'],
   ['lfon','LF ativo','lowEqBypassed','bi'],['lfhz','LF freq.','lowEqCutoffHz','n',20,20000,'Hz'],['lfg','LF ganho','lowEqGaindB10ths','n10',-24,24,'dB'],['lfq','LF Q','lowEqQ','n',0.5,10,''],['lft','LF tipo','lowEqType','e',0,0,'',[['lowshelf','Shelf'],['peaking','Peak']]],
@@ -2668,6 +2681,10 @@ var XBUS=[['blink','Link','*blink','b'],['arm','Arm','arm','b'],['gain','Gain','
   ['sL','Mix L entra no bus','hasBusL','b'],['sR','Mix R entra no bus','hasBusR','b'],['s1','Bus 1 entra no bus','hasBus1','b'],['s2','Bus 2 entra no bus','hasBus2','b'],
   ['comp','Compressor','compressorEnabled','b'],['cthr','Threshold','compressorThreshold10ths','n10',-40,0,'dB'],['crat','Ratio','compressorRatio10ths','n10',1,20,':1'],['catt','Attack','compressorAttackMs','n',1,200,'ms'],['crel','Release','compressorReleaseMs','n',50,1000,'ms']];
 var XOUT=[['mute','Mute','muted','b'],['link','Link com o par','*link','b'],['rmute','Record Mute','*am4','b'],['smute','Stop Mute','*am1','b'],['pmute','Play Mute','*am2','b']];
+/* pré do input físico (InputPreamps.isMicN / phantomOnN) do canal n: N = número do Adc da fonte do canal.
+   isMicN confirmado (PL 1111 v1: input 15 em Mic). phantomOnN ainda não visto ligado num arquivo real: * */
+var PRE_ADC={};
+function adcCh(n){var f=PRE_ADC[n];if(f===undefined){var sc=scCarregar();f=sc?sjGet(sc.m,['InputChannel'+n,'inputSrcName']):'';}var m=/^Adc(\d+)$/.exec(f||'');return m?+m[1]:0;}
 function xBase(alvo,id){return alvo==='ch'?['InputChannel'+id]:alvo==='bus'?['OutputBusControl','obus'+id]:['AnalogOutputs',id];}
 /* pares de bus que o gravador aceita linkar: L-R, 1-2, 3-4, 5-6, 7-8, 9-10 (teste de 06/11) */
 function parBus(b){if(b==='L'||b==='R')return ['L','R'];var n=+b;if(!n)return null;return n%2?[String(n),String(n+1)]:[String(n-1),String(n)];}
@@ -2676,6 +2693,7 @@ function parOut(k){var m=/^X(\d+)$/.exec(k);if(!m)return null;var n=+m[1];return
 function xArq(alvo,id,f){var sc=scCarregar();if(!sc)return null;var b=xBase(alvo,id),m=sc.m;
   if(f[2]==='*comp'){var en=sjGet(m,b.concat('compressorEnabled'));return !en?'off':sjGet(m,b.concat('compressorPreFader'))?'pre':'post';}
   if(f[2]==='*eq'){var e2=sjGet(m,b.concat('eqEnabled'));return !e2?'off':sjGet(m,b.concat('eqPreFader'))?'pre':'post';}
+  if(f[2]==='*mic'||f[2]==='*p48'){var ad=alvo==='ch'?adcCh(+id):0;if(!ad)return null;var vv=sjGet(m,['InputPreamps',(f[2]==='*mic'?'isMic':'phantomOn')+ad]);return vv===undefined?null:!!vv;}
   if(f[2]==='*lim')return !!(sjGet(m,b.concat('trimLimiterEnabled'))||sjGet(m,b.concat('faderLimiterEnabled'))||sjGet(m,b.concat('eqLimiterEnabled')));
   if(f[2]==='*chlink')return sjGet(m,b.concat('linkType'))||'Unlinked';
   if(f[2]==='*blink'){var lb=sjGet(m,b.concat('linkedToBus'));return !!lb&&lb!=='nOutBuses';}
@@ -2709,6 +2727,7 @@ function xExport(m,alvo,id,obj,specs){var b=xBase(alvo,id);specs.forEach(functio
   if(f[2]==='*comp'){sjSet(m,b.concat('compressorEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('compressorPreFader'),v==='pre');return;}
   if(f[2]==='*eq'){sjSet(m,b.concat('eqEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('eqPreFader'),v==='pre');return;}
   if(f[2]==='*blink'){var pb=parBus(id);if(!pb)return;pb.forEach(function(q){sjSet(m,['OutputBusControl','obus'+q,'linkedToBus'],v?'obus'+pb[0]:'nOutBuses');});return;}
+  if(f[2]==='*mic'||f[2]==='*p48'){var ad=alvo==='ch'?adcCh(+id):0;if(!ad)return;var kk=(f[2]==='*mic'?'isMic':'phantomOn')+ad;if(sjGet(m,['InputPreamps',kk])===undefined)return;sjSet(m,['InputPreamps',kk],!!v);return;}
   if(f[2]==='*lim'){['trimLimiterEnabled','faderLimiterEnabled','eqLimiterEnabled'].forEach(function(k){sjSet(m,b.concat(k),!!v);});return;}
   if(f[2]==='*chlink'){var n0=+id;if(n0%2!==1||n0>15)return;[n0,n0+1].forEach(function(q,i){sjSet(m,['InputChannel'+q,'linkType'],v);sjSet(m,['InputChannel'+q,'linkedToId'],v==='Unlinked'?-1:n0);
       if(v!=='Unlinked'&&!(obj&&obj.x_pan!=null))sjSet(m,['InputChannel'+q,'lrPanPercentage'],i?100:-100);});return;}
@@ -2756,7 +2775,8 @@ function painelSlot(R,M){
   h+=sdRow('Arm:',sdSw(!!ch.arm,'data-act="mled" data-n="'+n+'" data-k="arm"'));
   h+='<div class="sd-row sd-acts"><button class="sd-btn'+(COPIA?' sel':'')+'" type="button" data-act="mcopia">⧉ Copiar este canal…</button><button class="sd-btn" type="button" data-act="mlimpa" title="Tira a pessoa desta pista (tecla Delete)">Limpar canal</button><button class="sd-btn" type="button" data-act="mclipc" title="Ctrl+C">Copiar</button>'+(CLIP?'<button class="sd-btn" type="button" data-act="mclipv" title="Ctrl+V">Colar '+CLIP.it.length+' pista(s) a partir daqui</button>':'')+'</div>';
   h+='</div><div class="sd-col">';
-  h+=sdRow('Source:','<button type="button" class="sd-btn src'+(PICK==='src'?' sel':'')+'" data-act="mpick" data-v="src">'+esc(s.cn?s.cn:'escolher')+'</button>'+(/MIC/i.test(s.cn||'')?'<span class="sd-tag">48V</span>':''));
+  h+=sdRow('Source:','<button type="button" class="sd-btn src'+(PICK==='src'?' sel':'')+'" data-act="mpick" data-v="src">'+esc(s.cn?s.cn:'escolher')+'</button>'+(function(){PRE_ADC[n]=s.tok&&s.cn?(fonteSlot(s)||undefined):undefined;if(!adcCh(n)||!scCarregar())return '';
+    return ' '+xSk('ch',n,'mic',ch,'Mic',XCH)+xSk('ch',n,'p48',ch,'48V*',XCH);})());
   if(PICK==='src')h+=pickSrc(R,s);
   var hz=ch.hpf?ch.hpf:(ch.hpfhz||80);
   h+=sdRow('HPF:',sdNum('mhpfhz','hpfhz',ch.hpf===null||ch.hpf===undefined?(ch.hpfhz||''):hz,'Hz')+sdSw(ch.hpf==null?null:ch.hpf>0,'data-act="msw" data-k="hpf"'));
@@ -3120,6 +3140,7 @@ document.addEventListener('change',function(ev){
   else if(a==='copcena'&&COPCENA){COPCENA.alvos[el.value]=el.checked;renderModal();}
   else if(a==='copenv'&&COPCENA){COPCENA.env=el.checked;}
   else if(a==='cenail'){UI.cenaIL=el.value;salvarUi();render();}
+  else if(a==='dosdata'){UI.dataDos=el.value||null;salvarUi();dosEstilo();}
   else if(a==='elim'){fazer({acao:'eliminar',id:EDIT,ep:el.checked?UI.ep:''});renderModal();}
   else if(a==='scan'&&el.files[0]){var fsc=el.files[0];var rd=new FileReader();rd.onload=function(){var sc=lerScan(String(rd.result),fsc.name);if(!sc){toast('Não reconheci frequências e níveis nesse arquivo.',true);return;}SCAN=guardarScan(sc);try{localStorage.setItem('plc_scan',JSON.stringify(SCAN));}catch(e){}toast('Scan importado e guardado na planilha: '+SCAN.pts.length+' pontos');render();};rd.readAsText(fsc);}
   else if(a==='fotoeq'&&el.files[0]){var ab=el.dataset.aba,idq=el.dataset.id;reduzirFoto(el.files[0],function(url){fazer({acao:'fotoEquip',aba:ab,id:idq,base64:url.split(',')[1],mime:'image/jpeg',preview:url});renderModal();toast('Foto salva');});}
@@ -3150,7 +3171,7 @@ document.addEventListener('keydown',function(ev){
 });
 document.addEventListener('toggle',function(ev){var d=ev.target;if(!d||!d.dataset||!d.dataset.sec||IMPRIMINDO)return;UI.secs=UI.secs||{};UI.secs[d.dataset.sec]=d.open;salvarUi();},true);
 var IMPRIMINDO=false,FECHADAS=[];
-window.addEventListener('beforeprint',function(){IMPRIMINDO=true;FECHADAS=[].slice.call(document.querySelectorAll('details.sec:not([open])'));FECHADAS.forEach(function(d){d.open=true;});});
+window.addEventListener('beforeprint',function(){try{dosEstilo();}catch(e){}IMPRIMINDO=true;FECHADAS=[].slice.call(document.querySelectorAll('details.sec:not([open])'));FECHADAS.forEach(function(d){d.open=true;});});
 window.addEventListener('afterprint',function(){FECHADAS.forEach(function(d){d.open=false;});FECHADAS=[];setTimeout(function(){IMPRIMINDO=false;},50);});
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&MODO==='api')buscar();});
 
