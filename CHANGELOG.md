@@ -26,6 +26,9 @@
 
 
 
+## v1.94 · 14/11/2026
+- Mixer: botão ⇄ na linha de resumo troca a posição dos times — quem ocupa as pistas 4–8 e quem fica nas 9–13 (bloco da Clara/633). Padrão: azul na frente. A escolha fica no aparelho e vale para o mixer, o input list e o export.
+
 ## v1.93 · 14/11/2026
 - Canal: o preamp virou uma escolha só, como no gravador: Line, Mic ou Mic+48V (antes eram dois botões on/off).
 
