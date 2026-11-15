@@ -26,6 +26,9 @@
 
 
 
+## v2.01 · 15/11/2026
+- Acaba o aviso "sem cápsula" para o gooseneck e para as mixes que entram por entrada fixa: o gooseneck é o próprio microfone e as mixes são retorno de linha.
+
 ## v2.00 · 15/11/2026
 - O botão ⇄ agora troca os times de lugar de verdade: as pistas que estavam com um time passam a ter o outro, na mesma ordem interna. Funciona em qualquer cena, inclusive nas que usam posições da colinha (C:n), e muda a cena, então vale para o input list e para o export.
 - As faixas acima das pistas passam a dizer o time que está de fato em cada bloco, com a contagem; quando os dois se misturam, mostra a contagem de cada um.

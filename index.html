@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.00 · 15/11 21:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.01 · 15/11 22:05</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -850,7 +850,7 @@ function situacao(ep){
       if(t&&t.dev&&ep>t.dev)av.push({k:'bad',t:'TX '+t.num+' foi devolvido após o EP '+t.dev,trocar:true});
       if(e&&e.tx&&uso.tx[e.tx]&&uso.tx[e.tx].length>1)av.push({k:'bad',t:'TX '+e.tx+' repetido'});
       if(e&&e.cap&&uso.cap[e.cap]&&uso.cap[e.cap].length>1)av.push({k:'bad',t:'cápsula '+e.cap+' repetida'});
-      if(!e||!e.cap)av.push({k:'pend',t:'sem cápsula'});
+      if(!p.entrada&&(!e||!e.cap))av.push({k:'pend',t:'sem cápsula'}); /* gooseneck é o próprio microfone e as mixes entram em linha: não têm cápsula para escolher */
       var c=e&&e.cap?D.capPor[e.cap]:null;
       var cc=c&&t?compatCap(c,t):{ok:true};
       if(!cc.ok)av.push({k:'bad',t:'cápsula '+c.id+': '+cc.motivo,c:'cápsula incompatível'});
