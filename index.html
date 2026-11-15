@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.95 · 15/11 20:30</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.96 · 15/11 20:45</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1304,7 +1304,7 @@ function fotoEquip(tipo,o){
   return '<svg viewBox="0 0 60 80" aria-hidden="true"><path d="M30 34 C 30 52, 18 58, 22 76" stroke="'+cc+'" stroke-width="3" fill="none"/><rect x="24" y="14" width="12" height="22" rx="6" fill="'+cc+'" stroke="rgba(0,0,0,.35)"/></svg>';
 }
 /* fotos de referência por modelo (pasta img/tx do site); a foto de cada aparelho, se houver, tem prioridade */
-var CAP_FOTOS=['AD MicroDot-Lemo','AD MicroDot-TA5F','DPA 4060','DPA 6061 B','DPA 6060','DPA 6061 P','COS11 P','COS11 R','COS11 N','COS11 B','TL47 2','TL47 B'];
+var CAP_FOTOS=['AD MicroDot-Lemo','AD MicroDot-TA5F','DPA 4060','DPA 6061 B','DPA 6060','DPA 6061 P','COS11 P','COS11 R','COS11 N','COS11 B','TL47 2','TL47 B','B3 Clara'];
 function imgModeloTx(m){m=String(m||'');return /DBSMD|SMDB/i.test(m)?'img/tx/dbsmd.webp':/^SMQV|^SMV\b/i.test(m)?'img/tx/smqv.webp':/^SSM/i.test(m)?'img/tx/ssm.webp':/^UM(400|200)/i.test(m)?'img/tx/um.webp':/^A10/i.test(m)?'img/tx/a10.webp':'';}
 var COR_BLOCO={19:'#16181c',20:'#16181c',21:'#6e4424',22:'#d0302a',23:'#ee7a1c',24:'#f2c81a',25:'#2c9a49',26:'#2766cf',27:'#b058d6',28:'#8a8f98',29:'#f4f4f4',470:'#16181c'};
 function blocoNum(t){if(!t||isNaN(t.freq)||!LECTRO.test(t.modelo||''))return 0;return Math.floor((Math.round(t.freq*1000)+1e-6)/25600);}
