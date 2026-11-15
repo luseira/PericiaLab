@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.96 · 15/11 20:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.97 · 15/11 21:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -938,7 +938,7 @@ function epBar(cur){
 function corDe(id){var c=D.capPor[id];return c&&/^(bege|preto|marrom)$/.test(c.cor)?c.cor:'';}
 /* nome sem a letra da cor (COS11 B bege → COS11): a cor aparece na bolinha e no fundo */
 /* nome curto da cápsula: só o modelo (COS11 B → COS11, COS11D R → COS11D, TL47 2 → TL47); a cor vai na caixa */
-function capNome(id){var c=D.capPor[id];if(!c)return id;if(c.tipo!=='lapela')return c.id;var m=/^(.*\S)\s+[A-Z0-9]$/i.exec(c.id);return m?m[1]:c.id;}
+function capNome(id){var c=D.capPor[id];if(!c)return id;if(c.tipo!=='lapela'||!c.cor)return c.id; /* só encurta quando a bolinha de cor distingue as irmãs (COS11 P/B); sem cor, mostra o nome inteiro (Gold Clara 1/2) */ var m=/^(.*\S)\s+[A-Z0-9]$/i.exec(c.id);return m?m[1]:c.id;}
 /* cabo com marca vermelha (para distinguir duas cápsulas iguais) */
 function redMark(id){var c=D.capPor[id];return !!c&&(/red\s*mark|marca\s*vermelha/i.test([c.obs,c.modelo,c.cor,c.id].join(' '))||/^COS-?11D?\s+R$/i.test(c.id));}
 function capTag(id,cls){return '<span class="tag cap '+(corDe(id)||'semcor')+(cls?' '+cls:'')+'" title="'+esc(id)+'">'+esc(capNome(id))+(redMark(id)?'<i class="rm" title="marca vermelha"></i>':'')+'</span>';}

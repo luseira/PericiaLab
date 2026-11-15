@@ -26,6 +26,9 @@
 
 
 
+## v1.97 · 15/11/2026
+- Nome da cápsula só é encurtado quando há cor para distinguir (COS11 P/B). Sem cor, aparece inteiro: Gold Clara 1 e Gold Clara 2 não ficam mais iguais na lista.
+
 ## v1.96 · 15/11/2026
 - Fotos das cápsulas da Clara (2 MKE2 Gold e 1 B3) no inventário, recortadas e com fundo limpo, no mesmo padrão das outras (480×480 webp em img/cap). O caminho de cada uma também vai na coluna Foto da aba Cápsulas, que agora existe e tem prioridade sobre o nome do arquivo.
 
