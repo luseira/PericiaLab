@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.94 · 14/11 23:50</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.95 · 15/11 20:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -677,8 +677,10 @@ UI.view='car';
 /* ───────── dados ───────── */
 /* times: guardados como Vermelho/Azul (aceita A/B antigos); internamente A=Vermelho, B=Azul */
 function normTime(v){var t=str(v).toLowerCase();if(/^az/.test(t)||t==='b')return 'B';if(/^verm/.test(t)||t==='a'||t==='v')return 'A';return '';}
-var TIMES={A:{nome:'Time A',cls:'tv',grava:'A'},B:{nome:'Time B',cls:'tz',grava:'B'}};
+var TIMES={A:{nome:'Time A',cls:'tv',grava:'A',mentor:'Thelma'},B:{nome:'Time B',cls:'tz',grava:'B',mentor:'Salada'}};
 function timeNome(t){return TIMES[t]?TIMES[t].nome:'';}
+function timeMentor(t){return TIMES[t]?TIMES[t].mentor:'';}
+function outroTime(t){return t==='A'?'B':'A';}
 function timeCls(t){return TIMES[t]?TIMES[t].cls:'';}
 function timeChip(t){return TIMES[t]?'<span class="chip '+TIMES[t].cls+'">'+TIMES[t].nome+'</span>':'';}
 /* ───────── códigos e grade de frequência ───────── */
@@ -1898,8 +1900,10 @@ function linhaMix(R,a,b,v,M){
   [[1,12,'CL-12'],[13,32,'só iPad']].forEach(function(z){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
-    var zl=i===1?timeNome('A')+' · Thelma ('+R.F.length+')':i===2?timeNome('B')+' · Salada ('+R.T.length+') · Clara':z[2];
-    h+='<span class="band zb z'+i+'" style="grid-row:'+(FAIXA_REAPER?3:2)+';grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
+    var tf=R.frente,tt=outroTime(tf),
+      zl=i===1?timeNome(tf)+' · '+timeMentor(tf)+' ('+R.F.length+')':i===2?timeNome(tt)+' · '+timeMentor(tt)+' ('+R.T.length+') · Clara':z[2],
+      zi=i===1?(tf==='A'?1:2):i===2?(tf==='A'?2:1):i;
+    h+='<span class="band zb z'+zi+'" style="grid-row:'+(FAIXA_REAPER?3:2)+';grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
   (function(){var x=Math.max(a,1),y=Math.min(b,REAPER_N);if(FAIXA_REAPER&&x<=y)h+='<span class="band rp" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'" title="Dante '+x+'–'+y+' pré-fader entram nas pistas '+x+'–'+y+' do Reaper">→ Reaper · Dante '+x+'–'+y+' · pré-fader</span>';})();
   S.forEach(function(s,i){h+='<span style="grid-row:'+(FAIXA_REAPER?4:3)+';grid-column:'+(i+1)+';display:flex;flex-direction:column">'+stripHtml(s,v,M)+'</span>';});
   return h+'</div>';
@@ -2811,8 +2815,8 @@ function painelSlot(R,M){
   var s=R.S[MSEL-1],n=MSEL,ch=M.ch[n],o='<option value="">Vazio</option>';
   ['A','B'].forEach(function(t){var L=R[t];
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
-  [['F','Time A (Thelma)'],['T','Time B (Salada)']].forEach(function(g){var L=R[g[0]];
-    o+='<optgroup label="'+g[1]+' · '+timeNome(g[0]==='F'?R.frente:(R.frente==='A'?'B':'A'))+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
+  [['F','Frente (4–8)'],['T','Atrás (9–13, Clara)']].forEach(function(g){var L=R[g[0]],tg=g[0]==='F'?R.frente:outroTime(R.frente);
+    o+='<optgroup label="'+g[1]+' · '+timeNome(tg)+' ('+timeMentor(tg)+')">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   o+='<optgroup label="Colinha (ordem de transmissor)">'+Array.apply(null,{length:COL_N}).map(function(_,i){return i+1;}).map(function(k){var tk=R.C[k-1]||'',mm=/^P:(.+)$/.exec(tk),nm=mm&&D.pPor[mm[1]]?D.pPor[mm[1]].nome:tk.replace(/^S:/,'');return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(nm?' ('+esc(nm)+')':'')+'</option>';}).join('')+'</optgroup>';
   o+='<optgroup label="Pessoa ou fonte fixa">'+D.elenco.map(function(p){return '<option value="P:'+esc(p.id)+'"'+(s.tok==='P:'+p.id?' selected':'')+'>'+esc(p.nome)+'</option>';}).join('')+'</optgroup>';
   var p=s.p,e=s.e||{},t=s.t,fonte=s.cn?fonteSlot(s):'';

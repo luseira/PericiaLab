@@ -26,6 +26,10 @@
 
 
 
+## v1.95 · 15/11/2026
+- As faixas acima das pistas (Time A · Thelma / Time B · Salada · Clara) agora seguem o botão ⇄: nome, contagem e cor acompanham o time que está em cada bloco. Antes ficavam fixas e pareciam que nada tinha mudado.
+- No seletor de pista, as opções de time viraram "Frente (4–8)" e "Atrás (9–13, Clara)", com o time e o mentor de cada bloco.
+
 ## v1.94 · 14/11/2026
 - Mixer: botão ⇄ na linha de resumo troca a posição dos times — quem ocupa as pistas 4–8 e quem fica nas 9–13 (bloco da Clara/633). Padrão: azul na frente. A escolha fica no aparelho e vale para o mixer, o input list e o export.
 
