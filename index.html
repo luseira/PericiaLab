@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.98 · 15/11 21:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.99 · 15/11 21:25</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2056,6 +2056,7 @@ function cliqueMix(a,el){
   if(a==='mgrp'){grupoAplicar(el.dataset.k,el.dataset.v);return true;}
   if(a==='mfechar'){MSEL=0;MSELS=[];MTROCA=false;render();return true;}
   if(a==='mtroca'){MTROCA=!MTROCA;render();return true;}
+  if(a==='mmv'){if(!MSEL)return true;var nv=MSEL+(+el.dataset.v);if(nv<1||nv>32)return true;trocarPistas(MSEL,nv);MSEL=nv;MTROCA=false;render();return true;}
   if(a==='mlimpa'){mudarPista(MSEL,'');return true;}
   if(a==='mcena'){UI.cena=el.dataset.v;MSEL=0;salvarUi();render();return true;}
   if(a==='mview'){UI.mixv=el.dataset.v;salvarUi();render();return true;}
@@ -2833,6 +2834,11 @@ function painelSlot(R,M){
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
   h+='<div class="sd-cols"><div class="sd-col">';
   h+=sdRow('Name:',p?'<span class="sd-in nome"><input type="text" id="mpista" data-act="mpistac" maxlength="14" value="'+esc(nomePista(p))+'"></span>':(s.fx?'<span class="sd-in nome"><input type="text" data-act="mfxnome" maxlength="14" value="'+esc(nomeFx(s,M))+'"></span>':'<span class="sd-dim">Ch '+n+'</span>'));
+  /* simular posições: mover a pista uma casa ou trocar com outra qualquer */
+  h+=sdRow('Posição:',sdK('◀',''+(n<=1?' off':''),'data-act="mmv" data-v="-1" title="Uma casa para a esquerda (troca com a pista '+(n-1)+')"'+(n<=1?' disabled':''))+
+    sdK('▶',''+(n>=32?' off':''),'data-act="mmv" data-v="1" title="Uma casa para a direita (troca com a pista '+(n+1)+')"'+(n>=32?' disabled':''))+
+    ' '+sdK('⇄ Trocar com…',MTROCA?'on':'','data-act="mtroca" title="Toque aqui e depois em outra pista para trocar as duas de lugar"')+
+    (MTROCA?' <i class="sd-dim">toque na outra pista</i>':''));
   var auto=/^[ABCFT]:/.test(s.tok)?rotuloTok(s.tok):'';
   h+=sdRow('Quem:','<button type="button" class="sd-btn'+(PICK==='nome'?' sel':'')+'" data-act="mpick" data-v="nome">'+esc(p?primeiroNome(p):'— escolher —')+'</button>'+(auto?'<i class="sd-dim" title="Esta pista segue automaticamente a ordem do time/colinha">auto: '+esc(auto)+'</i>':''));
   if(PICK==='nome')h+=pickNome(R,s);

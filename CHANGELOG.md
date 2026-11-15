@@ -26,6 +26,9 @@
 
 
 
+## v1.99 · 15/11/2026
+- Tela do canal: linha "Posição" com ◀ ▶ (move a pista uma casa, trocando com a vizinha) e "⇄ Trocar com…" (toca em outra pista e as duas trocam de lugar). Serve para simular arranjos; a troca fica salva na cena.
+
 ## v1.98 · 15/11/2026
 - Cápsula mostra só a foto do próprio item. Antes, sem foto, ela pegava emprestada a de outra cápsula do mesmo modelo e cor. Sem foto, agora aparece o desenho.
 
