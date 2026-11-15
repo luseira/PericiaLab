@@ -26,6 +26,10 @@
 
 
 
+## v2.00 · 15/11/2026
+- O botão ⇄ agora troca os times de lugar de verdade: as pistas que estavam com um time passam a ter o outro, na mesma ordem interna. Funciona em qualquer cena, inclusive nas que usam posições da colinha (C:n), e muda a cena, então vale para o input list e para o export.
+- As faixas acima das pistas passam a dizer o time que está de fato em cada bloco, com a contagem; quando os dois se misturam, mostra a contagem de cada um.
+
 ## v1.99 · 15/11/2026
 - Tela do canal: linha "Posição" com ◀ ▶ (move a pista uma casa, trocando com a vizinha) e "⇄ Trocar com…" (toca em outra pista e as duas trocam de lugar). Serve para simular arranjos; a troca fica salva na cena.
 
