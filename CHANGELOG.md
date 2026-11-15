@@ -27,7 +27,7 @@
 
 
 ## v1.96 · 15/11/2026
-- Fotos das cápsulas da Clara (2 MKE2 Gold e 1 B3) no inventário, recortadas e com fundo limpo, no mesmo padrão das outras (480×480 webp em img/cap). O caminho de cada uma vai na coluna Foto da aba Cápsulas, porque os dois Golds têm nomes que geram o mesmo arquivo.
+- Fotos das cápsulas da Clara (2 MKE2 Gold e 1 B3) no inventário, recortadas e com fundo limpo, no mesmo padrão das outras (480×480 webp em img/cap). O caminho de cada uma também vai na coluna Foto da aba Cápsulas, que agora existe e tem prioridade sobre o nome do arquivo.
 
 ## v1.95 · 15/11/2026
 - As faixas acima das pistas (Time A · Thelma / Time B · Salada · Clara) agora seguem o botão ⇄: nome, contagem e cor acompanham o time que está em cada bloco. Antes ficavam fixas e pareciam que nada tinha mudado.
