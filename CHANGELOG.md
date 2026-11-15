@@ -26,6 +26,9 @@
 
 
 
+## v1.98 · 15/11/2026
+- Cápsula mostra só a foto do próprio item. Antes, sem foto, ela pegava emprestada a de outra cápsula do mesmo modelo e cor. Sem foto, agora aparece o desenho.
+
 ## v1.97 · 15/11/2026
 - Nome da cápsula só é encurtado quando há cor para distinguir (COS11 P/B). Sem cor, aparece inteiro: Gold Clara 1 e Gold Clara 2 não ficam mais iguais na lista.
 

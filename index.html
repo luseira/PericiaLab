@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.97 · 15/11 21:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.98 · 15/11 21:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1295,7 +1295,8 @@ function fotoEquip(tipo,o){
   var f=o.foto;
   if(!f&&tipo==='rx')f=/UCR411/i.test(o.modelo||'')?'img/rx/ucr411.webp':'';
   if(!f&&tipo==='tx')f=imgModeloTx(o.modelo); /* foto do modelo antes da foto de outro aparelho (ex.: SMQV da Clara) */
-  if(!f&&tipo!=='rx'){var L=tipo==='tx'?D.tx:D.cap;var irmao=L.filter(function(y){return y.foto&&y.modelo===o.modelo&&(tipo==='tx'||y.cor===o.cor);})[0];if(irmao)f=irmao.foto;}
+  /* cápsula mostra só a foto do próprio item; sem foto, fica o desenho. Transmissor ainda pode pegar a foto de outro aparelho do mesmo modelo */
+  if(!f&&tipo==='tx'){var irmao=D.tx.filter(function(y){return y.foto&&y.modelo===o.modelo;})[0];if(irmao)f=irmao.foto;}
   if(!f&&tipo==='tx')f=imgModeloTx(o.modelo);
   if(!f&&tipo==='cap'&&CAP_FOTOS.indexOf(o.id)>=0)f='img/cap/'+o.id.toLowerCase().replace(/\s+/g,'-')+'.webp';
   if(f)return '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">';
