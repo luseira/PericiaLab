@@ -26,6 +26,9 @@
 
 
 
+## v1.93 · 14/11/2026
+- Canal: o preamp virou uma escolha só, como no gravador: Line, Mic ou Mic+48V (antes eram dois botões on/off).
+
 ## v1.92 · 12/11/2026
 - Settings do Scorpio também vai para a planilha: ao carregar um .json na aba Scorpio, uma cópia comprimida (gzip + base64, ~10 KB) é salva na aba Cenas, linha `sc:arquivo`. Assim o Claude consegue ler o arquivo carregado, e outro aparelho sem arquivo local usa essa cópia. "Esquecer arquivo" vale só para esta sessão/aparelho.
 

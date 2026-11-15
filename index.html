@@ -616,7 +616,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.92 · 12/11 17:00</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v1.93 · 14/11 23:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2618,6 +2618,10 @@ function cliqueMesa(a,el){
   if(a==='moutsrc'){var oo=el.dataset.o,ov=el.dataset.v;mudarMesa(function(m){m.out[oo]=Object.assign({},m.out[oo]||{},{src:ov});});return true;}
   if(a==='mxs'){var al=el.dataset.alvo,id=el.dataset.id,kx=el.dataset.k,cX=cenaAtual(),MX=mesaEf(cX,resolver(cX,UI.ep)),ob=al==='ch'?MX.ch[+id]:al==='bus'?MX.bus[id]:MX.out[id],cv=ob?ob['x_'+kx]:null;
     setX(al,al==='ch'?+id:id,kx,cv==null?true:cv===true?false:null);return true;}
+  if(a==='mpre'){var np=+el.dataset.id,chp=(mesaEf(cenaAtual(),resolver(cenaAtual(),UI.ep)).ch||{})[np]||{},vp=el.dataset.v,
+      fm=XCH.filter(function(x){return x[0]==='mic';})[0],fp=XCH.filter(function(x){return x[0]==='p48';})[0],em=xEf('ch',np,fm,chp),ep=xEf('ch',np,fp,chp),
+      wm=vp!=='line',wp=vp==='48';
+    setX('ch',np,'mic',em.arq!==null&&wm===em.arq?null:wm);setX('ch',np,'p48',ep.arq!==null&&wp===ep.arq?null:wp);return true;}
   if(a==='mxt'){var al3=el.dataset.alvo,id3=el.dataset.id,k3=el.dataset.k,c3=cenaAtual(),M3=mesaEf(c3,resolver(c3,UI.ep)),ob3=al3==='ch'?M3.ch[+id3]:al3==='bus'?M3.bus[id3]:M3.out[id3];
     var f3=XCH.concat(XEQ,XBUS,XOUT).filter(function(f){return f[0]===k3;})[0],e3=xEf(al3,al3==='ch'?+id3:id3,f3,ob3),nv=!e3.v;
     setX(al3,al3==='ch'?+id3:id3,k3,e3.arq!==null&&nv===e3.arq?null:nv);
@@ -2772,6 +2776,10 @@ function xSkNum(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x
   return '<label class="sd-sk num'+(e.set?' mod':'')+'">'+esc(lbl)+'<span><input type="number" step="any" min="'+f[4]+'" max="'+f[5]+'" data-act="mxn" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'" value="'+(e.v==null?'':(e.v<=-127?-127.5:Math.round(e.v*100)/100))+'" placeholder="—">'+esc(f[6]||'')+'</span></label>';}
 function xSkC(alvo,id,k,obj,lbl,specs){var f=specs.filter(function(x){return x[0]===k;})[0],e=xEf(alvo,id,f,obj);
   return '<button type="button" class="sd-sk'+(e.v&&e.v!=='off'&&e.v!=='Unlinked'?' on':'')+(e.set?' mod':'')+'" data-act="mxc" data-alvo="'+alvo+'" data-id="'+esc(String(id))+'" data-k="'+k+'">'+esc(lbl)+'<small>'+esc(e.v==null?'—':xTxt(f,e.v))+'</small></button>';}
+/* preamp do input físico: uma escolha só, como no gravador: Line, Mic ou Mic+48V */
+function xPre(n,ch){var fm=XCH.filter(function(x){return x[0]==='mic';})[0],fp=XCH.filter(function(x){return x[0]==='p48';})[0],
+  em=xEf('ch',n,fm,ch),ep=xEf('ch',n,fp,ch),cur=em.v==null?null:!em.v?'line':ep.v?'48':'mic',mod=em.set||ep.set;
+  return [['line','Line'],['mic','Mic'],['48','Mic+48V*']].map(function(o){return '<button type="button" class="sd-sk'+(cur===o[0]?' on':'')+(cur===o[0]&&mod?' mod':'')+'" data-act="mpre" data-id="'+n+'" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join('');}
 function xSo(lbl,v){return '<div class="sd-row"><span class="sd-l">'+esc(lbl)+':</span><span class="sd-v"><i class="sd-dim">'+esc(v)+' · só leitura, falta testar</i></span></div>';}
 function setX(alvo,id,k,v){mudarMesa(function(m){var c=alvo==='ch'?m.ch:alvo==='bus'?m.bus:m.out;var o=c[id]=c[id]||{};if(v===null||v===undefined)delete o['x_'+k];else o['x_'+k]=v;});}
 /* grava no settings os ajustes extras definidos (só os que não estão em "não mexer") */
@@ -2828,7 +2836,7 @@ function painelSlot(R,M){
   h+='<div class="sd-row sd-acts"><button class="sd-btn'+(COPIA?' sel':'')+'" type="button" data-act="mcopia">⧉ Copiar este canal…</button><button class="sd-btn" type="button" data-act="mlimpa" title="Tira a pessoa desta pista (tecla Delete)">Limpar canal</button><button class="sd-btn" type="button" data-act="mclipc" title="Ctrl+C">Copiar</button>'+(CLIP?'<button class="sd-btn" type="button" data-act="mclipv" title="Ctrl+V">Colar '+CLIP.it.length+' pista(s) a partir daqui</button>':'')+'</div>';
   h+='</div><div class="sd-col">';
   h+=sdRow('Source:','<button type="button" class="sd-btn src'+(PICK==='src'?' sel':'')+'" data-act="mpick" data-v="src">'+esc(s.cn?s.cn:'escolher')+'</button>'+(function(){PRE_ADC[n]=s.tok&&s.cn?(fonteSlot(s)||undefined):undefined;if(!adcCh(n)||!scCarregar())return '';
-    return ' '+xSk('ch',n,'mic',ch,'Mic',XCH)+xSk('ch',n,'p48',ch,'48V*',XCH);})());
+    return ' '+xPre(n,ch);})());
   if(PICK==='src')h+=pickSrc(R,s);
   var hz=ch.hpf?ch.hpf:(ch.hpfhz||80);
   h+=sdRow('HPF:',sdNum('mhpfhz','hpfhz',ch.hpf===null||ch.hpf===undefined?(ch.hpfhz||''):hz,'Hz')+sdSw(ch.hpf==null?null:ch.hpf>0,'data-act="msw" data-k="hpf"'));
