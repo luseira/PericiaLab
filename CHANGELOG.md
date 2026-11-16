@@ -26,6 +26,10 @@
 
 
 
+## v2.02 · 15/11/2026
+- Aba Técnico mostra a versão do Apps Script publicada na planilha e a do repositório, com o passo a passo para atualizar quando estiver atrasada.
+- Planilha: criada a coluna Adaptador na aba Escalação. Sem ela, o Apps Script não conseguia gravar a unidade do adaptador (a aba tinha só 9 colunas).
+
 ## v2.01 · 15/11/2026
 - Acaba o aviso "sem cápsula" para o gooseneck e para as mixes que entram por entrada fixa: o gooseneck é o próprio microfone e as mixes são retorno de linha.
 
