@@ -26,6 +26,9 @@
 
 
 
+## v2.06 · 16/11/2026
+- Fotos das cápsulas da Gabi trocadas pelas novas, em fundo branco.
+
 ## v2.05 · 16/11/2026
 - Foto da COS11D R (bege, Lemo 3) no inventário.
 
