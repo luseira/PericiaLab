@@ -240,7 +240,7 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .dl .clip{height:100%;background:linear-gradient(90deg,transparent 0 2px,var(--lc) 2px);opacity:.85;position:relative;border-radius:2px;
  -webkit-mask:repeating-linear-gradient(90deg,#000 0 3px,rgba(0,0,0,.55) 3px 4px);mask:repeating-linear-gradient(90deg,#000 0 3px,rgba(0,0,0,.55) 3px 4px)}
 .dl.k-host{--lc:var(--c-host,#c9a227)}.dl.k-mentor{--lc:var(--c-mentor,#8e5cc4)}.dl.k-tv{--lc:var(--c-A,#d0362b)}.dl.k-tz{--lc:var(--c-B,#2e6fd6)}
-.dl.k-boom{--lc:var(--c-boom,#2aa198)}.dl.k-goose{--lc:var(--c-goose,#8a9a2e)}.dl.k-mix{--lc:#d9822b}.dl.k-bus{--lc:#4fa3c7}.dl.k-fonte{--lc:#8a8f98}
+.dl.k-boom{--lc:var(--c-boom,#2aa198)}.dl.k-goose{--lc:var(--c-goose,#8a9a2e)}.dl.k-mix{--lc:var(--c-mix,#d9822b)}.dl.k-bus{--lc:#4fa3c7}.dl.k-fonte{--lc:#8a8f98}
 .strip{user-select:none;-webkit-user-select:none;width:var(--sw);height:236px;background:#26292e;border:1px solid #34383f;border-radius:7px;display:flex;flex-direction:column;align-items:center;padding:.3rem .25rem;gap:.25rem;color:#e9ecef;position:relative;cursor:pointer}
 .strip.k-host{background:#3b3524;border-color:#5a5034}.strip.k-mentor{background:#33293f;border-color:#4f3f61}
 .strip.k-tv{background:#3c2527;border-color:#5e383b}.strip.k-tz{background:#223049;border-color:#344a6e}
@@ -313,13 +313,14 @@ pre{background:#14171c;color:#d6dae0;padding:.8rem;border-radius:6px;overflow:au
 .fita span{font-family:'Permanent Marker',var(--fc);font-weight:400}
 
 /* cores por função (configuráveis no mixer) */
-:root{--c-host:#c9a227;--c-mentor:#8e5cc4;--c-A:#d0362b;--c-B:#2e6fd6;--c-boom:#2aa198;--c-goose:#8a9a2e}
+:root{--c-host:#c9a227;--c-mentor:#8e5cc4;--c-A:#d0362b;--c-B:#2e6fd6;--c-boom:#2aa198;--c-goose:#8a9a2e;--c-mix:#d9822b}
 .strip.k-host{background:color-mix(in srgb,var(--c-host) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-host) 45%,#1c1e22)}
 .strip.k-mentor{background:color-mix(in srgb,var(--c-mentor) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-mentor) 45%,#1c1e22)}
 .strip.k-tv{background:color-mix(in srgb,var(--c-A) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-A) 45%,#1c1e22)}
 .strip.k-tz{background:color-mix(in srgb,var(--c-B) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-B) 45%,#1c1e22)}
 .strip.k-boom{background:color-mix(in srgb,var(--c-boom) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-boom) 45%,#1c1e22)}
 .strip.k-goose{background:color-mix(in srgb,var(--c-goose) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-goose) 45%,#1c1e22)}
+.strip.k-mix{background:color-mix(in srgb,var(--c-mix) 26%,#1c1e22);border-color:color-mix(in srgb,var(--c-mix) 45%,#1c1e22)}
 .strip.k-fonte{background:#2a2d33;border-color:#4a4f58;border-style:dashed}
 .strip.k-fonte .slab{color:#cfd6df;letter-spacing:.04em}
 .sd-pick details{grid-column:1/-1}.sd-pick details summary{cursor:pointer;font-size:12px;color:var(--mut,#9aa3ad);padding:4px 0}
@@ -616,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.02 · 15/11 22:15</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.03 · 15/11 22:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1880,7 +1881,7 @@ function xDaClara(M,n){return clara633(M,n).length;}
 function catStrip(s){
   var p=s.p;if(!p)return s.fx?' k-fonte':'';
   if(p.papel==='HOST')return ' k-host';if(p.papel==='MENTOR')return ' k-mentor';
-  if(p.papel==='FONTE')return /goose/i.test(p.id+p.nome)?' k-goose':' k-boom';
+  if(p.papel==='FONTE')return /goose/i.test(p.id+p.nome)?' k-goose':/boom/i.test(p.id+p.nome)?' k-boom':' k-mix'; /* mixes e retornos têm cor própria */
   var t=s.e&&s.e.time;return t==='A'?' k-tv':t==='B'?' k-tz':' k-part';
 }
 function stripHtml(s,v,M){
@@ -1928,8 +1929,8 @@ function aplicarBuscaMix(){
   var c=$('#nmbusca');if(c)c.textContent=ativo?n+' pista(s)':'';
 }
 /* cores das funções no mixer (por aparelho) */
-var CORES_PAD={host:'#c9a227',mentor:'#8e5cc4',A:'#2e6fd6',B:'#d0362b',boom:'#2aa198',goose:'#8a9a2e'};
-var CORES_ROT=[['host','Host'],['mentor','Mentores'],['A','Time A'],['B','Time B'],['boom','Boom'],['goose','Gooseneck']];
+var CORES_PAD={host:'#c9a227',mentor:'#8e5cc4',A:'#2e6fd6',B:'#d0362b',boom:'#2aa198',goose:'#8a9a2e',mix:'#d9822b'};
+var CORES_ROT=[['host','Host'],['mentor','Mentores'],['A','Time A'],['B','Time B'],['boom','Boom'],['goose','Gooseneck'],['mix','Mix / retorno']];
 function corFuncao(k){return (UI.cores&&UI.cores[k])||CORES_PAD[k];}
 function aplicarCores(){var r=document.documentElement.style;
   /* 11/11: Time A passou a azul e B a vermelho; descarta uma vez as cores de time escolhidas antes neste aparelho */
@@ -2625,7 +2626,7 @@ function resumoCanais(R,M){
 }
 /* Reaper: pistas 1–16 do Scorpio saem no Dante 1–16 (ISO pré-fader) e entram nas pistas 1–16 do Reaper */
 var REAPER_N=16,FAIXA_REAPER=false; /* faixa verde no mixer: escondida a pedido (05/11) */
-function corCat(s){var k=(catStrip(s)||'').trim();return {'k-host':'host','k-mentor':'mentor','k-tv':'A','k-tz':'B','k-boom':'boom','k-goose':'goose'}[k]||'';}
+function corCat(s){var k=(catStrip(s)||'').trim();return {'k-host':'host','k-mentor':'mentor','k-tv':'A','k-tz':'B','k-boom':'boom','k-goose':'goose','k-mix':'mix'}[k]||'';}
 function reaperTxt(c){var R=resolver(c,UI.ep),M=mesaEf(c,R),L=['PERICIALAB-REAPER 1\tcena: '+c.nome+'\tEP '+UI.ep+'\t'+agora()];
   R.S.slice(0,REAPER_N).forEach(function(sl){var nome=sl.p?nomePista(sl.p):sl.fx?semAcento(nomeFx(sl,M)).toUpperCase():'Ch '+sl.n,k=sl.p?corCat(sl):'';
     L.push(sl.n+'\t'+String(nome).replace(/[\t\r\n]/g,' ')+'\t'+(k?corFuncao(k):''));});

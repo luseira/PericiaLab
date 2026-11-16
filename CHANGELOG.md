@@ -26,6 +26,9 @@
 
 
 
+## v2.03 · 15/11/2026
+- As mixes e retornos (Mix B, Mix B + SLD) ganham cor própria no mixer, laranja, em vez de usar a cor do boom. A cor entra na legenda e pode ser trocada, como as outras.
+
 ## v2.02 · 15/11/2026
 - Aba Técnico mostra a versão do Apps Script publicada na planilha e a do repositório, com o passo a passo para atualizar quando estiver atrasada.
 - Planilha: criada a coluna Adaptador na aba Escalação. Sem ela, o Apps Script não conseguia gravar a unidade do adaptador (a aba tinha só 9 colunas).
