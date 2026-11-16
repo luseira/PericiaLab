@@ -26,6 +26,9 @@
 
 
 
+## v2.07 · 16/11/2026
+- Cápsulas da Gabi renomeadas para Gold Gabi 1 e Gold Gabi 2, as duas TA5F.
+
 ## v2.06 · 16/11/2026
 - Fotos das cápsulas da Gabi trocadas pelas novas, em fundo branco.
 
