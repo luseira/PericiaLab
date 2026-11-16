@@ -27,7 +27,7 @@
 
 
 ## v2.04 · 16/11/2026
-- Fotos das duas cápsulas Gold da Gabi (MKE 2-4, Lemo 3; MKE 2-5, TA5F), no mesmo tratamento das outras. A da Gabi que já estava na planilha virou "Gold Gabi 5" e a outra entrou como "Gold Gabi 4", cada uma com a terminação certa.
+- Fotos das duas cápsulas Gold da Gabi (MKE 2-4, Lemo 3; MKE 2-5, TA5F), no mesmo tratamento das outras. A da Gabi que já estava na planilha virou "Gold Gabi 5" e a outra entrou como "Gold Gabi 4", cada uma com a terminação certa. Cor acertada pelo próprio cabo, que é preto nas duas.
 
 ## v2.03 · 15/11/2026
 - As mixes e retornos (Mix B, Mix B + SLD) ganham cor própria no mixer, laranja, em vez de usar a cor do boom. A cor entra na legenda e pode ser trocada, como as outras.
