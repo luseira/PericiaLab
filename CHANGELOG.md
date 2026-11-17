@@ -26,6 +26,11 @@
 
 
 
+## v2.12 · 16/11/2026
+- Time A é sempre o time do 1º mentor do elenco (Thelma) e Time B o do 2º (Salada). O que muda por episódio é a cor: escolhida no card do mentor, ela pinta o time no Carômetro, no mixer, nas fichas e nas faixas.
+- Do EP 3 em diante o bloco da Clara (Time B) começa na pista 9, para ela ter o time inteiro na página 9–16 do SD-Remote. Antes disso, vem logo depois do Time A.
+- PDF: título "Dossiê · Perícia Lab · Input list · Episódio 02 · v1 · data". A versão fica ao lado da data, sobe sozinha a cada impressão e é guardada por episódio.
+
 ## v2.11 · 16/11/2026
 - Ao carregar um settings na aba Scorpio, o app pergunta se é para trazer ON, ARM, routing, ajustes, buses e saídas do arquivo para a cena. Antes era preciso lembrar do botão "Trazer do gravador para a cena", e sem isso o site seguia mostrando os buses e as saídas dele, não os do arquivo.
 
