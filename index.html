@@ -2781,7 +2781,12 @@ function mudancaMesa(a,el){
     UI.cena=at.id;render();return true;}
   if(a==='moutv'){var o=el.dataset.o;mudarMesa(function(m){var x={};x[k]=k==='nome'?el.value.trim().toUpperCase():el.value;m.out[o]=Object.assign({},m.out[o]||{},x);});return true;}
   if(a==='moutn'){var o2=el.dataset.o,scN=scCarregar(),aqN=scN?(scN._A||(scN._A=lerArquivo(scN.m))).out[o2]:null;mudarMesa(function(m){var x={};x[k]=el.value===''?null:parseFloat(el.value);if(x[k]!==null&&aqN&&+aqN[k]===x[k])x[k]=null;m.out[o2]=Object.assign({},m.out[o2]||{},x);});return true;}
-  if(a==='mscfile'&&el.files[0]){var f=el.files[0];f.text().then(function(t){try{scGuardar(f.name,t);toast('Settings lido');render();}catch(e){toast(e.message,true);}});return true;}
+  if(a==='mscfile'&&el.files[0]){var f=el.files[0];f.text().then(function(t){try{scGuardar(f.name,t);toast('Settings lido');
+    /* o site não usa sozinho os buses e as saídas do arquivo: oferece trazer, para não ter de refazer na mão */
+    var cf=cenaAtual();
+    if(cf&&confirm('Settings «'+f.name+'» lido.\n\nTrazer ON, ARM, routing, trim, HPF, fase, delay, buses e saídas deste arquivo para a cena «'+(cf.nome||cf.id)+'»?\n\nSe não quiser agora, dá para fazer depois no botão «Trazer do gravador para a cena».')){
+      var Rf=resolver(cf,UI.ep);trazerDoArquivo(Rf,lerArquivo(scCarregar().m));toast('Cena atualizada com o arquivo');return;}
+    render();}catch(e){toast(e.message,true);}});return true;}
   return false;
 }
 

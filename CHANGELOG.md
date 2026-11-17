@@ -26,6 +26,9 @@
 
 
 
+## v2.11 · 16/11/2026
+- Ao carregar um settings na aba Scorpio, o app pergunta se é para trazer ON, ARM, routing, ajustes, buses e saídas do arquivo para a cena. Antes era preciso lembrar do botão "Trazer do gravador para a cena", e sem isso o site seguia mostrando os buses e as saídas dele, não os do arquivo.
+
 ## v2.10 · 16/11/2026
 - O mixer volta a se organizar sozinho: os participantes entram a partir da pista 4, cada time do tamanho que tem, o do primeiro mentor (Thelma) na frente. Com 4 e 5, fica 4–7 e 8–12. As faixas coloridas acompanham o tamanho de cada bloco.
 - Saiu a opção de ordem nos times: é sempre por transmissor.
