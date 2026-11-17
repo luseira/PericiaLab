@@ -26,6 +26,10 @@
 
 
 
+## v2.08 · 16/11/2026
+- A cor de cada mentor passa a ser escolhida no card dele, no Carômetro, por episódio. O mixer segue essa escolha: o time do primeiro mentor do elenco (Thelma) vem nas primeiras pistas, e as faixas mostram o mentor de cada cor.
+- Quando a cena tem as pistas fixas e a ordem não bate com a cor da Thelma, o botão ⇄ fica amarelo e diz qual time deveria abrir.
+
 ## v2.07 · 16/11/2026
 - Cápsulas da Gabi renomeadas para Gold Gabi 1 e Gold Gabi 2, as duas TA5F.
 

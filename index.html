@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.07 · 16/11 18:15</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.08 · 16/11 21:45</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -680,7 +680,15 @@ UI.view='car';
 function normTime(v){var t=str(v).toLowerCase();if(/^az/.test(t)||t==='b')return 'B';if(/^verm/.test(t)||t==='a'||t==='v')return 'A';return '';}
 var TIMES={A:{nome:'Time A',cls:'tv',grava:'A',mentor:'Thelma'},B:{nome:'Time B',cls:'tz',grava:'B',mentor:'Salada'}};
 function timeNome(t){return TIMES[t]?TIMES[t].nome:'';}
-function timeMentor(t){return TIMES[t]?TIMES[t].mentor:'';}
+function mentores(){return D.elenco.filter(function(p){return p.papel==='MENTOR';});}
+/* o mentor de cada cor, como a direção definiu no episódio (card do mentor) */
+function timeMentor(t,ep){var EF=efetivo(ep===undefined?UI.ep:ep),m=mentores().filter(function(p){return (EF[p.id]||{}).time===t;})[0];
+  return m?m.nome:(TIMES[t]?TIMES[t].mentor:'');}
+/* qual time abre o mixer: o do primeiro mentor do elenco (Thelma) vem sempre primeiro */
+function timeFrente(ep){var EF=efetivo(ep),ms=mentores();if(!ms.length)return 'A';
+  var t0=(EF[ms[0].id]||{}).time;if(t0==='A'||t0==='B')return t0;
+  var t1=ms[1]?(EF[ms[1].id]||{}).time:'';if(t1==='A')return 'B';if(t1==='B')return 'A';
+  return 'A';}
 function outroTime(t){return t==='A'?'B':'A';}
 function timeCls(t){return TIMES[t]?TIMES[t].cls:'';}
 function timeChip(t){return TIMES[t]?'<span class="chip '+TIMES[t].cls+'">'+TIMES[t].nome+'</span>':'';}
@@ -1383,6 +1391,9 @@ function editorHtml(){
   if(x.av.length)h+='<div class="alertas">'+x.av.map(function(a){
       return '<div class="alerta '+a.k+'">'+esc(a.t[0].toUpperCase()+a.t.slice(1))+(a.ajuste?' (TX '+esc(t.num)+' em '+mhz(t.freq)+' MHz)<span class="sp"></span><button class="btn sm" type="button" data-act="ajustado" data-tx="'+esc(t.num)+'">Já ajustei</button>':'')+'</div>';}).join('')+'</div>';
   if(!WIZ||WIZ.id!==p.id)WIZ={id:p.id,passo:WIZ_PASSO,tx:e.tx||'',cap:e.cap||'',ad:e.ad||''};
+  if(p.papel==='MENTOR'){var ms0=mentores(),pri0=ms0.length&&ms0[0].id===p.id;
+    h+='<div class="timetop"><b>Cor do time</b><span class="seg" role="group" aria-label="Cor do time">'+['A','B',''].map(function(v){return '<button type="button" class="'+timeCls(v)+'" data-act="time" data-v="'+(v?TIMES[v].grava:'')+'" aria-pressed="'+((e.time||'')===v)+'">'+(timeNome(v)||'—')+'</button>';}).join('')+'</span></div>'+
+      '<p class="hint">A direção define a cor de cada mentor no episódio. No mixer, o time '+(pri0?'deste mentor':(ms0[0]?'de '+esc(ms0[0].nome):'do primeiro mentor'))+' vem nas primeiras pistas.</p>';}
   if(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')
     h+='<div class="timetop"><b>Time</b><span class="seg" role="group" aria-label="Time">'+['A','B',''].map(function(v){return '<button type="button" class="'+timeCls(v)+'" data-act="time" data-v="'+(v?TIMES[v].grava:'')+'" aria-pressed="'+((e.time||'')===v)+'">'+(timeNome(v)||'—')+'</button>';}).join('')+'</span></div>';
   h+=wizHtml(x,s);
@@ -1811,7 +1822,7 @@ function listaCanais(){
   return Object.keys(v).sort(function(a,b){return v[a]-v[b]||nat(a,b);});
 }
 function resolver(cena,ep){
-  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),fr='A' /* F = 1º bloco (4–8), T = 2º bloco (9–13, Clara). Trocar os times de lugar reescreve as pistas, em inverterTimesMix() */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
+  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),fr=timeFrente(ep) /* F = 1º bloco (4–8), T = 2º bloco (9–13, Clara). O time do 1º mentor (Thelma) abre o mixer */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
   var S=cena.pistas.map(function(tok,i){
     var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
@@ -1914,7 +1925,7 @@ function linhaMix(R,a,b,v,M){
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
   ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     var zt=i===1||i===2?timeDaFaixa(R,z[0],z[1]):null,
-      zl=zt?(zt.mix?timeNome('A')+' ('+zt.a+') · '+timeNome('B')+' ('+zt.b+')':timeNome(zt.t)+' · '+timeMentor(zt.t)+' ('+zt.n+')')+(i===2?' · Clara':''):z[2],
+      zl=zt?(zt.mix?timeNome('A')+' ('+zt.a+') · '+timeNome('B')+' ('+zt.b+')':timeNome(zt.t)+(timeMentor(zt.t)?' · '+timeMentor(zt.t):'')+' ('+zt.n+')')+(i===2?' · Clara':''):z[2],
       zi=zt&&!zt.mix?(zt.t==='A'?1:2):i;
     h+='<span class="band zb z'+zi+'" style="grid-row:'+(FAIXA_REAPER?3:2)+';grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+zl+'</span>';});
   (function(){var x=Math.max(a,1),y=Math.min(b,REAPER_N);if(FAIXA_REAPER&&x<=y)h+='<span class="band rp" style="grid-row:2;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'" title="Dante '+x+'–'+y+' pré-fader entram nas pistas '+x+'–'+y+' do Reaper">→ Reaper · Dante '+x+'–'+y+' · pré-fader</span>';})();
@@ -2008,7 +2019,10 @@ function viewMix(){
   var W0=avisosMix(R,UI.ep),g0=W0.filter(function(w){return w[0]==='bad';}).length;
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+
-    (function(){var q=primeiroTime(R);return q?' · <button type="button" class="chip" data-act="mfr" style="border:0;cursor:pointer" title="Põe o outro time nas primeiras pistas, mantendo a ordem de cada um. Muda as pistas da cena, então vale também para o input list e para o export.">⇄ Trocar os times de lugar ('+timeNome(q)+' nas primeiras)</button>':'';})()+'</p>';
+    (function(){var q=primeiroTime(R);if(!q)return '';
+      var tf=timeFrente(UI.ep),nm=timeMentor(tf),ok=q===tf;
+      return ' · <button type="button" class="chip'+(ok?'':' warn')+'" data-act="mfr" style="border:0;cursor:pointer" title="Põe o outro time nas primeiras pistas, mantendo a ordem de cada um. Muda as pistas da cena, então vale também para o input list e para o export.">⇄ '+
+        (ok?timeNome(q)+(nm?' ('+esc(nm)+')':'')+' nas primeiras pistas':'Pôr o time '+(nm?'de '+esc(nm)+' ':'')+'('+timeNome(tf)+') nas primeiras')+'</button>';})()+'</p>';
   if(pg!=='pistas'){
     var cab='<div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio',menu:'Menu do gravador'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>';
     var fn={rota:viewRota,bus:viewBus,out:viewOut,menu:viewMenu}[pg],corpo=fn?fn(R,M):viewScorpio(c,R,M),pt=corpo.split('<!--NAV-->');
@@ -2844,7 +2858,7 @@ function painelSlot(R,M){
   ['A','B'].forEach(function(t){var L=R[t];
     o+='<optgroup label="Time '+timeNome(t)+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+t+':'+k+'"'+(s.tok===t+':'+k?' selected':'')+'>'+timeNome(t)+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   [['F','Frente (4–8)'],['T','Atrás (9–13, Clara)']].forEach(function(g){var L=R[g[0]],tg=g[0]==='F'?R.frente:outroTime(R.frente);
-    o+='<optgroup label="'+g[1]+' · '+timeNome(tg)+' ('+timeMentor(tg)+')">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
+    o+='<optgroup label="'+g[1]+' · '+timeNome(tg)+(timeMentor(tg)?' ('+timeMentor(tg)+')':'')+'">'+[1,2,3,4,5].map(function(k){return '<option value="'+g[0]+':'+k+'"'+(s.tok===g[0]+':'+k?' selected':'')+'>'+g[1]+' · '+k+'º'+(L[k-1]?' ('+esc(L[k-1].nome)+')':'')+'</option>';}).join('')+'</optgroup>';});
   o+='<optgroup label="Colinha (ordem de transmissor)">'+Array.apply(null,{length:COL_N}).map(function(_,i){return i+1;}).map(function(k){var tk=R.C[k-1]||'',mm=/^P:(.+)$/.exec(tk),nm=mm&&D.pPor[mm[1]]?D.pPor[mm[1]].nome:tk.replace(/^S:/,'');return '<option value="C:'+k+'"'+(s.tok==='C:'+k?' selected':'')+'>Colinha · '+k+'º'+(nm?' ('+esc(nm)+')':'')+'</option>';}).join('')+'</optgroup>';
   o+='<optgroup label="Pessoa ou fonte fixa">'+D.elenco.map(function(p){return '<option value="P:'+esc(p.id)+'"'+(s.tok==='P:'+p.id?' selected':'')+'>'+esc(p.nome)+'</option>';}).join('')+'</optgroup>';
   var p=s.p,e=s.e||{},t=s.t,fonte=s.cn?fonteSlot(s):'';
