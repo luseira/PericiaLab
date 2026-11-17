@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.08 · 16/11 21:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.09 · 16/11 21:55</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2019,10 +2019,9 @@ function viewMix(){
   var W0=avisosMix(R,UI.ep),g0=W0.filter(function(w){return w[0]==='bad';}).length;
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+
-    (function(){var q=primeiroTime(R);if(!q)return '';
-      var tf=timeFrente(UI.ep),nm=timeMentor(tf),ok=q===tf;
-      return ' · <button type="button" class="chip'+(ok?'':' warn')+'" data-act="mfr" style="border:0;cursor:pointer" title="Põe o outro time nas primeiras pistas, mantendo a ordem de cada um. Muda as pistas da cena, então vale também para o input list e para o export.">⇄ '+
-        (ok?timeNome(q)+(nm?' ('+esc(nm)+')':'')+' nas primeiras pistas':'Pôr o time '+(nm?'de '+esc(nm)+' ':'')+'('+timeNome(tf)+') nas primeiras')+'</button>';})()+'</p>';
+    (function(){var tf=timeFrente(UI.ep),nm=timeMentor(tf),cor=timeNome(tf);
+      if(porTimes(cenaAtual()))return ' · <span class="chip" title="As pistas 4–8 e 9–13 seguem os times. Quem abre é a cor do primeiro mentor, escolhida no card dele.">'+cor+(nm?' ('+esc(nm)+')':'')+' nas pistas 4–8</span>';
+      return ' · <button type="button" class="chip warn" data-act="mfr" style="border:0;cursor:pointer" title="Põe os participantes nas pistas 4–13 por time, cinco de cada. A ordem segue a cor dos mentores: quem tem a cor do primeiro mentor abre, nas 4–8.">⇄ Organizar pelos times'+(nm?' ('+esc(nm)+' nas 4–8)':'')+'</button>';})()+'</p>';
   if(pg!=='pistas'){
     var cab='<div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio',menu:'Menu do gravador'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>';
     var fn={rota:viewRota,bus:viewBus,out:viewOut,menu:viewMenu}[pg],corpo=fn?fn(R,M):viewScorpio(c,R,M),pt=corpo.split('<!--NAV-->');
@@ -2062,17 +2061,15 @@ function dawStrip(R,M){
 function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
 /* time do participante que está numa pista */
 function timeDePista(s){return s.p&&s.e&&(s.p.papel==='PARTICIPANTE'||s.p.papel==='CONVIDADO')&&(s.e.time==='A'||s.e.time==='B')?s.e.time:'';}
-function primeiroTime(R){for(var i=0;i<16&&i<R.S.length;i++){var t=timeDePista(R.S[i]);if(t)return t;}return '';}
-/* troca os dois times de lugar: as pistas de um time passam a ter o outro, cada time na mesma ordem interna */
-function inverterTimesMix(){
-  var c=clone(cenaAtual()),R=resolver(c,UI.ep),pos=[],A=[],B=[],pri='';
-  R.S.slice(0,16).forEach(function(s,i){var t=timeDePista(s);if(!t)return;
-    if(!pri)pri=t;pos.push(i);(t==='A'?A:B).push(c.pistas[i]);});
-  if(!A.length||!B.length){toast('Só dá para trocar quando os dois times estão no mixer.',true);return;}
-  var novos=pri==='A'?B.concat(A):A.concat(B);
-  pos.forEach(function(ix,k){c.pistas[ix]=novos[k];});
+/* a cena põe os participantes por time: 4–8 o primeiro bloco, 9–13 o bloco da Clara */
+function porTimes(c){var p=(c&&c.pistas)||[];for(var i=0;i<5;i++)if(p[3+i]!=='F:'+(i+1)||p[8+i]!=='T:'+(i+1))return false;return true;}
+function organizarPorTimes(){
+  var c=clone(cenaAtual()),ocupa=[];
+  for(var i=3;i<13;i++)if(c.pistas[i]&&!/^[FT]:/.test(c.pistas[i]))ocupa.push(i+1);
+  if(ocupa.length&&!confirm('As pistas 4 a 13 passam a seguir os times, cinco de cada, com o time do primeiro mentor nas 4–8.\n\nO que está hoje nas pistas '+ocupa.join(', ')+' será substituído. Continuar?'))return;
+  for(i=0;i<5;i++){c.pistas[3+i]='F:'+(i+1);c.pistas[8+i]='T:'+(i+1);}
   salvarCenaMix(c);
-  toast(timeNome(pri==='A'?'B':'A')+' agora nas primeiras pistas');
+  toast('Pistas 4–13 organizadas pelos times');
 }
 function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
 function cliqueMix(a,el){
@@ -2654,7 +2651,7 @@ function baixar(nome,txt){
 /* ───────── eventos da mesa ───────── */
 function cliqueMesa(a,el){
   if(a==='mpag'){UI.mixp=el.dataset.v;salvarUi();render();return true;}
-  if(a==='mfr'){inverterTimesMix();return true;}
+  if(a==='mfr'){organizarPorTimes();return true;}
   if(a==='mled'){cliqueLed(+el.dataset.n,el.dataset.k);return true;}
   if(a==='mrota'){var c=cenaAtual(),R=resolver(c,UI.ep),M=mesaEf(c,R),n=+el.dataset.n,b=el.dataset.b,i=ROTA_CICLO.indexOf(M.ch[n].r[b]||''),r={};r[b]=ROTA_CICLO[(i+1)%4];setCh(n,{r:r});return true;}
   if(a==='mnav'){var vv=el.dataset.v;if(MIXV.some(function(x){return x[0]===vv;})){UI.mixv=vv;UI.mixp='pistas';}else UI.mixp=vv;salvarUi();render();return true;}

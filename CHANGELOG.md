@@ -26,6 +26,10 @@
 
 
 
+## v2.09 · 16/11/2026
+- Botão "⇄ Organizar pelos times" no mixer: põe os participantes nas pistas 4–13 por time, cinco de cada, e a partir daí a ordem segue sozinha a cor dos mentores. Quando a cena já está assim, o lugar do botão mostra qual cor abre as 4–8.
+- Antes, numa cena com as pistas presas à ordem da colinha, mudar a cor do mentor não mexia em nada.
+
 ## v2.08 · 16/11/2026
 - A cor de cada mentor passa a ser escolhida no card dele, no Carômetro, por episódio. O mixer segue essa escolha: o time do primeiro mentor do elenco (Thelma) vem nas primeiras pistas, e as faixas mostram o mentor de cada cor.
 - Quando a cena tem as pistas fixas e a ordem não bate com a cor da Thelma, o botão ⇄ fica amarelo e diz qual time deveria abrir.
