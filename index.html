@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.09 · 16/11 21:55</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.10 · 16/11 22:10</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1080,6 +1080,16 @@ function avisosPainel(s){
   return '<div class="avpainel noprint"><div class="avhd"><b>'+(only?'Problemas':'Problemas e avisos')+' ('+n+')</b><span class="sp"></span>'+
     '<button type="button" class="btn sm" data-act="avtoggle" data-v="'+(only?'all':'bad')+'">'+(only?'ver também os avisos':'só os problemas')+'</button><button type="button" class="btn sm" data-act="avtoggle" data-v="">fechar</button></div>'+(h||'<p class="hint">Nada por aqui.</p>')+'<p class="hint" style="margin:.4rem 0 0">Toque numa pessoa para abrir e resolver.</p></div>';
 }
+/* ordem dos cards dos participantes: por transmissor (padrão) ou por time, o do primeiro mentor na frente */
+function ordemCar(L){
+  var fr=timeFrente(UI.ep),porTime=(UI.cord||'tx')==='time';
+  var tx=function(x){return int((x.e||{}).tx)||99;},
+      gt=function(x){var t=(x.e||{}).time||'';return !t?2:(t===fr?0:1);};
+  return L.slice().sort(function(a,b){
+    if(porTime){var d=gt(a)-gt(b);if(d)return d;}
+    return (tx(a)-tx(b))||nat(a.p.nome,b.p.nome);
+  });
+}
 function viewCar(){
   var s=situacao(UI.ep),h='';
   var ativos=s.pessoas.filter(function(x){return x.ativo&&(x.p.papel==='PARTICIPANTE'||x.p.papel==='CONVIDADO');}).length;
@@ -1093,6 +1103,7 @@ function viewCar(){
   var col=colinhaMap(UI.ep);
   h+='<div class="busca noprint"><input type="search" id="busca" data-act="busca" value="'+esc(BUSCA)+'" placeholder="Buscar nome, TX, cápsula…" aria-label="Buscar" autocomplete="off">'+
     '<span class="seg" role="group" aria-label="Time">'+[['','Todos',''],['A','Time A','tv'],['B','Time B','tz'],['-','Sem time','']].map(function(o){return '<button type="button" class="'+o[2]+'" data-act="ft" data-v="'+o[0]+'" aria-pressed="'+((UI.ft||'')===o[0])+'">'+o[1]+'</button>';}).join('')+'</span>'+
+    '<span class="seg" role="group" aria-label="Ordem dos participantes" style="margin-left:.35rem">'+[['tx','Por TX'],['time','Por time']].map(function(o){return '<button type="button" data-act="cord" data-v="'+o[0]+'" aria-pressed="'+((UI.cord||'tx')===o[0])+'" title="Ordem dos cards dos participantes">'+o[1]+'</button>';}).join('')+'</span>'+
     '<span class="hint" id="nbusca" style="margin:0"></span></div>';
   var ft=UI.ft||'';
   function passaTime(x){if(!ft)return true;if(x.p.papel!=='PARTICIPANTE'&&x.p.papel!=='CONVIDADO')return false;var t=(x.e||{}).time||'';return ft==='-'?!t:t===ft;}
@@ -1102,6 +1113,7 @@ function viewCar(){
     ['Eliminados',function(x){return !x.ativo;}]];
   grupos.forEach(function(g){
     var L=s.pessoas.filter(g[1]).filter(passaTime);if(!L.length)return;
+    if(/Participantes|Eliminados/.test(g[0]))L=ordemCar(L);
     h+='<section class="grupo'+(g[0]==='Eliminados'?' elim':'')+'"><h3>'+g[0]+' <small>'+L.length+'</small></h3><div class="grid carr">'+L.map(function(x){return cardHtml(x,col);}).join('')+'</div></section>';
   });
   h+='<details class="info noprint"'+(s.graves?' open':'')+'><summary>Informações e avisos</summary>'+infoHtml(s)+'</details>';
@@ -1799,13 +1811,10 @@ function nomePista(p){
   return semAcento(p.nome.split(/\s+/)[0]).toUpperCase();
 }
 function corta16(s){return s.length<=8?s:s.slice(0,3)+'...'+s.slice(-4);}
-function timeDe(ep,t,ordem){
+function timeDe(ep,t){
   var EF=efetivo(ep);
   var L=D.elenco.filter(function(p){return ativo(p,ep)&&(p.papel==='PARTICIPANTE'||p.papel==='CONVIDADO')&&(EF[p.id]||{}).time===t;});
-  return L.sort(function(a,b){
-    if(ordem!=='alfa'){var x=int((EF[a.id]||{}).tx)||99,y=int((EF[b.id]||{}).tx)||99;return x-y;}
-    return nat(a.nome,b.nome);
-  });
+  return L.sort(function(a,b){var x=int((EF[a.id]||{}).tx)||99,y=int((EF[b.id]||{}).tx)||99;return x-y;});
 }
 /* quem está em cada entrada (canal do gravador) neste episódio, pelo Carômetro */
 function mapaCanais(ep,EF){
@@ -1822,8 +1831,8 @@ function listaCanais(){
   return Object.keys(v).sort(function(a,b){return v[a]-v[b]||nat(a,b);});
 }
 function resolver(cena,ep){
-  var EF=efetivo(ep),A=timeDe(ep,'A',cena.ordem),B=timeDe(ep,'B',cena.ordem),fr=timeFrente(ep) /* F = 1º bloco (4–8), T = 2º bloco (9–13, Clara). O time do 1º mentor (Thelma) abre o mixer */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
-  var S=cena.pistas.map(function(tok,i){
+  var EF=efetivo(ep),A=timeDe(ep,'A'),B=timeDe(ep,'B'),fr=timeFrente(ep) /* F = 1º bloco (4–8), T = 2º bloco (9–13, Clara). O time do 1º mentor (Thelma) abre o mixer */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
+  var S=pistasEf(cena,ep,F,T).map(function(tok,i){
     var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
     var m=/^([PABCSFT]):(.+)$/.exec(tok);if(!m)return s;
@@ -1919,11 +1928,20 @@ function timeDaFaixa(R,a,b){
   if(ca&&cb)return {mix:true,a:ca,b:cb};
   return {t:ca?'A':'B',n:ca||cb};
 }
+/* as faixas dos dois times acompanham quantas pistas cada um ocupa */
+function zonasEf(R){
+  var Z=ZONAS.map(function(z){return z.slice();}),nF=R.F.length,nT=R.T.length;
+  if(!nF&&!nT)return Z;
+  Z[1][1]=Math.min(13,3+Math.max(nF,1));
+  Z[2][0]=Z[1][1]+1; Z[2][1]=Math.max(Z[2][0],Math.min(14,3+Math.max(nF,1)+Math.max(nT,1)));
+  if(Z[2][1]<14)Z[2][1]=14;
+  return Z;
+}
 function linhaMix(R,a,b,v,M){
   var S=R.S.slice(a-1,b),cols=b-a+1,h='<div class="mrow" style="grid-template-columns:repeat('+cols+',var(--sw))">';
   [[1,12,'CL-12'],[13,32,'só iPad']].forEach(function(z){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     h+='<span class="band ctl'+(z[0]===1?' cl':'')+'" style="grid-row:1;grid-column:'+(x-a+1)+' / span '+(y-x+1)+'">'+z[2]+'</span>';});
-  ZONAS.forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
+  zonasEf(R).forEach(function(z,i){var x=Math.max(a,z[0]),y=Math.min(b,z[1]);if(x>y)return;
     var zt=i===1||i===2?timeDaFaixa(R,z[0],z[1]):null,
       zl=zt?(zt.mix?timeNome('A')+' ('+zt.a+') · '+timeNome('B')+' ('+zt.b+')':timeNome(zt.t)+(timeMentor(zt.t)?' · '+timeMentor(zt.t):'')+' ('+zt.n+')')+(i===2?' · Clara':''):z[2],
       zi=zt&&!zt.mix?(zt.t==='A'?1:2):i;
@@ -1965,7 +1983,6 @@ function nomeTok(tok,R){
 function diffCena(a,b){
   var out=[],R=resolver(b,UI.ep),Ra=resolver(a,UI.ep);
   if(a.nome!==b.nome)out.push('Cena renomeada: '+a.nome+' → '+b.nome);
-  if(a.ordem!==b.ordem)out.push('Ordem nos times: '+(b.ordem==='tx'?'transmissor':'alfabética'));
   var mud=[];for(var i=0;i<32;i++)if((a.pistas[i]||'')!==(b.pistas[i]||''))mud.push(i);
   if(mud.length===2&&a.pistas[mud[0]]===b.pistas[mud[1]]&&a.pistas[mud[1]]===b.pistas[mud[0]])
     out.push('Ch '+(mud[0]+1)+' ⇄ Ch '+(mud[1]+1)+' ('+nomeTok(a.pistas[mud[0]],Ra)+' ⇄ '+nomeTok(a.pistas[mud[1]],Ra)+')');
@@ -1998,7 +2015,7 @@ function impressaoMix(R,c,M){
   var linhas=R.S.filter(function(s){return s.p||s.tok||(M&&M.ch[s.n].arm);}).map(function(s){var p=s.p;
     return '<tr><td><span class="tag sm">'+s.n+'</span></td><td class="n">'+esc(p?nomePista(p):'—')+'</td><td>'+esc(p?p.nome:(s.motivo||rotuloTok(s.tok)))+'</td><td>'+esc(s.t?txNome(s.t):'')+'</td><td><b>'+esc(s.t?s.t.canal:'')+'</b></td><td>'+(s.e&&s.e.cap?esc(s.e.cap)+(capInv(s.e.cap)?' '+invIcon(s.e.cap,1):''):'')+'</td><td>'+esc(s.e?timeNome(s.e.time):'')+'</td><td>'+(M&&M.ch[s.n].on?'●':'')+'</td><td>'+(M&&M.ch[s.n].arm?'<b class="armtxt">● ARM</b>':'')+'</td><td>'+(M?CL_ROTAS.map(function(r){var x=M.ch[s.n].r[r[0]];return x?r[1]+' '+ROTA_TXT[x]:'';}).filter(Boolean).join(' · '):'')+'</td><td>'+esc(s.copia?'cópia do Ch '+s.copia:'')+(function(){var k=xDaClara(M,s.n);return k?' X'+k+' → 633·'+k:'';})()+'</td></tr>';}).join('');
   var fita='<div class="fita">'+R.S.slice(0,12).map(function(s){return '<span class="'+(s.p&&s.e?timeCls(s.e.time):'')+'" style="border-top:6px solid '+CAPS[s.n-1]+'">'+esc(s.p?nomePista(s.p):'')+'<i>'+s.n+'</i></span>';}).join('')+'</div>';
-  return '<section class="doc soimpr"><div class="dochead"><div><h1>Cena · '+esc(c.nome)+'</h1><p>EP '+UI.ep+' · ordem nos times: '+(c.ordem==='tx'?'transmissor':'alfabética')+' · colinha em ordem de transmissor</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
+  return '<section class="doc soimpr"><div class="dochead"><div><h1>Cena · '+esc(c.nome)+'</h1><p>EP '+UI.ep+' · times em ordem de transmissor · colinha em ordem de transmissor</p></div><div class="r">Gerado em '+agora()+'</div></div>'+
     '<h3>Fita do CL-12</h3>'+fita+'<h3>Pistas do Scorpio</h3><div class="tabwrap"><table class="tab"><thead><tr><th>Ch</th><th>Nome de pista</th><th>Quem</th><th>TX</th><th>Canal</th><th>Cápsula</th><th>Time</th><th>ON</th><th>ARM</th><th>X1 · L · R · X2</th><th>Obs.</th></tr></thead><tbody>'+linhas+'</tbody></table></div></section>';
 }
 function viewMix(){
@@ -2009,7 +2026,6 @@ function viewMix(){
     '<button class="btn sm'+(CENAOP==='nova'?' pri':'')+'" type="button" data-act="mnova">＋ Nova cena</button><button class="btn sm'+(CENAOP==='colar'?' pri':'')+'" type="button" data-act="mcolar">⧉ Colar de outra cena</button><button class="btn sm" type="button" data-act="mren">Renomear</button>'+(L.length>1?'<span class="seg"><button type="button" data-act="mmover" data-v="-1" title="Mover a cena para a esquerda">◀</button><button type="button" data-act="mmover" data-v="1" title="Mover a cena para a direita">▶</button></span>':'')+''+(L.length>1?'<button class="btn sm dan" type="button" data-act="mdel">Excluir</button>':'')+'</div>';
   if(CENAOP)h+=cenaOpHtml(L,c);
   h+='<div class="bar">'+
-    '<label class="campo" style="display:flex;align-items:center;gap:.4rem">Ordem nos times <select data-act="mordem"><option value="tx"'+(c.ordem!=='alfa'?' selected':'')+'>Transmissor</option><option value="alfa"'+(c.ordem==='alfa'?' selected':'')+'>Alfabética</option></select></label>'+
     '<span class="sp"></span><button class="btn sm" type="button" data-act="mreaper" title="Arquivo com nome e cor das pistas 1–16 para o script do Reaper">⤓ Exportar para o Reaper</button><a class="btn sm" href="reaper/PericiaLab_Reaper.lua" download title="Instalar uma vez no Reaper: Actions › Load ReaScript">Script do Reaper</a><button class="btn sm" type="button" data-act="mcolauto" title="Volta as pistas 17–32 para a ordem automática (por transmissor)">↺ Refazer colinha</button><button class="btn sm" type="button" data-act="mreset">Restaurar estrutura base</button>'+dataDosHtml()+'<button class="btn pri sm" type="button" data-act="print">Imprimir</button></div>';
   h+='<div class="busca noprint"><input type="search" id="mbusca" data-act="mbusca" value="'+esc(MBUSCA)+'" placeholder="Achar no mixer: nome, TX, canal, cápsula…" aria-label="Buscar no mixer" autocomplete="off">'+
     '<button class="btn sm'+(MVARIOS?' pri':'')+'" type="button" data-act="mvarios" title="Tocar em várias pistas para selecionar (no computador: Shift ou Ctrl + clique)">☐ Selecionar vários</button>'+
@@ -2019,9 +2035,9 @@ function viewMix(){
   var W0=avisosMix(R,UI.ep),g0=W0.filter(function(w){return w[0]==='bad';}).length;
   h+='<p class="hint noprint" style="margin:-.4rem 0 .6rem">'+M.ch.filter(function(x){return x&&x.arm;}).length+' pistas armadas · '+M.ch.filter(function(x){return x&&x.on;}).length+' ligadas'+
     (W0.length?' · <button type="button" class="chip '+(g0?'bad':'warn')+'" data-act="mavabrir" style="border:0;cursor:pointer">⚠ '+(g0?g0+' importante'+(g0>1?'s':'')+', ':'')+W0.length+' aviso'+(W0.length>1?'s':'')+'</button>':' · <span class="chip ok">tudo no lugar</span>')+
-    (function(){var tf=timeFrente(UI.ep),nm=timeMentor(tf),cor=timeNome(tf);
-      if(porTimes(cenaAtual()))return ' · <span class="chip" title="As pistas 4–8 e 9–13 seguem os times. Quem abre é a cor do primeiro mentor, escolhida no card dele.">'+cor+(nm?' ('+esc(nm)+')':'')+' nas pistas 4–8</span>';
-      return ' · <button type="button" class="chip warn" data-act="mfr" style="border:0;cursor:pointer" title="Põe os participantes nas pistas 4–13 por time, cinco de cada. A ordem segue a cor dos mentores: quem tem a cor do primeiro mentor abre, nas 4–8.">⇄ Organizar pelos times'+(nm?' ('+esc(nm)+' nas 4–8)':'')+'</button>';})()+'</p>';
+    (function(){var tf=timeFrente(UI.ep),nm=timeMentor(tf),cor=timeNome(tf),R0=resolver(cenaAtual(),UI.ep),nF=R0.F.length;
+      if(porTimes(cenaAtual()))return ' · <span class="chip" title="As pistas se arrumam sozinhas: os times entram a partir da 4, na ordem do transmissor, e quem abre é a cor do primeiro mentor, escolhida no card dele.">'+cor+(nm?' ('+esc(nm)+')':'')+' da pista 4 à '+(3+nF)+'</span>';
+      return ' · <button type="button" class="chip warn" data-act="mfr" style="border:0;cursor:pointer" title="Volta as pistas dos participantes para o automático: os times entram a partir da 4, na ordem do transmissor, com a cor do primeiro mentor na frente.">⇄ Voltar para o automático'+(nm?' ('+esc(nm)+' na frente)':'')+'</button>';})()+'</p>';
   if(pg!=='pistas'){
     var cab='<div class="dochead"><div><h1>'+esc({rota:'Routing',bus:'Buses',out:'Saídas',scorpio:'Scorpio',menu:'Menu do gravador'}[pg])+' · '+esc(c.nome)+'</h1><p>EP '+UI.ep+'</p></div><div class="r">Gerado em '+agora()+'</div></div>';
     var fn={rota:viewRota,bus:viewBus,out:viewOut,menu:viewMenu}[pg],corpo=fn?fn(R,M):viewScorpio(c,R,M),pt=corpo.split('<!--NAV-->');
@@ -2058,20 +2074,34 @@ function dawStrip(R,M){
   return '<details class="dawbox noprint"'+(UI.dawFechado?'':' open')+'><summary data-act="dawtog"><b>Na DAW</b> · '+L.length+' faixas no arquivo</summary>'+
     '<div class="dawlanes">'+L.map(function(x,i){return '<div class="dl'+x.cat+'" title="'+(x.n==='bus L'||x.n==='bus R'?'Mixdown do Scorpio (bus '+x.n.slice(-1)+')':'Canal '+x.n+' do Scorpio')+'"><span class="dn">'+(i+1)+'</span><span class="dt">'+esc(x.nome)+'</span><span class="dc">'+(typeof x.n==='number'?'Ch '+x.n:'')+'</span><span class="clip"></span></div>';}).join('')+'</div></details>';
 }
-function mudarPista(n,tok){var c=clone(cenaAtual());c.pistas[n-1]=tok;salvarCenaMix(c);}
+function mudarPista(n,tok){var c=cenaEditavel();c.pistas[n-1]=tok;salvarCenaMix(c);}
 /* time do participante que está numa pista */
 function timeDePista(s){return s.p&&s.e&&(s.p.papel==='PARTICIPANTE'||s.p.papel==='CONVIDADO')&&(s.e.time==='A'||s.e.time==='B')?s.e.time:'';}
+/* onde cada participante toca, quando a cena está no automático: os times entram em sequência a partir da pista 4,
+   cada um do tamanho que tem. Com 4 no time da frente, o outro começa na 8. */
+function pistasEf(c,ep,F,T){
+  var p=(c.pistas||[]).slice();
+  if(!porTimes(c))return p;
+  if(!F){var fr=timeFrente(ep);F=timeDe(ep,fr);T=timeDe(ep,fr==='A'?'B':'A');}
+  for(var i=3;i<13;i++)p[i]='';
+  var k=0;
+  for(i=0;i<F.length&&k<10;i++)p[3+k++]='F:'+(i+1);
+  for(i=0;i<T.length&&k<10;i++)p[3+k++]='T:'+(i+1);
+  return p;
+}
+/* cópia da cena já com as posições que estão na tela, para editar uma pista sem bagunçar o resto */
+function cenaEditavel(){var c=clone(cenaAtual());c.pistas=pistasEf(c,UI.ep);return c;}
 /* a cena põe os participantes por time: 4–8 o primeiro bloco, 9–13 o bloco da Clara */
 function porTimes(c){var p=(c&&c.pistas)||[];for(var i=0;i<5;i++)if(p[3+i]!=='F:'+(i+1)||p[8+i]!=='T:'+(i+1))return false;return true;}
 function organizarPorTimes(){
   var c=clone(cenaAtual()),ocupa=[];
   for(var i=3;i<13;i++)if(c.pistas[i]&&!/^[FT]:/.test(c.pistas[i]))ocupa.push(i+1);
-  if(ocupa.length&&!confirm('As pistas 4 a 13 passam a seguir os times, cinco de cada, com o time do primeiro mentor nas 4–8.\n\nO que está hoje nas pistas '+ocupa.join(', ')+' será substituído. Continuar?'))return;
+  if(ocupa.length&&!confirm('As pistas dos participantes voltam ao automático: os times entram a partir da 4, na ordem do transmissor, com a cor do primeiro mentor na frente.\n\nO que está hoje nas pistas '+ocupa.join(', ')+' será substituído. Continuar?'))return;
   for(i=0;i<5;i++){c.pistas[3+i]='F:'+(i+1);c.pistas[8+i]='T:'+(i+1);}
   salvarCenaMix(c);
-  toast('Pistas 4–13 organizadas pelos times');
+  toast('Pistas dos participantes no automático');
 }
-function trocarPistas(a,b){if(a===b)return;var c=clone(cenaAtual()),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
+function trocarPistas(a,b){if(a===b)return;var c=cenaEditavel(),t=c.pistas[a-1];c.pistas[a-1]=c.pistas[b-1];c.pistas[b-1]=t;salvarCenaMix(c);}
 function cliqueMix(a,el){
   var c;
   if(a==='mslot'&&COPIA){var nn=+el.dataset.n;if(nn!==COPIA.de){var ix=COPIA.para.indexOf(nn);if(ix>=0)COPIA.para.splice(ix,1);else COPIA.para.push(nn);render();}return true;}
@@ -2098,7 +2128,7 @@ function cliqueMix(a,el){
   if(a==='mcena'){UI.cena=el.dataset.v;MSEL=0;salvarUi();render();return true;}
   if(a==='mview'){UI.mixv=el.dataset.v;salvarUi();render();return true;}
   if(a==='mcolauto'){if(confirm('Voltar as pistas 23–32 desta cena para a ordem automática (só participantes, do transmissor mais baixo ao mais alto)? As trocas que você fez à mão na colinha serão desfeitas.')){c=clone(cenaAtual());for(var ci=0;ci<COL_N;ci++)c.pistas[COL_INI-1+ci]='C:'+(ci+1);salvarCenaMix(c);toast('Colinha refeita');}return true;}
-  if(a==='mreset'){if(confirm('Voltar esta cena para a estrutura base (fixos 1–3, Time A 4–8, Time B 9–13, boom 14, gooseneck 15, colinha 23–32 (participantes) em ordem de transmissor; times também em ordem de transmissor)?')){c=clone(cenaAtual());c.pistas=cenaBase();c.ordem='tx';salvarCenaMix(c);}return true;}
+  if(a==='mreset'){if(confirm('Voltar esta cena para a estrutura base (fixos 1–3, participantes a partir da 4 pelos times, boom 14, gooseneck 15, colinha 23–32, tudo em ordem de transmissor)?')){c=clone(cenaAtual());c.pistas=cenaBase();c.ordem='tx';salvarCenaMix(c);}return true;}
   if(a==='minv'){MINV=!MINV;render();return true;}
   if(a==='mundo'){desfazerMix();return true;}
   if(a==='mredo'){refazerMix();return true;}
@@ -2133,7 +2163,6 @@ function mudancaMix(a,el){
   if(a==='mcor'){UI.cores=Object.assign({},UI.cores||{});UI.cores[el.dataset.k]=el.value;salvarUi();aplicarCores();return true;}
   if(mudancaMesa(a,el))return true;
   if(a==='mtok'){mudarPista(MSEL,el.value);return true;}
-  if(a==='mordem'){var c=clone(cenaAtual());c.ordem=el.value;salvarCenaMix(c);return true;}
   return false;
 }
 /* arrastar pistas desligado: no console, clicar só seleciona (ON/ARM e envios só pelos botões) */
@@ -2272,7 +2301,7 @@ function colarSel(){
 }
 function esvaziarSel(){
   var ns=MSELS.length>1?MSELS.slice():(MSEL?[MSEL]:[]);if(!ns.length)return;
-  var c=clone(cenaAtual()),n0=0;ns.forEach(function(n){if(c.pistas[n-1]){c.pistas[n-1]='';n0++;}});
+  var c=cenaEditavel(),n0=0;ns.forEach(function(n){if(c.pistas[n-1]){c.pistas[n-1]='';n0++;}});
   if(!n0){toast('Essas pistas já estão vazias');return;}
   salvarCenaMix(c);MSELS=[];render();toast(n0+' canal(is) limpo(s) · Ctrl+Z desfaz');
 }
@@ -3227,6 +3256,7 @@ document.addEventListener('click',function(ev){
   else if(a==='zoom'){abrirZoom(el.dataset.tipo,el.dataset.id);}
   else if(a==='whats'){var tw=textoWhats();if(navigator.share&&/Mobi|Android|iPhone/i.test(navigator.userAgent)){navigator.share({text:tw}).catch(function(){});}else if(navigator.clipboard){navigator.clipboard.writeText(tw).then(function(){toast('Copiado. Cole no WhatsApp.');},function(){toast('Não consegui copiar.',true);});}}
   else if(a==='ft'){UI.ft=v;salvarUi();render();}
+  else if(a==='cord'){UI.cord=v;salvarUi();render();}
   else if(a==='rford'){UI.rford=el.dataset.v;salvarUi();render();}
   else if(a==='print')imprimir();
   else if(a==='quem'){QUEM=$('#quem').value.trim();jset(K.quem,QUEM);toast('Nome salvo');}

@@ -26,6 +26,12 @@
 
 
 
+## v2.10 · 16/11/2026
+- O mixer volta a se organizar sozinho: os participantes entram a partir da pista 4, cada time do tamanho que tem, o do primeiro mentor (Thelma) na frente. Com 4 e 5, fica 4–7 e 8–12. As faixas coloridas acompanham o tamanho de cada bloco.
+- Saiu a opção de ordem nos times: é sempre por transmissor.
+- Carômetro: botões "Por TX" e "Por time" para a ordem dos cards dos participantes. O padrão é por transmissor.
+- Mexer na mão numa pista de participante continua possível: a cena passa a guardar aquelas posições e aparece o botão "⇄ Voltar para o automático".
+
 ## v2.09 · 16/11/2026
 - Botão "⇄ Organizar pelos times" no mixer: põe os participantes nas pistas 4–13 por time, cinco de cada, e a partir daí a ordem segue sozinha a cor dos mentores. Quando a cena já está assim, o lugar do botão mostra qual cor abre as 4–8.
 - Antes, numa cena com as pistas presas à ordem da colinha, mudar a cor do mentor não mexia em nada.
