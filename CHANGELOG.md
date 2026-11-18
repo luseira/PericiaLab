@@ -26,6 +26,11 @@
 
 
 
+## v2.13 · 18/11/2026
+- O time do Salada volta a entrar logo depois do último participante do time da Thelma, sem pista vaga no meio: cai a regra que abria o bloco dele na pista 9 a partir do EP 3. Com 4 e 5, fica 4–7 e 8–12; com 5 e 4, 4–8 e 9–12.
+- Telma é sem H: corrigido o nome na planilha (Elenco e Escalação), o nome de pista do Scorpio (THELMA → TELMA) e os rótulos do app.
+- Correção: o número da versão no cabeçalho tinha ficado parado na v2.10.
+
 ## v2.12 · 16/11/2026
 - Time A é sempre o time do 1º mentor do elenco (Thelma) e Time B o do 2º (Salada). O que muda por episódio é a cor: escolhida no card do mentor, ela pinta o time no Carômetro, no mixer, nas fichas e nas faixas.
 - Do EP 3 em diante o bloco da Clara (Time B) começa na pista 9, para ela ter o time inteiro na página 9–16 do SD-Remote. Antes disso, vem logo depois do Time A.

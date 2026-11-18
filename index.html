@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.10 · 16/11 22:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.13 · 18/11 15:45</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -678,14 +678,14 @@ UI.view='car';
 /* ───────── dados ───────── */
 /* times: guardados como Vermelho/Azul (aceita A/B antigos); internamente A=Vermelho, B=Azul */
 function normTime(v){var t=str(v).toLowerCase();if(/^az/.test(t)||t==='b')return 'B';if(/^verm/.test(t)||t==='a'||t==='v')return 'A';return '';}
-var TIMES={A:{nome:'Time A',cls:'tv',grava:'A',mentor:'Thelma'},B:{nome:'Time B',cls:'tz',grava:'B',mentor:'Salada'}};
+var TIMES={A:{nome:'Time A',cls:'tv',grava:'A',mentor:'Telma'},B:{nome:'Time B',cls:'tz',grava:'B',mentor:'Salada'}};
 function timeNome(t){return TIMES[t]?TIMES[t].nome:'';}
 function mentores(){return D.elenco.filter(function(p){return p.papel==='MENTOR';});}
-/* Time A é sempre do 1º mentor do elenco (Thelma) e Time B do 2º (Salada) */
+/* Time A é sempre do 1º mentor do elenco (Telma) e Time B do 2º (Salada) */
 function timeMentor(t){var ms=mentores(),m=t==='A'?ms[0]:t==='B'?ms[1]:null;return m?m.nome:(TIMES[t]?TIMES[t].mentor:'');}
 function outroTime(t){return t==='A'?'B':'A';}
 function timeCls(t){return TIMES[t]?(corTime(t)==='A'?'tv':'tz'):'';}
-/* cor do time no episódio: 'A' = azul, 'B' = vermelho. Vem do card do mentor; sem escolha, Thelma azul */
+/* cor do time no episódio: 'A' = azul, 'B' = vermelho. Vem do card do mentor; sem escolha, Telma azul */
 function corTime(t,ep){
   if(t!=='A'&&t!=='B')return '';
   var EF=efetivo(ep===undefined?UI.ep:ep),ms=mentores(),c=ms[0]?(EF[ms[0].id]||{}).time:'';
@@ -1767,7 +1767,7 @@ function reduzirFoto(file,cb){
 var CAPS=['#4a1f26','#1f2b5c','#b9bcc0','#6b2fa0','#e2401c','#f2d01a','#1f9a54','#1e4fc4','#f07a1e','#ea6f95','#f2f0ea','#15181d'];
 var CAPNOME=['vinho','marinho','cinza','roxo','vermelho','amarelo','verde','azul','laranja','rosa','branco','preto'];
 var MIXV=[['cl','CL-12',1,12],['b1','1–8',1,8],['b2','9–16',9,16],['b3','17–24',17,24],['b4','25–32',25,32],['s1','1–16',1,16],['s2','17–32',17,32],['all','Tudo',1,32]];
-var ZONAS=[[1,3,'Principais'],[4,8,'Time A · Thelma'],[9,14,'Time B · Salada · Clara'],[15,22,'Livres'],[23,32,'Colinha']];
+var ZONAS=[[1,3,'Principais'],[4,8,'Time A · Telma'],[9,14,'Time B · Salada · Clara'],[15,22,'Livres'],[23,32,'Colinha']];
 var MSEL=0,MTROCA=false;
 
 function cenaBase(){
@@ -1840,7 +1840,7 @@ function listaCanais(){
   return Object.keys(v).sort(function(a,b){return v[a]-v[b]||nat(a,b);});
 }
 function resolver(cena,ep){
-  var EF=efetivo(ep),A=timeDe(ep,'A'),B=timeDe(ep,'B'),fr='A' /* F = Time A (Thelma), sempre nas primeiras pistas; T = Time B (Salada), no bloco da Clara */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
+  var EF=efetivo(ep),A=timeDe(ep,'A'),B=timeDe(ep,'B'),fr='A' /* F = Time A (Telma), sempre nas primeiras pistas; T = Time B (Salada), no bloco da Clara */,F=fr==='A'?A:B,T=fr==='A'?B:A,C=colinhaMap(ep).lista,primeira={},onde={},porCanal=mapaCanais(ep,EF);
   var S=pistasEf(cena,ep,F,T).map(function(tok,i){
     var s={n:i+1,tok:tok||'',p:null,motivo:'',cn:''};
     if(!tok){return s;}
@@ -1942,7 +1942,7 @@ function zonasEf(R){
   var Z=ZONAS.map(function(z){return z.slice();}),nF=R.F.length,nT=R.T.length;
   if(!nF&&!nT)return Z;
   Z[1][1]=Math.min(13,3+Math.max(nF,1));
-  Z[2][0]=Math.max(Z[1][1]+1,iniTras(UI.ep,nF)+1);
+  Z[2][0]=Math.max(Z[1][1]+1,iniTras(nF)+1);
   Z[2][1]=14;
   return Z;
 }
@@ -2088,16 +2088,16 @@ function mudarPista(n,tok){var c=cenaEditavel();c.pistas[n-1]=tok;salvarCenaMix(
 function timeDePista(s){return s.p&&s.e&&(s.p.papel==='PARTICIPANTE'||s.p.papel==='CONVIDADO')&&(s.e.time==='A'||s.e.time==='B')?s.e.time:'';}
 /* onde cada participante toca, quando a cena está no automático: os times entram em sequência a partir da pista 4,
    cada um do tamanho que tem. Com 4 no time da frente, o outro começa na 8. */
-/* onde começa o bloco da Clara (Time B). Do EP 3 em diante ele abre na pista 9, para a Clara
-   ter o time inteiro na mesma página do SD-Remote (9–16). Antes disso, vem logo depois do Time A. */
-function iniTras(ep,nF){return (+ep>=3?Math.max(8,3+nF):3+nF);}
+/* onde começa o bloco da Clara (Time B): logo depois do último participante do time da Telma,
+   sem pista vaga no meio. Com 4 na frente, começa na 8; com 5, na 9. */
+function iniTras(nF){return 3+nF;}
 function pistasEf(c,ep,F,T){
   var p=(c.pistas||[]).slice();
   if(!porTimes(c))return p;
   if(!F){F=timeDe(ep,'A');T=timeDe(ep,'B');}
   for(var i=3;i<13;i++)p[i]='';
   for(i=0;i<F.length&&3+i<13;i++)p[3+i]='F:'+(i+1);
-  var j=iniTras(ep,F.length);
+  var j=iniTras(F.length);
   for(i=0;i<T.length&&j+i<13;i++)p[j+i]='T:'+(i+1);
   return p;
 }
