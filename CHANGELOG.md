@@ -26,6 +26,9 @@
 
 
 
+## v2.16 · 20/11/2026
+- Nomes fixos das pistas que não são pessoas, escritos como estão no gravador: DANTE 1 e 2 (a volta do Reaper) viram **FABIO RTN** e **GIOVANNA RTN**, IN 16 vira **B** e RTN B1 segue como **MIX B**. Antes o export renomeava essas pistas para o código do input.
+
 ## v2.15 · 20/11/2026
 - **O export passa a mexer só no que foi mudado no site.** O arquivo carregado em Scorpio é a referência: campo a campo, só vai para o arquivo gerado o que difere dele. Buses, saídas, AES, Dante, slate, tone, fones, EQ, compressor, fader e pan que você não tocou saem idênticos. A janela de confirmação lista exatamente o que mudou.
 - **"Trazer do gravador" agora traz tudo o que o app sabe representar** — inclusive ISO, os pares AES das saídas L/R e o Dante — e devolve para "como no gravador" os campos que o site só sobrescreve (EQ, compressor, fader, pan, mic/48V, Dante, slate, fones). Depois de importar, um export sai igual ao arquivo que entrou.

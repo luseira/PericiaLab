@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.15 · 20/11 10:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.16 · 20/11 10:30</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2073,9 +2073,16 @@ function viewMix(){
   return h+logHtml()+impressaoMix(R,c,M);
 }
 /* ───────── simulação da DAW: só as pistas armadas viram faixa, em ordem de canal ───────── */
+/* Nomes das pistas que não são pessoas, escritos como estão no gravador. DANTE 1 e 2 são a volta do
+   Reaper (o que o Fábio e a Giovana estão ouvindo), IN 16 é a mix só do time B que a Clara manda pelo
+   633 e serve para montar bus de monitoração, RTN B1 é a mix completa dela, que vai gravada na 16.
+   Um nome posto à mão na tela do canal vem antes desta tabela. */
+var NOME_FX={'RTN B1':'Mix B','RTN B2':'Mix R-B','IN 16':'B','DANTE 1':'FABIO RTN','DANTE 2':'GIOVANNA RTN'};
 function nomeFx(s,M){
   var ch=M&&M.ch&&M.ch[s.n];if(ch&&ch.nome)return ch.nome;
-  var c=s.cn||'';if(/^RTN\s*B\s*1/i.test(c))return 'Mix B';if(/^RTN\s*B\s*2/i.test(c))return 'Mix R-B';return c;
+  var c=s.cn||'',k=c.toUpperCase().replace(/\s+/g,' ').trim();
+  if(NOME_FX[k])return NOME_FX[k];
+  if(/^RTN\s*B\s*1/i.test(c))return 'Mix B';if(/^RTN\s*B\s*2/i.test(c))return 'Mix R-B';return c;
 }
 function dawFaixas(R,M){
   var L=[],fora=[];
