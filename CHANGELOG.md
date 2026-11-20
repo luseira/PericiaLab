@@ -26,6 +26,13 @@
 
 
 
+## v2.17 · 20/11/2026
+- **Scorpio virou aba do menu de cima**, ao lado de Mixer. Sai da barra de bancos do mixer (1–8, 9–16…), que não tinha o que fazer ali, e ganha o seletor de cena no topo.
+- **Escolher o arquivo agora só carrega.** Ele fica guardado no aparelho, com botões para trocar ou esquecer. Não pergunta mais nada na hora de carregar.
+- **"Trazer do gravador para a cena" virou "Importar settings do gravador"**, com três opções: tudo, só os canais (ON, ARM, ISO, trim, lowcut, fase, delay) ou só routing, buses, saídas, AES e Dante. Cada uma diz o que faz antes de confirmar.
+- **Comparação e resumo por canal agora ficam recolhidos**, e lembram se você deixou abertos.
+- A importação preserva o nome que você tiver posto à mão numa pista: esse é do site, não do gravador.
+
 ## v2.16 · 20/11/2026
 - Nomes fixos das pistas que não são pessoas, escritos como estão no gravador: DANTE 1 e 2 (a volta do Reaper) viram **FABIO RTN** e **GIOVANNA RTN**, IN 16 vira **B** e RTN B1 segue como **MIX B**. Antes o export renomeava essas pistas para o código do input.
 
