@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.14 · 18/11 16:20</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.15 · 20/11 10:20</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2526,7 +2526,12 @@ function lerArquivo(m){
     A.ch[n]=ch;A.nomes[n]=sjGet(m,['MetaData','TrackName'+n])||'';A.fonte[n]=sjGet(m,[k,'inputSrcName'])||'';}
   BUSES.forEach(function(b){A.bus[b]={nome:sjGet(m,['OutputBusControl','obus'+b,'userName'])||'',src:b==='L'||b==='R'?'':(sjGet(m,['SlateMicAndReturns','bus'+b])||'')};});
   SAIDAS.forEach(function(o){var p=['AnalogOutputs',o];A.out[o]={nome:sjGet(m,p.concat('userName'))||'',src:srcDoArquivo(sjGet(m,p.concat('source')),sjGet(m,p.concat('chan'))),
-    nivel:sjGet(m,p.concat('isAes'))?'AES':(sjGet(m,p.concat('lineMic'))||''),gain:(sjGet(m,p.concat('dB10thsGain'))||0)/10,dly:sjGet(m,p.concat('msDelay'))||0};});
+    nivel:sjGet(m,p.concat('isAes'))?'AES':(sjGet(m,p.concat('lineMic'))||''),gain:(sjGet(m,p.concat('dB10thsGain'))||0)/10,dly:sjGet(m,p.concat('msDelay'))||0};
+    if(AES_PAR[o]){var ae={};AES_PAR[o].forEach(function(q,i){var pa=['AESOutputs','AES'+q];if(sjGet(m,pa.concat('source'))===undefined)return;
+      var sa=srcDoArquivo(sjGet(m,pa.concat('source')),sjGet(m,pa.concat('chan')))||'',mb=/^bus:(.+)$/.exec(sa);
+      ae['c'+(i+1)]=mb?mb[1]:'';if(!i)ae.am=+sjGet(m,pa.concat('autoMutOptions'))||0;});
+    if(ae.c1!==undefined||ae.c2!==undefined)A.out[o].aes=ae;}});
+  A.dante={};for(var d=1;d<=32;d++){var pd=['DanteOutputs','Dante'+d];if(sjGet(m,pd.concat('source'))!==undefined)A.dante[d]=srcDoArquivo(sjGet(m,pd.concat('source')),sjGet(m,pd.concat('chan')))||'';}
   return A;
 }
 function nomeArquivoPista(s,M){return s.p?nomePista(s.p).slice(0,16):s.fx?semAcento(nomeFx(s,M)).toUpperCase().slice(0,16):'Ch '+s.n;}
@@ -2554,13 +2559,28 @@ function comparar(R,M,A){
     if(AES_PAR[o]&&c.aes)AES_PAR[o].forEach(function(n,i){var v=c.aes['c'+(i+1)],f=aesArq(n);if(v!=null)add('Saída '+o,'AES '+n+' *',v?'Bus '+v:'silêncio',f?(f.bus?'Bus '+f.bus:'silêncio'):'—');});});
   return L;
 }
+/* A cena passa a ser uma cópia fiel do arquivo: o que a cena guarda vem do arquivo, e o que ela só
+   sobrescreve (ajustes extras, Dante, slate, fones) volta para "como no gravador". Assim, logo depois
+   de importar, um export não muda nada — e daí em diante só sai o que foi mexido no site. */
 function trazerDoArquivo(R,A){
   mudarMesa(function(m){
-    R.S.forEach(function(s){var a=A.ch[s.n];m.ch[s.n]={on:a.on,arm:a.arm,r:clone(a.r),sg:clone(a.sg),trim:a.trim,hpf:a.hpf,ph:a.ph,dly:a.dly};});
+    for(var n=1;n<=32;n++){var a=A.ch[n];if(!a)continue;
+      m.ch[n]={on:a.on,arm:a.arm,r:clone(a.r),sg:clone(a.sg),iso:a.iso,trim:a.trim,hpf:a.hpf,ph:a.ph,dly:a.dly};}
     BUSES.forEach(function(b){m.bus[b]={nome:A.bus[b].nome,src:A.bus[b].src};});
     SAIDAS.forEach(function(o){m.out[o]=clone(A.out[o]);});
+    m.dante={};m.sl={};m.hp={};
   });
 }
+/* em que canal do arquivo estava esta pessoa (pelo nome da pista) ou este input. A busca fica na mesma
+   zona do canal: pista de mixer (1–16) procura em 1–16, colinha (17–32) procura entre as colinhas —
+   senão a colinha herdaria o mute e o ARM da pista de mixer da pessoa. */
+function chZona(n){return n<=16?[1,16]:[17,32];}
+function chDoNome(A,nm,menos){if(!nm)return 0;var z=chZona(menos);for(var j=z[0];j<=z[1];j++)if(j!==menos&&A.nomes[j]===nm)return j;return 0;}
+function chDaFonte(A,f,menos){if(!f)return 0;var z=chZona(menos);for(var j=z[0];j<=z[1];j++)if(j!==menos&&A.fonte[j]===f)return j;return 0;}
+/* chaves do arquivo que o site assumiu para si neste canal (ajuste posto à mão na tela do canal) */
+function chavesDoSite(ch,n){var o={};XCH.concat(n<=16?XEQ:[]).forEach(function(f){if(!ch||ch['x_'+f[0]]==null)return;
+  if(f[2]==='*eq'){o.eqEnabled=1;o.eqPreFader=1;}else if(f[2]==='*comp'){o.compressorEnabled=1;o.compressorPreFader=1;}
+  else if(f[2].charAt(0)!=='*')o[f[2]]=1;});return o;}
 function deduzidosUsados(M,R){
   var d=[];
   /* confirmados nos testes de 05/11: entradas AES3-n, saída ← Bus n (n+6), HP-L/R, Com Rtn 1; fontes de bus Al, Bl, _1, _2 */
@@ -2572,39 +2592,73 @@ function deduzidosUsados(M,R){
     if(fs.indexOf('Adc6')>=0&&fs.some(function(f){return /^AES3-[56]$/.test(f);}))d.push('XLR 6 usado como analógico (LINE 6) e como AES 5/6 ao mesmo tempo');}
   return d;
 }
+/* Export: o arquivo carregado é a referência. Só vai para o arquivo o campo em que a cena difere dele.
+   Quem troca de pista leva junto o input (ganho, lowcut, fase, delay, EQ, compressor) e o ON/ARM,
+   a não ser nos campos que foram mexidos à mão na pista de destino. Pista que esvazia é limpa. */
 function exportar(c,R,M,nome){
-  var m=sjParse(SC.txt),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
+  var m=sjParse(SC.txt),orig=sjParse(SC.txt),A=lerArquivo(orig),rot={'':'Unrouted',post:'Postfader',pre:'Prefader',send:'PostSend'};
+  var L=[],avisos=[];function dif(a,b){return String(a==null?'':a)!==String(b==null?'':b);}
+  function log(n,campo,de,para){L.push('Ch '+n+' · '+campo+': '+(de===''||de==null?'—':de)+' → '+para);}
   var srcAntes={};SAIDAS.forEach(function(o){srcAntes[o]=srcDoArquivo(sjGet(m,['AnalogOutputs',o,'source']),+sjGet(m,['AnalogOutputs',o,'chan']));});
-  R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n];
+  R.S.forEach(function(s){var n=s.n,k='InputChannel'+n,ch=M.ch[n]||{},a=A.ch[n]||{};
     PRE_ADC[n]=s.tok&&s.cn?(fonteSlot(s)||undefined):undefined;
     xExport(m,'ch',n,ch,XCH.concat(n<=16?XEQ:[]));
-    /* pista vazia na cena: nome e fonte ficam como no arquivo base, mas ARM, mute e envios seguem a cena
-       (antes ficavam do arquivo: um canal armado e aberto no gravador continuava gravando e somando na mix) */
-    if(s.tok){
-      sjSet(m,['MetaData','TrackName'+n],nomeArquivoPista(s,M));
-      sjSet(m,[k,'inputSrcName'],s.cn?(fonteSlot(s)||sjGet(m,[k,'inputSrcName'])):'Nosource');
-      sjSet(m,[k,'isoPostFader'],false); /* pistas sempre ISO pré */
+    if(!s.tok){ /* pista vazia: sem input, muda, desarmada e com o nome padrão */
+      if(dif('Ch '+n,A.nomes[n])){sjSet(m,['MetaData','TrackName'+n],'Ch '+n);log(n,'nome',A.nomes[n],'Ch '+n);}
+      if(dif('Nosource',A.fonte[n])){sjSet(m,[k,'inputSrcName'],'Nosource');log(n,'input',fonteTxt(A.fonte[n]),'sem input');}
+      if(a.on){sjSet(m,[k,'isMuted'],true);log(n,'mute','aberta','muda');}
+      if(a.arm){sjSet(m,[k,'isRecordArmed'],false);log(n,'arm','armada','desarmada');}
+      return;
     }
-    sjSet(m,[k,'isRecordArmed'],!!ch.arm);sjSet(m,[k,'isMuted'],!ch.on);
-    BUSES.forEach(function(b){var v=ch.r[b]||'';
-      /* send em −∞ já é "desligado": não mexe para não sujar o arquivo */
-      if(!v&&rotaArq({routeState:sjGet(m,[k,'bus'+b,'routeState']),gain:sjGet(m,[k,'bus'+b,'dB10thsSendGain'])})==='')return;
+    var nm=nomeArquivoPista(s,M),f=s.cn?fonteSlot(s):'';
+    /* de onde essa pessoa (ou esse input) veio no arquivo */
+    var mov=dif(nm,A.nomes[n])?chDoNome(A,nm,n):0;
+    if(!mov&&f&&dif(f,A.fonte[n]))mov=chDaFonte(A,f,n);
+    var o=mov?A.ch[mov]:null,meu=chavesDoSite(ch,n);
+    if(dif(nm,A.nomes[n])){sjSet(m,['MetaData','TrackName'+n],nm);log(n,'nome',A.nomes[n],nm);}
+    if(f&&dif(f,A.fonte[n])){sjSet(m,[k,'inputSrcName'],f);log(n,'input',fonteTxt(A.fonte[n]),fonteTxt(f));}
+    if(!f&&s.cn)avisos.push('Ch '+n+' '+nm+': código do input a confirmar, ficou como no arquivo');
+    /* ON e ARM: o que foi mexido no site manda; se não foi, vêm com a pessoa */
+    var on=ch.on,arm=ch.arm;
+    if(o){if(!dif(on,a.on))on=o.on;if(!dif(arm,a.arm))arm=o.arm;}
+    if(dif(on,a.on)){sjSet(m,[k,'isMuted'],!on);log(n,'mute',a.on?'aberta':'muda',on?'aberta':'muda');}
+    if(dif(arm,a.arm)){sjSet(m,[k,'isRecordArmed'],!!arm);log(n,'arm',a.arm?'armada':'desarmada',arm?'armada':'desarmada');}
+    if(ch.iso!=null&&dif(ch.iso,a.iso))sjSet(m,[k,'isoPostFader'],ch.iso==='post');
+    if(a.iso==='post')avisos.push('Ch '+n+' '+nm+': ISO pós-fader no arquivo (a Clara recebe ISO pré)');
+    BUSES.forEach(function(b){var v=ch.r[b]||'';if(!dif(v,a.r[b]||'')&&!(v==='send'&&dif(ch.sg[b]||0,a.sg[b]||0)))return;
       sjSet(m,[k,'bus'+b,'routeState'],rot[v]);
-      if(v==='send')sjSet(m,[k,'bus'+b,'dB10thsSendGain'],Math.round((ch.sg[b]||0)*10));});
-    if(ch.trim!=null)sjSet(m,[k,'trimGaindB10ths'],Math.round(ch.trim*10));
-    if(ch.hpf!=null){sjSet(m,[k,'lowcutEnabled'],ch.hpf>0);if(ch.hpf>0)sjSet(m,[k,'lowcutHz'],Math.round(ch.hpf));}
-    if(n<=16&&ch.ph!=null)sjSet(m,[k,'isPolarityInverted'],!!ch.ph);
-    if(n<=16&&ch.dly!=null)sjSet(m,[k,'msInputDelay'],+ch.dly);
+      if(v==='send')sjSet(m,[k,'bus'+b,'dB10thsSendGain'],Math.round((ch.sg[b]||0)*10));
+      log(n,'→ bus '+b,ROTA_TXT[a.r[b]||''],ROTA_TXT[v]);});
+    /* ajustes do input: o que o site não mexeu vem da pista de origem da pessoa */
+    var tr=ch.trim,hf=ch.hpf,ph=ch.ph,dl=ch.dly;
+    if(o&&n<=16){if(!dif(tr,a.trim))tr=o.trim;if(!dif(hf,a.hpf))hf=o.hpf;if(!dif(ph,a.ph))ph=o.ph;if(!dif(dl,a.dly))dl=o.dly;}
+    if(tr!=null&&dif(tr,a.trim)){sjSet(m,[k,'trimGaindB10ths'],Math.round(tr*10));log(n,'trim',a.trim+' dB',tr+' dB');}
+    if(hf!=null&&dif(hf,a.hpf)){sjSet(m,[k,'lowcutEnabled'],hf>0);if(hf>0)sjSet(m,[k,'lowcutHz'],Math.round(hf));log(n,'lowcut',a.hpf?a.hpf+' Hz':'off',hf?hf+' Hz':'off');}
+    if(n<=16&&ph!=null&&dif(ph,a.ph)){sjSet(m,[k,'isPolarityInverted'],!!ph);log(n,'fase',a.ph?'invertida':'normal',ph?'invertida':'normal');}
+    if(n<=16&&dl!=null&&dif(dl,a.dly)){sjSet(m,[k,'msInputDelay'],+dl);log(n,'delay',a.dly+' ms',dl+' ms');}
+    /* EQ e compressor do canal de origem, nos campos que o site não assumiu */
+    if(o&&n<=16){var lev=[];CAMPOS_INPUT.forEach(function(q){
+        if(/^(trimGaindB10ths|lowcutEnabled|lowcutHz|isPolarityInverted|msInputDelay)$/.test(q)||meu[q])return;
+        var v=sjGet(orig,['InputChannel'+mov,q]);if(v===undefined||sjGet(orig,[k,q])===undefined)return;
+        if(dif(v,sjGet(orig,[k,q])))lev.push(q);sjSet(m,[k,q],v);});
+      if(lev.length)log(n,'EQ/compressor','do ch '+mov,'(vieram com '+nm+')');}
   });
   BUSES.forEach(function(b){xExport(m,'bus',b,M.bus[b],XBUS.filter(function(f){return !/^s[LR12]$/.test(f[0])||(b!=='L'&&b!=='R'&&b!=='1'&&b!=='2');}));});
-  BUSES.forEach(function(b){var x=M.bus[b];if(x.nome)sjSet(m,['OutputBusControl','obus'+b,'userName'],x.nome);if(b!=='L'&&b!=='R')sjSet(m,['SlateMicAndReturns','bus'+b],x.src||'');});
-  SAIDAS.forEach(function(o){var x=M.out[o],p=['AnalogOutputs',o],f=srcParaArquivo(x.src);
-    sjSet(m,p.concat('userName'),x.nome||'');if(f){sjSet(m,p.concat('source'),f[0]);sjSet(m,p.concat('chan'),f[1]);}
-    if(x.nivel==='AES'&&(o==='L'||o==='R'))sjSet(m,p.concat('isAes'),true);
-    else if(x.nivel&&x.nivel!=='AES'){sjSet(m,p.concat('lineMic'),x.nivel);if(sjGet(m,p.concat('isAes'))!==undefined)sjSet(m,p.concat('isAes'),false);}if(x.gain!=null)sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));if(x.dly!=null)sjSet(m,p.concat('msDelay'),Math.round(x.dly));
-    if(AES_PAR[o]&&x.aes){AES_PAR[o].forEach(function(n,i){var pa=['AESOutputs','AES'+n];if(sjGet(m,pa.concat('source'))===undefined)return;var v=x.aes['c'+(i+1)];
-      if(v!=null){var fa=srcParaArquivo(v?'bus:'+v:'');sjSet(m,pa.concat('source'),fa[0]);sjSet(m,pa.concat('chan'),fa[1]);}
-      if(x.aes.am!=null){sjSet(m,pa.concat('autoMutOptions'),x.aes.am);sjSet(m,pa.concat('autoMute'),!!(x.aes.am&1));}});}});
+  BUSES.forEach(function(b){var x=M.bus[b],ab=A.bus[b]||{};
+    if(x.nome&&dif(x.nome,ab.nome)){sjSet(m,['OutputBusControl','obus'+b,'userName'],x.nome);L.push('Bus '+b+' · nome: '+(ab.nome||'—')+' → '+x.nome);}
+    if(b!=='L'&&b!=='R'&&dif(x.src||'',ab.src||'')){sjSet(m,['SlateMicAndReturns','bus'+b],x.src||'');L.push('Bus '+b+' · fonte: '+(ab.src||'—')+' → '+(x.src||'—'));}});
+  SAIDAS.forEach(function(o){var x=M.out[o],ao=A.out[o]||{},p=['AnalogOutputs',o],f=srcParaArquivo(x.src);
+    if(dif(x.nome||'',ao.nome||'')){sjSet(m,p.concat('userName'),x.nome||'');L.push(o+' · nome: '+(ao.nome||'—')+' → '+(x.nome||'—'));}
+    if(f&&dif(x.src||'',ao.src||'')){sjSet(m,p.concat('source'),f[0]);sjSet(m,p.concat('chan'),f[1]);L.push(o+' · fonte: '+(ao.src||'—')+' → '+(x.src||'—'));}
+    if(dif(x.nivel||'',ao.nivel||'')){
+      if(x.nivel==='AES'&&(o==='L'||o==='R'))sjSet(m,p.concat('isAes'),true);
+      else if(x.nivel&&x.nivel!=='AES'){sjSet(m,p.concat('lineMic'),x.nivel);if(sjGet(m,p.concat('isAes'))!==undefined)sjSet(m,p.concat('isAes'),false);}
+      if(x.nivel)L.push(o+' · nível: '+(ao.nivel||'—')+' → '+x.nivel);}
+    if(x.gain!=null&&dif(x.gain,ao.gain)){sjSet(m,p.concat('dB10thsGain'),Math.round(x.gain*10));L.push(o+' · ganho: '+(ao.gain||0)+' → '+x.gain+' dB');}
+    if(x.dly!=null&&dif(x.dly,ao.dly))sjSet(m,p.concat('msDelay'),Math.round(x.dly));
+    if(AES_PAR[o]&&x.aes){AES_PAR[o].forEach(function(n,i){var pa=['AESOutputs','AES'+n];if(sjGet(m,pa.concat('source'))===undefined)return;var v=x.aes['c'+(i+1)],va=(ao.aes||{})['c'+(i+1)];
+      if(v!=null&&dif(v,va)){var fa=srcParaArquivo(v?'bus:'+v:'');sjSet(m,pa.concat('source'),fa[0]);sjSet(m,pa.concat('chan'),fa[1]);L.push('AES '+n+': '+(va||'—')+' → bus '+(v||'—'));}
+      if(x.aes.am!=null&&dif(x.aes.am,(ao.aes||{}).am)){sjSet(m,pa.concat('autoMutOptions'),x.aes.am);sjSet(m,pa.concat('autoMute'),!!(x.aes.am&1));}});}});
   /* saídas em par (link) com fontes diferentes no plano: desfaz o link */
   for(var i=1;i<=9;i+=2){var a1='X'+i,a2='X'+(i+1),la=sjGet(m,['AnalogOutputs',a1,'linkedToOutput']),lb=sjGet(m,['AnalogOutputs',a2,'linkedToOutput']);
     var igual=(M.out[a1].src||'')===(srcAntes[a1]||'')&&(M.out[a2].src||'')===(srcAntes[a2]||'');
@@ -2615,13 +2669,16 @@ function exportar(c,R,M,nome){
   if(fontes.some(function(f){return f==='AES3-1'||f==='AES3-2';}))sjSet(m,['GlobalChannelSettings','xlr1Aes'],true);
   if(fontes.some(function(f){return f==='AES3-5'||f==='AES3-6';}))sjSet(m,['GlobalChannelSettings','xlr6Aes'],true);
   SAIDAS.forEach(function(o){xExport(m,'out',o,M.out[o],XOUT);});
-  Object.keys(M.dante||{}).forEach(function(d){var f=srcParaArquivo(M.dante[d]);if(f&&sjGet(m,['DanteOutputs','Dante'+d,'source'])!==undefined){sjSet(m,['DanteOutputs','Dante'+d,'source'],f[0]);sjSet(m,['DanteOutputs','Dante'+d,'chan'],f[1]);}});
-  Object.keys(M.hp||{}).forEach(function(pp){Object.keys(M.hp[pp]).forEach(function(f){var v=M.hp[pp][f];if(sjGet(m,['HeadphoneOut',pp,f])===undefined)return;sjSet(m,['HeadphoneOut',pp,f],typeof v==='boolean'?v:String(v));});});
+  Object.keys(M.dante||{}).forEach(function(d){var v=M.dante[d];if(v==null||!dif(v,(A.dante||{})[d]))return;var f=srcParaArquivo(v);
+    if(f&&sjGet(m,['DanteOutputs','Dante'+d,'source'])!==undefined){sjSet(m,['DanteOutputs','Dante'+d,'source'],f[0]);sjSet(m,['DanteOutputs','Dante'+d,'chan'],f[1]);L.push('Dante '+d+': '+((A.dante||{})[d]||'—')+' → '+(v||'silêncio'));}});
+  Object.keys(M.hp||{}).forEach(function(pp){Object.keys(M.hp[pp]).forEach(function(f){var v=M.hp[pp][f],at=sjGet(orig,['HeadphoneOut',pp,f]);
+    if(v==null||at===undefined||!dif(v,at))return;sjSet(m,['HeadphoneOut',pp,f],typeof v==='boolean'?v:String(v));L.push('Fone '+pp+' · '+f);});});
   Object.keys(M.sl||{}).forEach(function(k){var v=M.sl[k];if(v===null||v===undefined)return;
-    if(/^rtn[ABC]$/.test(k)){['LVolume','RVolume'].forEach(function(z){if(sjGet(m,['SlateMicAndReturns',k+z])!==undefined)sjSet(m,['SlateMicAndReturns',k+z],+v);});return;}
-    if(sjGet(m,[slSec(k),k])===undefined)return;sjSet(m,[slSec(k),k],typeof sjGet(m,[slSec(k),k])==='number'?+v:String(v));});
+    if(/^rtn[ABC]$/.test(k)){['LVolume','RVolume'].forEach(function(z){if(sjGet(m,['SlateMicAndReturns',k+z])!==undefined&&dif(v,sjGet(orig,['SlateMicAndReturns',k+z])))sjSet(m,['SlateMicAndReturns',k+z],+v);});return;}
+    var at=sjGet(orig,[slSec(k),k]);if(at===undefined||!dif(v,at))return;
+    sjSet(m,[slSec(k),k],typeof at==='number'?+v:String(v));L.push('Slate/tone · '+k+': '+at+' → '+v);});
   sjSet(m,['system','name'],nome);
-  return sjDump(m)+'\n';
+  return {txt:sjDump(m)+'\n',mudou:L,avisos:avisos};
 }
 /* ───────── Export "só participantes": o arquivo carregado vale para tudo; muda só quem está em cada canal ─────────
    Mesmo método do PL_1111_v2 (11/11): por canal de participante, troca inputSrcName e o nome da pista,
@@ -2759,18 +2816,20 @@ function cliqueMesa(a,el){
     var cur=cenaAtual(),mb=(cur.mesa&&cur.mesa.bus)||{},mo=(cur.mesa&&cur.mesa.out)||{};
     cenasLista().forEach(function(x){if(x.id===cur.id)return;var y=clone(x);y.mesa=y.mesa||{};y.mesa.bus=clone(mb);y.mesa.out=clone(mo);y.mesa.sl=clone((cur.mesa&&cur.mesa.sl)||{});y.mesa.dante=clone((cur.mesa&&cur.mesa.dante)||{});y.mesa.hp=clone((cur.mesa&&cur.mesa.hp)||{});salvarCena(y);});toast('Buses, saídas e Slate/Coms copiados para as outras cenas');return true;}
   if(a==='mscdel'){SC=null;SC_NUVEM=null;if(D)D.scarq=null;try{localStorage.removeItem(KSC);}catch(e){}render();return true;}
-  if(a==='mtrazer'){if(!SC)return true;if(!confirm('Substituir ON, ARM, routing, ajustes, buses e saídas desta cena pelo que está no arquivo?'))return true;
+  if(a==='mtrazer'){if(!SC)return true;if(!confirm('Trazer o arquivo do gravador para esta cena?\n\nON, ARM, routing, trim, lowcut, fase, delay, ISO, buses, saídas e AES passam a ser os do arquivo. EQ, compressor, fader, pan, mic/48V, Dante, slate e fones voltam para "como no gravador" — o site mostra o valor do arquivo e não mexe neles no export.\n\nA partir daqui, o export só muda o que você mudar no site.'))return true;
     var c3=cenaAtual(),R3=resolver(c3,UI.ep);trazerDoArquivo(R3,lerArquivo(SC.m));toast('Cena atualizada com o gravador');return true;}
   if(a==='mreaper'){var cr=cenaAtual();baixarTxt('PericiaLab_Reaper_'+nomeArq(cr.nome)+'_EP'+UI.ep+'.txt',reaperTxt(cr));toast('Arquivo do Reaper baixado. No Reaper, rode a ação "PericiaLab_Reaper" e escolha o arquivo.');return true;}
   if(a==='mexport'){if(!SC)return true;var c4=cenaAtual(),R4=resolver(c4,UI.ep),M4=mesaEf(c4,R4),nm=nomeArq($('#mscnome').value||c4.nome);
-    try{baixar(nm+'.json',exportar(c4,R4,M4,nm));toast('Settings gerado: '+nm+'.json');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
+    try{var X4=exportar(c4,R4,M4,nm);
+      var m4='Arquivo base: '+SC.nome+'\nCena: '+c4.nome+' · EP '+UI.ep+'\n\nMudanças ('+X4.mudou.length+'):\n'+(X4.mudou.join('\n')||'nenhuma — o arquivo sai igual ao que você carregou')+(X4.avisos.length?'\n\nATENÇÃO:\n'+X4.avisos.join('\n'):'')+'\n\nTodo o resto fica igual ao arquivo. Baixar '+nm+'.json?';
+      if(!confirm(m4))return true;baixar(nm+'.json',X4.txt);toast('Settings gerado: '+nm+'.json ('+X4.mudou.length+' mudanças)');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
   if(a==='mexppart'){if(!SC)return true;var c6=cenaAtual(),R6=resolver(c6,UI.ep),nm6=nomeArq($('#mscnome').value||c6.nome);
     try{var X6=exportarPart(c6,R6,nm6);
       var msg='Arquivo base: '+SC.nome+'\nCena: '+c6.nome+' · EP '+UI.ep+'\n\nMudanças ('+X6.mudou.length+'):\n'+(X6.mudou.join('\n')||'nenhuma')+(X6.avisos.length?'\n\nATENÇÃO:\n'+X6.avisos.join('\n'):'')+'\n\nTodo o resto fica igual ao arquivo. Baixar '+nm6+'.json?';
       if(!confirm(msg))return true;baixar(nm6+'.json',X6.txt);toast('Settings gerado: '+nm6+'.json ('+X6.mudou.length+' canais)');}catch(e){toast('Não consegui gerar: '+e.message,true);}return true;}
   if(a==='mexptodas'){if(!SC)return true;var LL=cenasLista(),k5=0;
     if(!confirm('Baixar '+LL.length+' arquivos de settings, um por cena (EP '+UI.ep+')? O navegador pode pedir permissão para vários downloads.'))return true;
-    LL.forEach(function(c5,i){setTimeout(function(){try{var R5=resolver(c5,UI.ep),M5=mesaEf(c5,R5),n5=nomeArq(c5.nome+'_EP'+UI.ep);baixar(n5+'.json',exportar(c5,R5,M5,n5));k5++;if(k5===LL.length)toast(k5+' settings gerados');}catch(e){toast('Cena "'+c5.nome+'": '+e.message,true);}},i*700);});return true;}
+    LL.forEach(function(c5,i){setTimeout(function(){try{var R5=resolver(c5,UI.ep),M5=mesaEf(c5,R5),n5=nomeArq(c5.nome+'_EP'+UI.ep);baixar(n5+'.json',exportar(c5,R5,M5,n5).txt);k5++;if(k5===LL.length)toast(k5+' settings gerados');}catch(e){toast('Cena "'+c5.nome+'": '+e.message,true);}},i*700);});return true;}
   return false;
 }
 function mudancaMesa(a,el){
@@ -2882,6 +2941,7 @@ function xSo(lbl,v){return '<div class="sd-row"><span class="sd-l">'+esc(lbl)+':
 function setX(alvo,id,k,v){mudarMesa(function(m){var c=alvo==='ch'?m.ch:alvo==='bus'?m.bus:m.out;var o=c[id]=c[id]||{};if(v===null||v===undefined)delete o['x_'+k];else o['x_'+k]=v;});}
 /* grava no settings os ajustes extras definidos (só os que não estão em "não mexer") */
 function xExport(m,alvo,id,obj,specs){var b=xBase(alvo,id);specs.forEach(function(f){var v=obj&&obj['x_'+f[0]];if(v===null||v===undefined)return;
+  var ar=xArq(alvo,id,f);if(ar!==null&&String(ar)===String(v))return; /* igual ao arquivo: não mexe */
   if(f[2]==='*comp'){sjSet(m,b.concat('compressorEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('compressorPreFader'),v==='pre');return;}
   if(f[2]==='*eq'){sjSet(m,b.concat('eqEnabled'),v!=='off');if(v!=='off')sjSet(m,b.concat('eqPreFader'),v==='pre');return;}
   if(f[2]==='*blink'){var pb=parBus(id);if(!pb)return;pb.forEach(function(q){sjSet(m,['OutputBusControl','obus'+q,'linkedToBus'],v?'obus'+pb[0]:'nOutBuses');});return;}
@@ -3349,7 +3409,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&MOD
 /* ───────── início ───────── */
 aplicarCores();recalcular();render();
 if(MODO==='api'){buscar();setInterval(function(){if(!document.hidden&&!EDIT)buscar();else if(FILA.length)enviar();},30000);}
-window.__plc={renumerarBuses:renumerarBuses,exportar:exportar,exportarPart:exportarPart,cenaPorId:cenaPorId,resolver:resolver,mesaEf:mesaEf,scCarregar:scCarregar,lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir};
+window.__plc={renumerarBuses:renumerarBuses,exportar:exportar,exportarPart:exportarPart,cenaPorId:cenaPorId,resolver:resolver,mesaEf:mesaEf,scCarregar:scCarregar,lerReport:lerReport,casar:casar,situacao:situacao,get D(){return D;},fazer:fazer,UI:UI,render:render,abrir:abrir,lerArquivo:lerArquivo,trazerDoArquivo:trazerDoArquivo,cenaAtual:cenaAtual,get SC(){return SC;},mudarMesa:mudarMesa};
 })();
 </script>
 </body>

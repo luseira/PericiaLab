@@ -26,6 +26,13 @@
 
 
 
+## v2.15 · 20/11/2026
+- **O export passa a mexer só no que foi mudado no site.** O arquivo carregado em Scorpio é a referência: campo a campo, só vai para o arquivo gerado o que difere dele. Buses, saídas, AES, Dante, slate, tone, fones, EQ, compressor, fader e pan que você não tocou saem idênticos. A janela de confirmação lista exatamente o que mudou.
+- **"Trazer do gravador" agora traz tudo o que o app sabe representar** — inclusive ISO, os pares AES das saídas L/R e o Dante — e devolve para "como no gravador" os campos que o site só sobrescreve (EQ, compressor, fader, pan, mic/48V, Dante, slate, fones). Depois de importar, um export sai igual ao arquivo que entrou.
+- **Ganho, lowcut, fase, delay, EQ, compressor e o ON/ARM viajam com a pessoa** quando ela troca de pista, inclusive quando o input é o mesmo do ocupante anterior (foi assim que a Nicolly herdou o ajuste do Leo no EP3). O que você mudou à mão na pista de destino continua valendo acima disso.
+- **Pista que esvazia é limpa**: sem input, muda, desarmada e com o nome padrão (Ch 13), para não sobrar uma pista antiga armada e somando na mix.
+- A busca de "onde essa pessoa estava" respeita a zona da pista: pista de mixer procura entre 1 e 16, colinha procura entre as colinhas.
+
 ## v2.14 · 18/11/2026
 - Correção: o card do mentor vinha com a cor trocada. Na escalação do mentor está a **cor**, não o time, e o card passava esse valor pela conversão de time para cor mais uma vez — a Telma vestia a cor do Salada e vice-versa. Vale também para a coluna Time do input list, a fita do CL-12 e o documento da cena.
 - Escolher a cor de um mentor agora grava automaticamente a cor contrária no outro, para os dois nunca ficarem com a mesma.
