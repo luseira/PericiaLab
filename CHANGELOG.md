@@ -26,6 +26,10 @@
 
 
 
+## v2.18 · 20/11/2026
+- Correção: o aviso do tipo "pendência" era cinza (#eceef1) no fundo cinza da página (#e9ebee) e sumia — a conta dizia 3 e dava para ver só os amarelos. Agora todo aviso tem uma faixa colorida na lateral e a pendência vem em fundo branco com borda.
+- O resumo dos avisos passa a dizer quantos são de cada tipo: importantes, avisos e pendências.
+
 ## v2.17 · 20/11/2026
 - **Scorpio virou aba do menu de cima**, ao lado de Mixer. Sai da barra de bancos do mixer (1–8, 9–16…), que não tinha o que fazer ali, e ganha o seletor de cena no topo.
 - **Escolher o arquivo agora só carrega.** Ele fica guardado no aparelho, com botões para trocar ou esquecer. Não pergunta mais nada na hora de carregar.
