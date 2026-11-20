@@ -26,6 +26,9 @@
 
 
 
+## v2.20 · 20/11/2026
+- Correção do ajuste de ontem: ao tirar a herança por input, o gooseneck passou a perder o ganho ao mudar de pista, porque no gravador a pista dele se chama GOOSE e no app, GOOSENECK — o nome não batia. Agora a regra é: os ajustes só viajam **quando a pista troca de dono**, e aí o app procura de onde veio quem chegou primeiro pelo nome e, se o nome não bater, pelo input. Mesma pessoa na mesma pista trocando de transmissor continua não herdando nada.
+
 ## v2.19 · 20/11/2026
 - **Correção importante:** quando a pessoa ficava na mesma pista e só trocava de transmissor, o export trazia para o canal dela os ajustes e o ON/ARM de onde aquele input estava antes. Foi o que aconteceu com a Andréa no EP4: ela herdou o trim, o lowcut, a fase e o canal mudo e desarmado do Charles. Agora só a pessoa carrega os ajustes dela; trocar de TX não muda mais nada no canal.
 - **Conferência automática antes de baixar o settings.** O app lê o arquivo que acabou de gerar e avisa, na mesma janela de confirmação, sobre: mesmo input em duas pistas armadas; pista de gente muda ou desarmada quando o resto não está; quem entrou no lugar de outro e ficou com um envio especial do canal (ISO da Clara, Ruivo, Cinara); bus que ficou sem nenhuma pista; e saída por ISO que mudou de dono.

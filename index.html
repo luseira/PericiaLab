@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.19 · 20/11 15:45</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.20 · 20/11 15:55</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2593,6 +2593,7 @@ function trazerDoArquivo(R,A,oque){
    zona do canal: pista de mixer (1–16) procura em 1–16, colinha (17–32) procura entre as colinhas —
    senão a colinha herdaria o mute e o ARM da pista de mixer da pessoa. */
 function chZona(n){return n<=16?[1,16]:[17,32];}
+function chDaFonte(A,f,menos){if(!f)return 0;var z=chZona(menos);for(var j=z[0];j<=z[1];j++)if(j!==menos&&A.fonte[j]===f)return j;return 0;}
 function chDoNome(A,nm,menos){if(!nm)return 0;var z=chZona(menos);for(var j=z[0];j<=z[1];j++)if(j!==menos&&A.nomes[j]===nm)return j;return 0;}
 /* chaves do arquivo que o site assumiu para si neste canal (ajuste posto à mão na tela do canal) */
 function chavesDoSite(ch,n){var o={};XCH.concat(n<=16?XEQ:[]).forEach(function(f){if(!ch||ch['x_'+f[0]]==null)return;
@@ -2629,9 +2630,12 @@ function exportar(c,R,M,nome){
     }
     var nm=nomeArquivoPista(s,M),f=s.cn?fonteSlot(s):'';
     /* de onde essa pessoa (ou esse input) veio no arquivo */
-    /* só a pessoa carrega os ajustes dela. Se ela ficou na mesma pista e só trocou de transmissor,
-       nada é trazido de onde aquele input estava: o canal continua sendo dela. */
-    var mov=dif(nm,A.nomes[n])?chDoNome(A,nm,n):0;
+    /* os ajustes só viajam quando a pista troca de dono. Aí o app procura de onde veio quem chegou:
+       pelo nome da pista e, se o nome não bater (o boom e o gooseneck são escritos diferente no
+       gravador), pelo input. Se a mesma pessoa continua na pista e só trocou de transmissor, não
+       vem nada de lugar nenhum: o canal continua sendo dela. */
+    var mov=0;
+    if(dif(nm,A.nomes[n])){mov=chDoNome(A,nm,n);if(!mov&&f&&dif(f,A.fonte[n]))mov=chDaFonte(A,f,n);}
     var o=mov?A.ch[mov]:null,meu=chavesDoSite(ch,n);
     if(dif(nm,A.nomes[n])){sjSet(m,['MetaData','TrackName'+n],nm);log(n,'nome',A.nomes[n],nm);}
     if(f&&dif(f,A.fonte[n])){sjSet(m,[k,'inputSrcName'],f);log(n,'input',fonteTxt(A.fonte[n]),fonteTxt(f));}
