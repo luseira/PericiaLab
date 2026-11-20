@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.18 · 20/11 15:35</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.19 · 20/11 15:45</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2594,7 +2594,6 @@ function trazerDoArquivo(R,A,oque){
    senão a colinha herdaria o mute e o ARM da pista de mixer da pessoa. */
 function chZona(n){return n<=16?[1,16]:[17,32];}
 function chDoNome(A,nm,menos){if(!nm)return 0;var z=chZona(menos);for(var j=z[0];j<=z[1];j++)if(j!==menos&&A.nomes[j]===nm)return j;return 0;}
-function chDaFonte(A,f,menos){if(!f)return 0;var z=chZona(menos);for(var j=z[0];j<=z[1];j++)if(j!==menos&&A.fonte[j]===f)return j;return 0;}
 /* chaves do arquivo que o site assumiu para si neste canal (ajuste posto à mão na tela do canal) */
 function chavesDoSite(ch,n){var o={};XCH.concat(n<=16?XEQ:[]).forEach(function(f){if(!ch||ch['x_'+f[0]]==null)return;
   if(f[2]==='*eq'){o.eqEnabled=1;o.eqPreFader=1;}else if(f[2]==='*comp'){o.compressorEnabled=1;o.compressorPreFader=1;}
@@ -2630,8 +2629,9 @@ function exportar(c,R,M,nome){
     }
     var nm=nomeArquivoPista(s,M),f=s.cn?fonteSlot(s):'';
     /* de onde essa pessoa (ou esse input) veio no arquivo */
+    /* só a pessoa carrega os ajustes dela. Se ela ficou na mesma pista e só trocou de transmissor,
+       nada é trazido de onde aquele input estava: o canal continua sendo dela. */
     var mov=dif(nm,A.nomes[n])?chDoNome(A,nm,n):0;
-    if(!mov&&f&&dif(f,A.fonte[n]))mov=chDaFonte(A,f,n);
     var o=mov?A.ch[mov]:null,meu=chavesDoSite(ch,n);
     if(dif(nm,A.nomes[n])){sjSet(m,['MetaData','TrackName'+n],nm);log(n,'nome',A.nomes[n],nm);}
     if(f&&dif(f,A.fonte[n])){sjSet(m,[k,'inputSrcName'],f);log(n,'input',fonteTxt(A.fonte[n]),fonteTxt(f));}
@@ -2696,6 +2696,7 @@ function exportar(c,R,M,nome){
     var at=sjGet(orig,[slSec(k),k]);if(at===undefined||!dif(v,at))return;
     sjSet(m,[slSec(k),k],typeof at==='number'?+v:String(v));L.push('Slate/tone · '+k+': '+at+' → '+v);});
   sjSet(m,['system','name'],nome);
+  try{avisos=avisos.concat(conferirSaida(m,R,mesaEf(c,R),lerArquivo(orig)));}catch(e){avisos.push('Não consegui conferir o arquivo gerado: '+e.message);}
   return {txt:sjDump(m)+'\n',mudou:L,avisos:avisos};
 }
 /* ───────── Export "só participantes": o arquivo carregado vale para tudo; muda só quem está em cada canal ─────────
@@ -2728,7 +2729,44 @@ function exportarPart(c,R,nome){
   if(fs.some(function(f){return f==='AES3-1'||f==='AES3-2';})&&!sjGet(m,['GlobalChannelSettings','xlr1Aes']))avisos.push('AES 1/2 em uso mas o XLR 1 não está em AES no arquivo: conferir');
   if(fs.some(function(f){return f==='AES3-5'||f==='AES3-6';})&&!sjGet(m,['GlobalChannelSettings','xlr6Aes']))avisos.push('AES 5/6 em uso mas o XLR 6 não está em AES no arquivo: conferir');
   sjSet(m,['system','name'],nome);
+  try{avisos=avisos.concat(conferirSaida(m,R,mesaEf(c,R),lerArquivo(orig)));}catch(e){avisos.push('Não consegui conferir o arquivo gerado: '+e.message);}
   return {txt:sjDump(m)+'\n',mudou:L,avisos:avisos};
+}
+/* Conferência do arquivo gerado, antes de baixar: pega o que costuma passar batido quando as pessoas
+   trocam de pista. Não altera nada no arquivo, só avisa. */
+function conferirSaida(m,R,M,A){
+  var W=[],n,
+    nm=function(n){return String(sjGet(m,['MetaData','TrackName'+n])||('Ch '+n));},
+    src=function(n){return String(sjGet(m,['InputChannel'+n,'inputSrcName'])||'');},
+    arm=function(n){return !!sjGet(m,['InputChannel'+n,'isRecordArmed']);},
+    mudo=function(n){return !!sjGet(m,['InputChannel'+n,'isMuted']);},
+    env=function(n){return BUSES.filter(function(b){return b!=='L'&&b!=='R'&&/^(Prefader|Postfader)$/.test(String(sjGet(m,['InputChannel'+n,'bus'+b,'routeState'])||''));});},
+    envA=function(n){var c=A.ch[n]||{r:{}};return BUSES.filter(function(b){return b!=='L'&&b!=='R'&&(c.r[b]==='pre'||c.r[b]==='post');});};
+  var por={};
+  for(n=1;n<=32;n++){var f=src(n);if(arm(n)&&f&&f!=='Nosource')(por[f]=por[f]||[]).push(n);}
+  Object.keys(por).forEach(function(f){if(por[f].length>1)W.push('Mesmo input em duas pistas armadas: '+fonteTxt(f)+' nas pistas '+por[f].join(' e ')+'.');});
+  /* pista de gente muda ou desarmada: só vale avisar quando ela é a exceção, porque às vezes o
+     arquivo inteiro vem fechado e você abre tudo no gravador */
+  var gente=R.S.filter(function(s){return s.p&&s.n<=16&&!s.copia;});
+  var nArm=gente.filter(function(s){return arm(s.n);}).length,nOn=gente.filter(function(s){return !mudo(s.n);}).length;
+  gente.forEach(function(s){var x=[];
+    if(mudo(s.n)&&nOn>gente.length/2)x.push('muda');
+    if(!arm(s.n)&&nArm>gente.length/2)x.push('desarmada');
+    if(x.length)W.push('Ch '+s.n+' '+nm(s.n)+' vai '+x.join(' e ')+', e o resto das pistas de gente não.');});
+  /* quem entrou no lugar de outro herda os envios do canal. Só interessa avisar dos envios especiais —
+     os que no arquivo saíam de uma ou duas pistas, como ISO da Clara, Ruivo e Cinara */
+  var quantos={};BUSES.forEach(function(b){var c=0;for(var i=1;i<=32;i++)if(envA(i).indexOf(b)>=0)c++;quantos[b]=c;});
+  for(n=1;n<=16;n++){var antes=A.nomes[n]||'',agora=nm(n);
+    if(!antes||antes===agora||/^Ch /i.test(agora)||/^Ch /i.test(antes))continue;
+    var e=env(n).filter(function(b){return quantos[b]&&quantos[b]<=2;});
+    if(e.length)W.push('Ch '+n+': '+agora+' entrou no lugar de '+antes+' e ficou com os envios que eram do canal: bus '+e.join(', ')+((M||{}).bus?' ('+e.map(function(b){return (M.bus[b]||{}).nome||('bus '+b);}).join(', ')+')':'')+'.');}
+  BUSES.forEach(function(b){if(b==='L'||b==='R')return;var tinha=[],tem=[];
+    for(var i=1;i<=32;i++){if(envA(i).indexOf(b)>=0)tinha.push(i);if(env(i).indexOf(b)>=0)tem.push(i);}
+    if(tinha.length&&!tem.length)W.push('Bus '+b+(((M||{}).bus||{})[b]&&M.bus[b].nome?' ('+M.bus[b].nome+')':'')+' ficou sem nenhuma pista; antes vinha de '+tinha.map(function(i){return 'Ch '+i;}).join(', ')+'.');});
+  if(M&&M.out){var iso=[];SAIDAS.forEach(function(o){var x=M.out[o]||{},mm=/^iso:(\d+)/.exec(x.src||'');if(!mm)return;var i=+mm[1];
+    if(A.nomes[i]&&A.nomes[i]!==nm(i))iso.push(o+(x.nome?' ('+x.nome+')':'')+' = ISO da pista '+i+', agora '+nm(i)+' (era '+A.nomes[i]+')');});
+    if(iso.length)W.push('Saídas por ISO que mudaram de dono: '+iso.join('; ')+'.');}
+  return W;
 }
 function nomeArq(s){return semAcento(s).replace(/[^A-Za-z0-9 _-]/g,'').trim().replace(/\s+/g,'_').slice(0,24)||'cena';}
 /* Aba Scorpio: carregar o arquivo, importar para a cena, exportar. A comparação e o resumo por canal

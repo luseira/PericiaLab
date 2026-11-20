@@ -26,6 +26,10 @@
 
 
 
+## v2.19 · 20/11/2026
+- **Correção importante:** quando a pessoa ficava na mesma pista e só trocava de transmissor, o export trazia para o canal dela os ajustes e o ON/ARM de onde aquele input estava antes. Foi o que aconteceu com a Andréa no EP4: ela herdou o trim, o lowcut, a fase e o canal mudo e desarmado do Charles. Agora só a pessoa carrega os ajustes dela; trocar de TX não muda mais nada no canal.
+- **Conferência automática antes de baixar o settings.** O app lê o arquivo que acabou de gerar e avisa, na mesma janela de confirmação, sobre: mesmo input em duas pistas armadas; pista de gente muda ou desarmada quando o resto não está; quem entrou no lugar de outro e ficou com um envio especial do canal (ISO da Clara, Ruivo, Cinara); bus que ficou sem nenhuma pista; e saída por ISO que mudou de dono.
+
 ## v2.18 · 20/11/2026
 - Correção: o aviso do tipo "pendência" era cinza (#eceef1) no fundo cinza da página (#e9ebee) e sumia — a conta dizia 3 e dava para ver só os amarelos. Agora todo aviso tem uma faixa colorida na lateral e a pendência vem em fundo branco com borda.
 - O resumo dos avisos passa a dizer quantos são de cada tipo: importantes, avisos e pendências.
