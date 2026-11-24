@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.20 · 20/11 15:55</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.21 · 24/11 10:55</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -2640,9 +2640,10 @@ function exportar(c,R,M,nome){
     if(dif(nm,A.nomes[n])){sjSet(m,['MetaData','TrackName'+n],nm);log(n,'nome',A.nomes[n],nm);}
     if(f&&dif(f,A.fonte[n])){sjSet(m,[k,'inputSrcName'],f);log(n,'input',fonteTxt(A.fonte[n]),fonteTxt(f));}
     if(!f&&s.cn)avisos.push('Ch '+n+' '+nm+': código do input a confirmar, ficou como no arquivo');
-    /* ON e ARM: o que foi mexido no site manda; se não foi, vêm com a pessoa */
+    /* ON e ARM são sempre o que está no mixer: o que você vê na tela é o que vai para o gravador.
+       Não herdam da pista de origem — senão, quando o valor da cena coincide com o do arquivo, o app
+       acha que você não mexeu e manda o estado de outra pista (foi o que desarmou a Amanda no EP5). */
     var on=ch.on,arm=ch.arm;
-    if(o){if(!dif(on,a.on))on=o.on;if(!dif(arm,a.arm))arm=o.arm;}
     if(dif(on,a.on)){sjSet(m,[k,'isMuted'],!on);log(n,'mute',a.on?'aberta':'muda',on?'aberta':'muda');}
     if(dif(arm,a.arm)){sjSet(m,[k,'isRecordArmed'],!!arm);log(n,'arm',a.arm?'armada':'desarmada',arm?'armada':'desarmada');}
     if(ch.iso!=null&&dif(ch.iso,a.iso))sjSet(m,[k,'isoPostFader'],ch.iso==='post');

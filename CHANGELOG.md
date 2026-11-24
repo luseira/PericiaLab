@@ -26,6 +26,9 @@
 
 
 
+## v2.21 · 24/11/2026
+- **ON e ARM passam a ser sempre o que está no mixer.** Antes, para saber se você tinha mexido, o app comparava a cena com o arquivo na mesma pista; quando os dois coincidiam, ele concluía que você não havia tocado e mandava o estado da pista de origem da pessoa. Foi isso que mandou a Amanda muda e desarmada no EP5, mesmo com ON e ARM acesos na tela: a pista 8 era da Caroline e já estava aberta e armada no arquivo. Trim, lowcut, fase, delay, EQ e compressor continuam viajando com a pessoa.
+
 ## v2.20 · 20/11/2026
 - Correção do ajuste de ontem: ao tirar a herança por input, o gooseneck passou a perder o ganho ao mudar de pista, porque no gravador a pista dele se chama GOOSE e no app, GOOSENECK — o nome não batia. Agora a regra é: os ajustes só viajam **quando a pista troca de dono**, e aí o app procura de onde veio quem chegou primeiro pelo nome e, se o nome não bater, pelo input. Mesma pessoa na mesma pista trocando de transmissor continua não herdando nada.
 
