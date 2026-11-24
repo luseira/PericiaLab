@@ -26,6 +26,11 @@
 
 
 
+## v2.22 · 24/11/2026
+- Sai o botão "⇄ Voltar para o automático" do mixer. A ordem é uma só: o time da Telma sempre na frente, na ordem do transmissor.
+- A importação do Wireless Designer saiu da aba Técnico e virou uma seção recolhível na aba **RF**, junto com o histórico das últimas importações. Os botões de escolher o scan (.csv) e o report (.html) continuam no alto da aba RF.
+- Abas renomeadas: **Scorpio → Settings** e **Técnico → Planilha**.
+
 ## v2.21 · 24/11/2026
 - **ON e ARM passam a ser sempre o que está no mixer.** Antes, para saber se você tinha mexido, o app comparava a cena com o arquivo na mesma pista; quando os dois coincidiam, ele concluía que você não havia tocado e mandava o estado da pista de origem da pessoa. Foi isso que mandou a Amanda muda e desarmada no EP5, mesmo com ON e ARM acesos na tela: a pista 8 era da Caroline e já estava aberta e armada no arquivo. Trim, lowcut, fase, delay, EQ e compressor continuam viajando com a pessoa.
 
