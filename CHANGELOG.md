@@ -26,6 +26,9 @@
 
 
 
+## v2.23 · 26/11/2026
+- Dá para batizar uma pista cujo input é de alguém que não está escalado. Antes, ao escolher um Source que pertence a um receptor (LINE 12, por exemplo) numa pista sem ninguém, o app marcava "ninguém em LINE 12" e deixava o campo Name travado em "Ch 10" — só os retornos e o Dante podiam receber nome. Agora qualquer pista com Source e sem pessoa aceita nome livre, que vai junto para o gravador.
+
 ## v2.22 · 24/11/2026
 - Sai o botão "⇄ Voltar para o automático" do mixer. A ordem é uma só: o time da Telma sempre na frente, na ordem do transmissor.
 - A importação do Wireless Designer saiu da aba Técnico e virou uma seção recolhível na aba **RF**, junto com o histórico das últimas importações. Os botões de escolher o scan (.csv) e o report (.html) continuam no alto da aba RF.

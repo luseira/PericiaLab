@@ -617,7 +617,7 @@ ul.imd{font-size:.84rem;margin:.3rem 0 0;padding-left:1.2rem}
 </head>
 <body>
 <header class="top">
-  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.22 · 24/11 11:10</span></small></div>
+  <div><h1>Perícia Lab · Carômetro</h1><small>Quem está com qual transmissor e cápsula, episódio a episódio · <span id="versao">v2.23 · 26/11 16:00</span></small></div>
   <div class="sp"></div>
   <button class="pill" id="status" type="button" data-act="sync">carregando…</button>
 </header>
@@ -1854,7 +1854,10 @@ function resolver(cena,ep){
     if(!tok){return s;}
     var m=/^([PABCSFT]):(.+)$/.exec(tok);if(!m)return s;
     if(m[1]==='C'){var t2=C[int(m[2])-1]||'';if(!t2){s.motivo='colinha '+m[2]+': ninguém';return s;}m=/^([PABCSFT]):(.+)$/.exec(t2);s.col=1;}
-    if(m[1]==='S'){s.cn=m[2];s.p=porCanal[m[2]]||null;if(!s.p){if(listaCanais().indexOf(m[2])>=0)s.motivo='ninguém em '+m[2];else s.fx=true;}
+    if(m[1]==='S'){s.cn=m[2];s.p=porCanal[m[2]]||null;
+      /* sem ninguém do episódio nesse input, a pista vira uma fonte com nome livre (dá para batizar na
+         tela do canal). Se o input é de alguém que ainda não está escalado, o motivo explica isso. */
+      if(!s.p){s.fx=true;if(listaCanais().indexOf(m[2])>=0)s.motivo='ninguém escalado em '+m[2]+' — pista com nome livre';}
       if(s.p){var e0=EF[s.p.id]||{};s.e=e0;s.t=e0.tx?D.txPor[e0.tx]:null;(onde[s.p.id]=onde[s.p.id]||[]).push(s.n);}
       if(primeira['c:'+s.cn])s.copia=primeira['c:'+s.cn];else primeira['c:'+s.cn]=s.n;
       return s;}
@@ -3057,7 +3060,7 @@ function painelSlot(R,M){
   if(p){var outras=(R.onde[p.id]||[]).filter(function(x){return x!==n;});
     h+=avatar(p,'sd-av')+'<div class="sd-who"><b>'+esc(p.nome)+'</b><span>'+[e.tx?'TX '+e.tx:'sem TX',t?t.nome:'',t?t.rx:'',t&&t.canal?t.canal:'',t&&t.num!=='GN'&&!isNaN(t.freq)?mhz(t.freq)+' MHz':''].filter(Boolean).map(esc).join(' · ')+'</span>'+
       '<span>'+(e.cap?bolinha(e.cap)+esc(e.cap)+' ':'')+(capInv(e.cap)?invIcon(e.cap,1)+' inverter no TX ':'')+timeChip(e.time)+(s.copia?' <i>cópia do Ch '+s.copia+'</i>':'')+(outras.length?' <i>também em '+outras.map(function(x){return 'Ch '+x;}).join(', ')+'</i>':'')+'</span></div>';}
-  else if(s.fx)h+='<div class="sd-who"><b>'+esc(s.cn)+'</b><span>Fonte do gravador, sem pessoa'+(fonteSlot(s)?' · '+esc(fonteTxt(fonteSlot(s))):' · código no settings ainda a confirmar')+(s.copia?' · <i>cópia do Ch '+s.copia+'</i>':'')+'</span></div>';
+  else if(s.fx)h+='<div class="sd-who"><b>'+esc(nomeFx(s,M)||s.cn)+'</b><span>'+esc(s.motivo||'Fonte do gravador, sem pessoa')+(fonteSlot(s)?' · '+esc(fonteTxt(fonteSlot(s))):' · código no settings ainda a confirmar')+(s.copia?' · <i>cópia do Ch '+s.copia+'</i>':'')+'</span></div>';
   else h+='<div class="sd-who"><b>—</b><span>'+esc(s.motivo||'pista vazia')+'</span></div>';
   h+='<span class="sp" style="flex:1"></span>'+(n<=12?'<span class="sd-cap" style="background:'+CAPS[n-1]+'" title="fader '+CAPNOME[n-1]+' no CL-12"></span>':'<span class="sd-tag">iPad</span>')+(function(){var c6=clara633(M,n);return c6.length?'<span class="sd-tag">'+esc(txt633(c6))+'</span>':'';})()+
     '<button class="sd-x" type="button" data-act="mfechar" aria-label="Fechar">×</button></div>';
